@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 48" fill="none" role="img" aria-label="Mine">
+  <defs>
+    <linearGradient id="rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d7efe4"/>
+      <stop offset="38%" stop-color="#6eae8e"/>
+      <stop offset="100%" stop-color="#163328"/>
+    </linearGradient>
+    <linearGradient id="face" x1="18%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#2f5f4a"/>
+      <stop offset="55%" stop-color="#1a3b2e"/>
+      <stop offset="100%" stop-color="#0c1f18"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="f0"><rect x="6.15" y="19.15" width="9.7" height="21.7" rx="1.95"/></clipPath>
+    <clipPath id="f1"><rect x="17.15" y="12.15" width="9.7" height="24.7" rx="1.95"/></clipPath>
+    <clipPath id="f2"><rect x="28.15" y="6.15" width="9.7" height="27.7" rx="1.95"/></clipPath>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="1.4" stdDeviation="1.1" flood-color="#0a1c14" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g filter="url(#lift)">
+    <g>
+      <rect x="5" y="18" width="12" height="24" rx="3.1" fill="url(#rim)"/>
+      <rect x="6.15" y="19.15" width="9.7" height="21.7" rx="1.95" fill="url(#face)"/>
+      <rect x="6.15" y="19.15" width="9.7" height="11.95" rx="1.95" fill="url(#sheen)" clip-path="url(#f0)"/>
+      <ellipse cx="8.87" cy="22.55" rx="2.6" ry="1.5" fill="#fff" opacity="0.55" clip-path="url(#f0)"/>
+    </g>
+    <g>
+      <rect x="16" y="11" width="12" height="27" rx="3.1" fill="url(#rim)"/>
+      <rect x="17.15" y="12.15" width="9.7" height="24.7" rx="1.95" fill="url(#face)"/>
+      <rect x="17.15" y="12.15" width="9.7" height="13.5" rx="1.95" fill="url(#sheen)" clip-path="url(#f1)"/>
+      <ellipse cx="19.87" cy="15.55" rx="2.6" ry="1.5" fill="#fff" opacity="0.55" clip-path="url(#f1)"/>
+    </g>
+    <g>
+      <rect x="27" y="5" width="12" height="30" rx="3.1" fill="url(#rim)"/>
+      <rect x="28.15" y="6.15" width="9.7" height="27.7" rx="1.95" fill="url(#face)"/>
+      <rect x="28.15" y="6.15" width="9.7" height="15.15" rx="1.95" fill="url(#sheen)" clip-path="url(#f2)"/>
+      <ellipse cx="30.87" cy="9.55" rx="2.6" ry="1.5" fill="#fff" opacity="0.55" clip-path="url(#f2)"/>
+    </g>
+  </g>
+</svg>
