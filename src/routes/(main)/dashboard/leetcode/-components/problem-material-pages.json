@@ -1,0 +1,804 @@
+{
+  "archive": [
+    {
+      "slug": "full",
+      "title": "Modul Lengkap",
+      "subtitle": "Referensi lengkap roadmap LeetCode",
+      "file": "full.pdf",
+      "pages": 489
+    },
+    {
+      "slug": "modul-1",
+      "title": "Materi Dasar",
+      "subtitle": "Python Fundamentals & Big-O Notation",
+      "file": "pertemuan1.pdf",
+      "pages": 24
+    },
+    {
+      "slug": "modul-2",
+      "title": "Arrays & Hashing (Bagian 1)",
+      "subtitle": "Arrays & Hashing (Bagian 1) - Tahap-Tahap Pemecahan Masalah",
+      "file": "pertemuan2.pdf",
+      "pages": 22
+    },
+    {
+      "slug": "modul-3",
+      "title": "Arrays & Hashing (Part 2)",
+      "subtitle": "Arrays & Hashing (Part 2) - Pola Advanced",
+      "file": "pertemuan3.pdf",
+      "pages": 21
+    },
+    {
+      "slug": "modul-4",
+      "title": "Arrays & Hashing (Part 3)",
+      "subtitle": "Arrays & Hashing (Part 3) - String Encoding dan Set Operations",
+      "file": "pertemuan4.pdf",
+      "pages": 18
+    },
+    {
+      "slug": "modul-5",
+      "title": "Two Pointers",
+      "subtitle": "Two Pointers",
+      "file": "pertemuan5.pdf",
+      "pages": 19
+    },
+    {
+      "slug": "modul-6",
+      "title": "Sliding Window (Part 1)",
+      "subtitle": "Sliding Window (Part 1)",
+      "file": "pertemuan6.pdf",
+      "pages": 13
+    },
+    {
+      "slug": "modul-7",
+      "title": "Sliding Window (Bagian 2)",
+      "subtitle": "Sliding Window (Bagian 2) - Fixed Window dan Character Frequency",
+      "file": "pertemuan7.pdf",
+      "pages": 12
+    },
+    {
+      "slug": "modul-8",
+      "title": "Stack dan Monotonic Stack",
+      "subtitle": "Stack dan Monotonic Stack",
+      "file": "pertemuan8.pdf",
+      "pages": 16
+    },
+    {
+      "slug": "modul-9",
+      "title": "Binary Search",
+      "subtitle": "Binary Search - Pencarian Efisien pada Array Terurut",
+      "file": "pertemuan9.pdf",
+      "pages": 21
+    },
+    {
+      "slug": "modul-10",
+      "title": "Linked List (Part 1)",
+      "subtitle": "Linked List (Part 1) - Reverse, Cycle Detection, Merge",
+      "file": "pertemuan10.pdf",
+      "pages": 19
+    },
+    {
+      "slug": "modul-11",
+      "title": "Linked List (Part 2)",
+      "subtitle": "Linked List (Part 2) - Fast & Slow Pointers, Merge K Lists",
+      "file": "pertemuan11.pdf",
+      "pages": 19
+    },
+    {
+      "slug": "modul-12",
+      "title": "Linked List (Part 3)",
+      "subtitle": "Linked List (Part 3) - Multiple Pointers & Reorder List",
+      "file": "pertemuan12.pdf",
+      "pages": 12
+    },
+    {
+      "slug": "modul-13",
+      "title": "Trees (Part 1)",
+      "subtitle": "Trees (Part 1) - Binary Tree Basics & DFS Traversal",
+      "file": "pertemuan13.pdf",
+      "pages": 23
+    },
+    {
+      "slug": "modul-14",
+      "title": "Trees (Part 2)",
+      "subtitle": "Trees (Part 2) - BFS & Level Order Traversal",
+      "file": "pertemuan14.pdf",
+      "pages": 17
+    },
+    {
+      "slug": "modul-15",
+      "title": "Trees (Part 3)",
+      "subtitle": "Trees (Part 3) - Construct Binary Tree from Traversals",
+      "file": "pertemuan15.pdf",
+      "pages": 15
+    },
+    {
+      "slug": "modul-16",
+      "title": "Trees (Part 4)",
+      "subtitle": "Trees (Part 4) - Binary Search Tree (BST)",
+      "file": "pertemuan16.pdf",
+      "pages": 16
+    },
+    {
+      "slug": "modul-17",
+      "title": "Trees (Part 5)",
+      "subtitle": "Trees (Part 5) - Hard Tree Problems",
+      "file": "pertemuan17.pdf",
+      "pages": 15
+    },
+    {
+      "slug": "modul-18",
+      "title": "Tries (Prefix Tree)",
+      "subtitle": "Tries (Prefix Tree)",
+      "file": "pertemuan18.pdf",
+      "pages": 16
+    },
+    {
+      "slug": "modul-19",
+      "title": "Backtracking",
+      "subtitle": "Backtracking",
+      "file": "pertemuan19.pdf",
+      "pages": 15
+    },
+    {
+      "slug": "modul-20",
+      "title": "Heap / Priority Queue",
+      "subtitle": "Heap / Priority Queue",
+      "file": "pertemuan20.pdf",
+      "pages": 16
+    },
+    {
+      "slug": "modul-21",
+      "title": "Graphs (Part 1)",
+      "subtitle": "Graphs (Part 1) - Introduction & BFS",
+      "file": "pertemuan21.pdf",
+      "pages": 16
+    },
+    {
+      "slug": "modul-22",
+      "title": "Graphs (Part 2)",
+      "subtitle": "Graphs (Part 2) - DFS & Topological Sort",
+      "file": "pertemuan22.pdf",
+      "pages": 15
+    },
+    {
+      "slug": "modul-23",
+      "title": "Graphs (Part 3)",
+      "subtitle": "Graphs (Part 3) - Union-Find (Disjoint Set)",
+      "file": "pertemuan23.pdf",
+      "pages": 17
+    },
+    {
+      "slug": "modul-24",
+      "title": "Dynamic Programming (Part 1)",
+      "subtitle": "Dynamic Programming (Part 1) - 1D DP",
+      "file": "pertemuan24.pdf",
+      "pages": 12
+    },
+    {
+      "slug": "modul-25",
+      "title": "Dynamic Programming (Part 2)",
+      "subtitle": "Dynamic Programming (Part 2) - 2D DP",
+      "file": "pertemuan25.pdf",
+      "pages": 11
+    },
+    {
+      "slug": "modul-26",
+      "title": "Dynamic Programming (Part 3)",
+      "subtitle": "Dynamic Programming (Part 3) - Classic Problems",
+      "file": "pertemuan26.pdf",
+      "pages": 12
+    },
+    {
+      "slug": "modul-27",
+      "title": "Intervals",
+      "subtitle": "Intervals - Merging & Scheduling",
+      "file": "pertemuan27.pdf",
+      "pages": 12
+    },
+    {
+      "slug": "modul-28",
+      "title": "Greedy Algorithms",
+      "subtitle": "Greedy Algorithms",
+      "file": "pertemuan28.pdf",
+      "pages": 11
+    },
+    {
+      "slug": "modul-29",
+      "title": "Math & Bit Manipulation",
+      "subtitle": "Math & Bit Manipulation",
+      "file": "pertemuan29.pdf",
+      "pages": 15
+    }
+  ],
+  "problems": {
+    "217": {
+      "pageFull": 26,
+      "pageModule": 1,
+      "moduleTitle": "Arrays & Hashing (Bagian 1)",
+      "archiveSlug": "modul-2"
+    },
+    "242": {
+      "pageFull": 26,
+      "pageModule": 1,
+      "moduleTitle": "Arrays & Hashing (Bagian 1)",
+      "archiveSlug": "modul-2"
+    },
+    "1": {
+      "pageFull": 26,
+      "pageModule": 1,
+      "moduleTitle": "Arrays & Hashing (Bagian 1)",
+      "archiveSlug": "modul-2"
+    },
+    "49": {
+      "pageFull": 48,
+      "pageModule": 1,
+      "moduleTitle": "Arrays & Hashing (Part 2)",
+      "archiveSlug": "modul-3"
+    },
+    "347": {
+      "pageFull": 48,
+      "pageModule": 1,
+      "moduleTitle": "Arrays & Hashing (Part 2)",
+      "archiveSlug": "modul-3"
+    },
+    "238": {
+      "pageFull": 61,
+      "pageModule": 14,
+      "moduleTitle": "Arrays & Hashing (Part 2)",
+      "archiveSlug": "modul-3"
+    },
+    "125": {
+      "pageFull": 87,
+      "pageModule": 1,
+      "moduleTitle": "Two Pointers",
+      "archiveSlug": "modul-5"
+    },
+    "11": {
+      "pageFull": 87,
+      "pageModule": 1,
+      "moduleTitle": "Two Pointers",
+      "archiveSlug": "modul-5"
+    },
+    "121": {
+      "pageFull": 106,
+      "pageModule": 1,
+      "moduleTitle": "Sliding Window (Part 1)",
+      "archiveSlug": "modul-6"
+    },
+    "3": {
+      "pageFull": 106,
+      "pageModule": 1,
+      "moduleTitle": "Sliding Window (Part 1)",
+      "archiveSlug": "modul-6"
+    },
+    "424": {
+      "pageFull": 119,
+      "pageModule": 1,
+      "moduleTitle": "Sliding Window (Bagian 2)",
+      "archiveSlug": "modul-7"
+    },
+    "76": {
+      "pageFull": 119,
+      "pageModule": 1,
+      "moduleTitle": "Sliding Window (Bagian 2)",
+      "archiveSlug": "modul-7"
+    },
+    "20": {
+      "pageFull": 131,
+      "pageModule": 1,
+      "moduleTitle": "Stack dan Monotonic Stack",
+      "archiveSlug": "modul-8"
+    },
+    "271": {
+      "pageFull": 67,
+      "pageModule": 20,
+      "moduleTitle": "Arrays & Hashing (Part 2)",
+      "archiveSlug": "modul-3"
+    },
+    "128": {
+      "pageFull": 68,
+      "pageModule": 21,
+      "moduleTitle": "Arrays & Hashing (Part 2)",
+      "archiveSlug": "modul-3"
+    },
+    "15": {
+      "pageFull": 97,
+      "pageModule": 11,
+      "moduleTitle": "Two Pointers",
+      "archiveSlug": "modul-5"
+    },
+    "153": {
+      "pageFull": 148,
+      "pageModule": 2,
+      "moduleTitle": "Binary Search",
+      "archiveSlug": "modul-9"
+    },
+    "33": {
+      "pageFull": 148,
+      "pageModule": 2,
+      "moduleTitle": "Binary Search",
+      "archiveSlug": "modul-9"
+    },
+    "206": {
+      "pageFull": 168,
+      "pageModule": 1,
+      "moduleTitle": "Linked List (Part 1)",
+      "archiveSlug": "modul-10"
+    },
+    "21": {
+      "pageFull": 168,
+      "pageModule": 1,
+      "moduleTitle": "Linked List (Part 1)",
+      "archiveSlug": "modul-10"
+    },
+    "143": {
+      "pageFull": 186,
+      "pageModule": 19,
+      "moduleTitle": "Linked List (Part 1)",
+      "archiveSlug": "modul-10"
+    },
+    "19": {
+      "pageFull": 187,
+      "pageModule": 1,
+      "moduleTitle": "Linked List (Part 2)",
+      "archiveSlug": "modul-11"
+    },
+    "141": {
+      "pageFull": 205,
+      "pageModule": 19,
+      "moduleTitle": "Linked List (Part 2)",
+      "archiveSlug": "modul-11"
+    },
+    "23": {
+      "pageFull": 187,
+      "pageModule": 1,
+      "moduleTitle": "Linked List (Part 2)",
+      "archiveSlug": "modul-11"
+    },
+    "226": {
+      "pageFull": 218,
+      "pageModule": 1,
+      "moduleTitle": "Trees (Part 1)",
+      "archiveSlug": "modul-13"
+    },
+    "104": {
+      "pageFull": 220,
+      "pageModule": 3,
+      "moduleTitle": "Trees (Part 1)",
+      "archiveSlug": "modul-13"
+    },
+    "100": {
+      "pageFull": 218,
+      "pageModule": 1,
+      "moduleTitle": "Trees (Part 1)",
+      "archiveSlug": "modul-13"
+    },
+    "572": {
+      "pageFull": 240,
+      "pageModule": 23,
+      "moduleTitle": "Trees (Part 1)",
+      "archiveSlug": "modul-13"
+    },
+    "235": {
+      "pageFull": 251,
+      "pageModule": 11,
+      "moduleTitle": "Trees (Part 2)",
+      "archiveSlug": "modul-14"
+    },
+    "98": {
+      "pageFull": 273,
+      "pageModule": 1,
+      "moduleTitle": "Trees (Part 4)",
+      "archiveSlug": "modul-16"
+    },
+    "105": {
+      "pageFull": 257,
+      "pageModule": 17,
+      "moduleTitle": "Trees (Part 2)",
+      "archiveSlug": "modul-14"
+    },
+    "102": {
+      "pageFull": 242,
+      "pageModule": 2,
+      "moduleTitle": "Trees (Part 2)",
+      "archiveSlug": "modul-14"
+    },
+    "230": {
+      "pageFull": 272,
+      "pageModule": 15,
+      "moduleTitle": "Trees (Part 3)",
+      "archiveSlug": "modul-15"
+    },
+    "124": {
+      "pageFull": 251,
+      "pageModule": 11,
+      "moduleTitle": "Trees (Part 2)",
+      "archiveSlug": "modul-14"
+    },
+    "297": {
+      "pageFull": 272,
+      "pageModule": 15,
+      "moduleTitle": "Trees (Part 3)",
+      "archiveSlug": "modul-15"
+    },
+    "208": {
+      "pageFull": 304,
+      "pageModule": 1,
+      "moduleTitle": "Tries (Prefix Tree)",
+      "archiveSlug": "modul-18"
+    },
+    "212": {
+      "pageFull": 317,
+      "pageModule": 14,
+      "moduleTitle": "Tries (Prefix Tree)",
+      "archiveSlug": "modul-18"
+    },
+    "211": {
+      "pageFull": 305,
+      "pageModule": 2,
+      "moduleTitle": "Tries (Prefix Tree)",
+      "archiveSlug": "modul-18"
+    },
+    "295": {
+      "pageFull": 350,
+      "pageModule": 16,
+      "moduleTitle": "Heap / Priority Queue",
+      "archiveSlug": "modul-20"
+    },
+    "39": {
+      "pageFull": 320,
+      "pageModule": 1,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "79": {
+      "pageFull": 320,
+      "pageModule": 1,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "200": {
+      "pageFull": 351,
+      "pageModule": 1,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "417": {
+      "pageFull": 366,
+      "pageModule": 16,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "133": {
+      "pageFull": 351,
+      "pageModule": 1,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "207": {
+      "pageFull": 366,
+      "pageModule": 16,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "323": {
+      "pageFull": 382,
+      "pageModule": 1,
+      "moduleTitle": "Graphs (Part 3)",
+      "archiveSlug": "modul-23"
+    },
+    "261": {
+      "pageFull": 382,
+      "pageModule": 1,
+      "moduleTitle": "Graphs (Part 3)",
+      "archiveSlug": "modul-23"
+    },
+    "70": {
+      "pageFull": 399,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "198": {
+      "pageFull": 399,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "213": {
+      "pageFull": 410,
+      "pageModule": 12,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "91": {
+      "pageFull": 410,
+      "pageModule": 12,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "322": {
+      "pageFull": 422,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 3)",
+      "archiveSlug": "modul-26"
+    },
+    "152": {
+      "pageFull": 422,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 3)",
+      "archiveSlug": "modul-26"
+    },
+    "300": {
+      "pageFull": 433,
+      "pageModule": 12,
+      "moduleTitle": "Dynamic Programming (Part 3)",
+      "archiveSlug": "modul-26"
+    },
+    "139": {
+      "pageFull": 410,
+      "pageModule": 12,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "62": {
+      "pageFull": 411,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 2)",
+      "archiveSlug": "modul-25"
+    },
+    "1143": {
+      "pageFull": 417,
+      "pageModule": 7,
+      "moduleTitle": "Dynamic Programming (Part 2)",
+      "archiveSlug": "modul-25"
+    },
+    "55": {
+      "pageFull": 446,
+      "pageModule": 1,
+      "moduleTitle": "Greedy Algorithms",
+      "archiveSlug": "modul-28"
+    },
+    "57": {
+      "pageFull": 434,
+      "pageModule": 1,
+      "moduleTitle": "Intervals",
+      "archiveSlug": "modul-27"
+    },
+    "56": {
+      "pageFull": 434,
+      "pageModule": 1,
+      "moduleTitle": "Intervals",
+      "archiveSlug": "modul-27"
+    },
+    "435": {
+      "pageFull": 435,
+      "pageModule": 2,
+      "moduleTitle": "Intervals",
+      "archiveSlug": "modul-27"
+    },
+    "252": {
+      "pageFull": 434,
+      "pageModule": 1,
+      "moduleTitle": "Intervals",
+      "archiveSlug": "modul-27"
+    },
+    "253": {
+      "pageFull": 443,
+      "pageModule": 10,
+      "moduleTitle": "Intervals",
+      "archiveSlug": "modul-27"
+    },
+    "48": {
+      "pageFull": 457,
+      "pageModule": 1,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    },
+    "73": {
+      "pageFull": 457,
+      "pageModule": 1,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    },
+    "191": {
+      "pageFull": 460,
+      "pageModule": 4,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    },
+    "190": {
+      "pageFull": 470,
+      "pageModule": 14,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    },
+    "167": {
+      "pageFull": 91,
+      "pageModule": 5,
+      "moduleTitle": "Two Pointers",
+      "archiveSlug": "modul-5"
+    },
+    "84": {
+      "pageFull": 142,
+      "pageModule": 12,
+      "moduleTitle": "Stack dan Monotonic Stack",
+      "archiveSlug": "modul-8"
+    },
+    "704": {
+      "pageFull": 147,
+      "pageModule": 1,
+      "moduleTitle": "Binary Search",
+      "archiveSlug": "modul-9"
+    },
+    "146": {
+      "pageFull": 186,
+      "pageModule": 19,
+      "moduleTitle": "Linked List (Part 1)",
+      "archiveSlug": "modul-10"
+    },
+    "25": {
+      "pageFull": 215,
+      "pageModule": 10,
+      "moduleTitle": "Linked List (Part 3)",
+      "archiveSlug": "modul-12"
+    },
+    "543": {
+      "pageFull": 303,
+      "pageModule": 15,
+      "moduleTitle": "Trees (Part 5)",
+      "archiveSlug": "modul-17"
+    },
+    "110": {
+      "pageFull": 223,
+      "pageModule": 6,
+      "moduleTitle": "Trees (Part 1)",
+      "archiveSlug": "modul-13"
+    },
+    "199": {
+      "pageFull": 254,
+      "pageModule": 14,
+      "moduleTitle": "Trees (Part 2)",
+      "archiveSlug": "modul-14"
+    },
+    "1448": {
+      "pageFull": 303,
+      "pageModule": 15,
+      "moduleTitle": "Trees (Part 5)",
+      "archiveSlug": "modul-17"
+    },
+    "703": {
+      "pageFull": 336,
+      "pageModule": 2,
+      "moduleTitle": "Heap / Priority Queue",
+      "archiveSlug": "modul-20"
+    },
+    "215": {
+      "pageFull": 336,
+      "pageModule": 2,
+      "moduleTitle": "Heap / Priority Queue",
+      "archiveSlug": "modul-20"
+    },
+    "621": {
+      "pageFull": 335,
+      "pageModule": 1,
+      "moduleTitle": "Heap / Priority Queue",
+      "archiveSlug": "modul-20"
+    },
+    "78": {
+      "pageFull": 331,
+      "pageModule": 12,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "46": {
+      "pageFull": 331,
+      "pageModule": 12,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "90": {
+      "pageFull": 331,
+      "pageModule": 12,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "40": {
+      "pageFull": 331,
+      "pageModule": 12,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "131": {
+      "pageFull": 332,
+      "pageModule": 13,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "17": {
+      "pageFull": 332,
+      "pageModule": 13,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "51": {
+      "pageFull": 320,
+      "pageModule": 1,
+      "moduleTitle": "Backtracking",
+      "archiveSlug": "modul-19"
+    },
+    "994": {
+      "pageFull": 366,
+      "pageModule": 16,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "286": {
+      "pageFull": 366,
+      "pageModule": 16,
+      "moduleTitle": "Graphs (Part 1)",
+      "archiveSlug": "modul-21"
+    },
+    "210": {
+      "pageFull": 381,
+      "pageModule": 15,
+      "moduleTitle": "Graphs (Part 2)",
+      "archiveSlug": "modul-22"
+    },
+    "684": {
+      "pageFull": 396,
+      "pageModule": 15,
+      "moduleTitle": "Graphs (Part 3)",
+      "archiveSlug": "modul-23"
+    },
+    "746": {
+      "pageFull": 400,
+      "pageModule": 2,
+      "moduleTitle": "Dynamic Programming (Part 1)",
+      "archiveSlug": "modul-24"
+    },
+    "416": {
+      "pageFull": 433,
+      "pageModule": 12,
+      "moduleTitle": "Dynamic Programming (Part 3)",
+      "archiveSlug": "modul-26"
+    },
+    "72": {
+      "pageFull": 411,
+      "pageModule": 1,
+      "moduleTitle": "Dynamic Programming (Part 2)",
+      "archiveSlug": "modul-25"
+    },
+    "45": {
+      "pageFull": 446,
+      "pageModule": 1,
+      "moduleTitle": "Greedy Algorithms",
+      "archiveSlug": "modul-28"
+    },
+    "134": {
+      "pageFull": 446,
+      "pageModule": 1,
+      "moduleTitle": "Greedy Algorithms",
+      "archiveSlug": "modul-28"
+    },
+    "763": {
+      "pageFull": 455,
+      "pageModule": 10,
+      "moduleTitle": "Greedy Algorithms",
+      "archiveSlug": "modul-28"
+    },
+    "202": {
+      "pageFull": 457,
+      "pageModule": 1,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    },
+    "136": {
+      "pageFull": 469,
+      "pageModule": 13,
+      "moduleTitle": "Math & Bit Manipulation",
+      "archiveSlug": "modul-29"
+    }
+  }
+}
