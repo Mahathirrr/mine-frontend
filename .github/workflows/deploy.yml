@@ -1,0 +1,71 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          mkdir -p artifact
+          cp -a .output artifact/output
+          cp -a public artifact/public
+          cp -a deploy artifact/deploy
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: artifact
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Validate deploy secrets
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          HAS_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' }}
+        run: |
+          if [ "$HAS_SSH_KEY" != "true" ] || [ -z "$VPS_HOST" ] || [ -z "$VPS_PORT" ] || [ -z "$VPS_USER" ]; then
+            exit 1
+          fi
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: artifact
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          rsync -avz --delete \
+            -e "ssh -p $VPS_PORT -o StrictHostKeyChecking=accept-new" \
+            ./artifact/output/ ${VPS_USER}@${VPS_HOST}:/opt/mine/frontend/.output/
+          rsync -avz --delete \
+            -e "ssh -p $VPS_PORT -o StrictHostKeyChecking=accept-new" \
+            ./artifact/public/ ${VPS_USER}@${VPS_HOST}:/opt/mine/frontend/public/
+          rsync -avz \
+            -e "ssh -p $VPS_PORT -o StrictHostKeyChecking=accept-new" \
+            ./artifact/deploy/ ${VPS_USER}@${VPS_HOST}:/opt/mine/frontend/deploy/
+          ssh -p "$VPS_PORT" -o StrictHostKeyChecking=accept-new \
+            ${VPS_USER}@${VPS_HOST} 'bash /opt/mine/frontend/deploy/deploy.sh'
