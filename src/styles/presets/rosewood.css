@@ -1,0 +1,90 @@
+/*
+label: Rosewood
+value: rosewood
+Muted rose-brown — elegant accent without loud pink tones.
+*/
+
+:root[data-theme-preset="rosewood"] {
+  --radius: 0.625rem;
+  --background: oklch(0.985 0.006 30);
+  --foreground: oklch(0.24 0.022 30);
+  --card: oklch(1 0.004 30);
+  --card-foreground: oklch(0.24 0.022 30);
+  --popover: oklch(1 0.004 30);
+  --popover-foreground: oklch(0.24 0.022 30);
+  --primary: oklch(0.5 0.09 30);
+  --primary-foreground: oklch(0.99 0.004 30);
+  --secondary: oklch(0.945 0.018 30);
+  --secondary-foreground: oklch(0.34 0.04 30);
+  --muted: oklch(0.965 0.01 30);
+  --muted-foreground: oklch(0.52 0.028 30);
+  --accent: oklch(0.915 0.028 30);
+  --accent-foreground: oklch(0.36 0.06 30);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.905 0.014 30);
+  --input: oklch(0.945 0.018 30);
+  --ring: oklch(0.5 0.09 30);
+  --chart-1: oklch(0.5 0.09 30);
+  --chart-2: oklch(0.62 0.09 55);
+  --chart-3: oklch(0.68 0.08 155);
+  --chart-4: oklch(0.58 0.07 320);
+  --chart-5: oklch(0.42 0.06 30);
+  --sidebar: oklch(0.968 0.012 30);
+  --sidebar-foreground: oklch(0.24 0.022 30);
+  --sidebar-primary: oklch(0.5 0.09 30);
+  --sidebar-primary-foreground: oklch(0.99 0.004 30);
+  --sidebar-accent: oklch(0.915 0.028 30);
+  --sidebar-accent-foreground: oklch(0.36 0.06 30);
+  --sidebar-border: oklch(0.905 0.014 30);
+  --sidebar-ring: oklch(0.5 0.09 30);
+  --shadow-2xs: 0px 1px 2px 0px hsl(25 18% 10% / 0.04);
+  --shadow-xs: 0px 1px 3px 0px hsl(25 18% 10% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(25 18% 10% / 0.08), 0px 1px 2px -1px hsl(25 18% 10% / 0.08);
+  --shadow: 0px 1px 3px 0px hsl(25 18% 10% / 0.1), 0px 1px 2px -1px hsl(25 18% 10% / 0.1);
+  --shadow-md: 0px 2px 4px -1px hsl(25 18% 10% / 0.1), 0px 4px 6px -1px hsl(25 18% 10% / 0.08);
+  --shadow-lg: 0px 4px 6px -1px hsl(25 18% 10% / 0.1), 0px 10px 15px -3px hsl(25 18% 10% / 0.08);
+  --shadow-xl: 0px 8px 10px -1px hsl(25 18% 10% / 0.1), 0px 20px 25px -5px hsl(25 18% 10% / 0.08);
+  --shadow-2xl: 0px 25px 50px -12px hsl(25 18% 10% / 0.2);
+}
+
+.dark:root[data-theme-preset="rosewood"] {
+  --background: oklch(0.17 0.016 30);
+  --foreground: oklch(0.94 0.01 30);
+  --card: oklch(0.21 0.018 30);
+  --card-foreground: oklch(0.94 0.01 30);
+  --popover: oklch(0.21 0.018 30);
+  --popover-foreground: oklch(0.94 0.01 30);
+  --primary: oklch(0.72 0.09 30);
+  --primary-foreground: oklch(0.18 0.02 30);
+  --secondary: oklch(0.26 0.02 30);
+  --secondary-foreground: oklch(0.94 0.01 30);
+  --muted: oklch(0.26 0.02 30);
+  --muted-foreground: oklch(0.7 0.025 30);
+  --accent: oklch(0.29 0.032 30);
+  --accent-foreground: oklch(0.88 0.04 30);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.32 0.022 30);
+  --input: oklch(0.32 0.022 30);
+  --ring: oklch(0.72 0.09 30);
+  --chart-1: oklch(0.72 0.09 30);
+  --chart-2: oklch(0.76 0.09 55);
+  --chart-3: oklch(0.7 0.08 155);
+  --chart-4: oklch(0.66 0.07 320);
+  --chart-5: oklch(0.48 0.06 30);
+  --sidebar: oklch(0.19 0.018 30);
+  --sidebar-foreground: oklch(0.94 0.01 30);
+  --sidebar-primary: oklch(0.72 0.09 30);
+  --sidebar-primary-foreground: oklch(0.18 0.02 30);
+  --sidebar-accent: oklch(0.29 0.032 30);
+  --sidebar-accent-foreground: oklch(0.88 0.04 30);
+  --sidebar-border: oklch(0.32 0.022 30);
+  --sidebar-ring: oklch(0.72 0.09 30);
+  --shadow-2xs: 0px 1px 2px 0px hsl(25 18% 0% / 0.2);
+  --shadow-xs: 0px 1px 3px 0px hsl(25 18% 0% / 0.25);
+  --shadow-sm: 0px 1px 3px 0px hsl(25 18% 0% / 0.3), 0px 1px 2px -1px hsl(25 18% 0% / 0.3);
+  --shadow: 0px 1px 3px 0px hsl(25 18% 0% / 0.35), 0px 1px 2px -1px hsl(25 18% 0% / 0.35);
+  --shadow-md: 0px 2px 4px -1px hsl(25 18% 0% / 0.35), 0px 4px 6px -1px hsl(25 18% 0% / 0.3);
+  --shadow-lg: 0px 4px 6px -1px hsl(25 18% 0% / 0.35), 0px 10px 15px -3px hsl(25 18% 0% / 0.3);
+  --shadow-xl: 0px 8px 10px -1px hsl(25 18% 0% / 0.35), 0px 20px 25px -5px hsl(25 18% 0% / 0.3);
+  --shadow-2xl: 0px 25px 50px -12px hsl(25 18% 0% / 0.45);
+}
