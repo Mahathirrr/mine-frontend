@@ -66,6 +66,29 @@ export const QUESTION_CATEGORY_LABEL: Record<QuestionCategory, string> = {
   other: "Lainnya",
 };
 
+/** Top-level tabs for general prep library (company-specific lives under Perusahaan tab). */
+export const GENERAL_PREP_CATEGORIES: QuestionCategory[] = [
+  "behavioral",
+  "technical",
+  "system_design",
+  "coding",
+  "salary",
+  "other",
+];
+
+export const GENERAL_PREP_CATEGORY_DESC: Partial<Record<QuestionCategory, string>> = {
+  behavioral: "Ceritakan diri, STAR, motivasi, kelebihan & kekurangan",
+  technical: "Konsep teknis per domain (mobile, backend, dll.)",
+  system_design: "Arsitektur, skalabilitas, trade-off",
+  coding: "Algoritma & struktur data",
+  salary: "Negosiasi gaji & benefit",
+  other: "Topik lain di luar kategori di atas",
+};
+
+export const DEFAULT_TECH_GROUPS = ["Umum", "Mobile", "Backend", "Frontend", "DevOps"] as const;
+
+export const TECH_GROUP_STORAGE_KEY = "mine-interview-tech-groups";
+
 export const PRIORITY_LABEL: Record<number, string> = {
   1: "Tinggi",
   2: "Sedang",

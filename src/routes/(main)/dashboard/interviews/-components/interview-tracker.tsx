@@ -9,7 +9,6 @@ import {
   BookOpen,
   Briefcase,
   CalendarClock,
-  CheckCircle2,
   ClipboardList,
   Kanban,
   Loader2,
@@ -35,7 +34,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,8 +60,9 @@ import {
   WORK_TYPE_LABEL,
 } from "./interview-constants";
 import { appRounds, formatDate, formatDateTime, formatRelativeSchedule, upcomingRounds } from "./interview-utils";
+import { CompanyPrepPanel } from "./company-prep-panel";
+import { GeneralPrepPanel } from "./general-prep-panel";
 import { PipelineBoard } from "./pipeline-board";
-import { PrepMaterialsPanel } from "./prep-materials-panel";
 
 function normalizeOverview(data: InterviewOverviewResponse): InterviewOverviewResponse {
   return {
@@ -137,6 +136,12 @@ export function InterviewTracker() {
   const [questionDraft, setQuestionDraft] = React.useState<CreateQuestionBody>(EMPTY_QUESTION);
   const [prepImportOpen, setPrepImportOpen] = React.useState(false);
   const [selectedPrepAppId, setSelectedPrepAppId] = React.useState<number | null>(null);
+  const [questionContext, setQuestionContext] = React.useState<{
+    scope: "general" | "company";
+    applicationId?: number;
+    category?: CreateQuestionBody["category"];
+    techGroup?: string | null;
+  }>({ scope: "general", category: "behavioral" });
 
   const reload = React.useCallback(async () => {
     if (!token) return;
@@ -223,6 +228,17 @@ export function InterviewTracker() {
     });
   }
 
+  function openQuestionDialog(ctx: typeof questionContext) {
+    setQuestionContext(ctx);
+    setQuestionDraft({
+      ...EMPTY_QUESTION,
+      category: ctx.category ?? "behavioral",
+      application_id: ctx.scope === "company" ? ctx.applicationId : null,
+      tech_group: ctx.techGroup ?? null,
+    });
+    setQuestionDialogOpen(true);
+  }
+
   async function handleCreateQuestion(e: React.FormEvent) {
     e.preventDefault();
     if (!token || !questionDraft.question.trim()) return;
@@ -231,6 +247,10 @@ export function InterviewTracker() {
         ...questionDraft,
         question: questionDraft.question.trim(),
         answer_notes: questionDraft.answer_notes?.trim() || null,
+        application_id: questionContext.scope === "company" ? questionContext.applicationId : null,
+        section_label: questionDraft.section_label?.trim() || null,
+        tech_group:
+          questionDraft.category === "technical" ? questionDraft.tech_group?.trim() || "Umum" : null,
       });
       setQuestionDraft(EMPTY_QUESTION);
       setQuestionDialogOpen(false);
@@ -238,8 +258,6 @@ export function InterviewTracker() {
   }
 
   const prepGuides = data?.prep_guides ?? [];
-  const prepAppIds = [...new Set(prepGuides.map((g) => g.application_id))];
-  const appsWithPrep = (data?.applications ?? []).filter((a) => prepAppIds.includes(a.id));
 
   if (loading || !data) {
     return (
@@ -255,15 +273,7 @@ export function InterviewTracker() {
   }
 
   const { stats, questions } = data;
-  const activePrepAppId = selectedPrepAppId ?? appsWithPrep[0]?.id ?? null;
-  const prepApplication = appsWithPrep.find((a) => a.id === activePrepAppId) ?? null;
-  const prepGuidesForApp = prepGuides.filter((g) => g.application_id === activePrepAppId);
-  const customQuestions = questions.filter((q) => !q.source_guide);
-  const practicedPct =
-    customQuestions.length > 0
-      ? Math.round((customQuestions.filter((q) => q.is_practiced).length / customQuestions.length) * 100)
-      : 0;
-  const defaultTab = appsWithPrep.length > 0 ? "prep" : "pipeline";
+  const activePrepAppId = selectedPrepAppId ?? data.applications[0]?.id ?? null;
 
   return (
     <div className="flex flex-col gap-5">
@@ -290,9 +300,9 @@ export function InterviewTracker() {
             <BookOpen />
             Impor materi
           </Button>
-          <Button variant="outline" onClick={() => setQuestionDialogOpen(true)}>
+          <Button variant="outline" onClick={() => openQuestionDialog({ scope: "general", category: "behavioral" })}>
             <ClipboardList />
-            Tambah soal
+            Tambah soal umum
           </Button>
           <Button onClick={() => setAppDialogOpen(true)}>
             <Plus />
@@ -301,14 +311,18 @@ export function InterviewTracker() {
         </div>
       </div>
 
-      <Tabs defaultValue={defaultTab}>
+      <Tabs defaultValue="general">
         <TabsList className="w-full flex-wrap sm:w-fit">
-          <TabsTrigger value="prep" className="gap-1.5">
+          <TabsTrigger value="general" className="gap-1.5">
             <BookOpen className="size-3.5" />
-            Materi persiapan
-            {appsWithPrep.length > 0 ? (
+            Materi umum
+          </TabsTrigger>
+          <TabsTrigger value="company" className="gap-1.5">
+            <Briefcase className="size-3.5" />
+            Perusahaan
+            {data.applications.length > 0 ? (
               <Badge variant="secondary" className="ml-1 h-5 px-1.5 tabular-nums">
-                {appsWithPrep.length}
+                {data.applications.length}
               </Badge>
             ) : null}
           </TabsTrigger>
@@ -325,66 +339,64 @@ export function InterviewTracker() {
               </Badge>
             ) : null}
           </TabsTrigger>
-          <TabsTrigger value="questions" className="gap-1.5">
-            <ClipboardList className="size-3.5" />
-            Soal lain
-          </TabsTrigger>
           <TabsTrigger value="list" className="gap-1.5">
-            <Briefcase className="size-3.5" />
+            <ClipboardList className="size-3.5" />
             Daftar
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="prep" className="mt-4">
-          {prepApplication && prepGuidesForApp.length > 0 ? (
-            <div className="space-y-4">
-              {appsWithPrep.length > 1 ? (
-                <div className="max-w-md">
-                  <Label className="mb-1.5 block text-muted-foreground text-xs">Perusahaan</Label>
-                  <Select value={String(activePrepAppId)} onValueChange={(v) => setSelectedPrepAppId(Number(v))}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {appsWithPrep.map((app) => (
-                        <SelectItem key={app.id} value={String(app.id)}>
-                          {app.company} · {app.role_title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : null}
-              <PrepMaterialsPanel
-                application={prepApplication}
-                guides={prepGuidesForApp}
-                questions={questions}
-                disabled={saving}
-                onTogglePracticed={async (questionId, practiced) => {
-                  if (!token) return;
-                  await withSave(async () => {
-                    await interviewsApi.updateQuestion(token, questionId, { is_practiced: practiced });
-                  });
-                }}
-              />
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-                <BookOpen className="size-10 text-muted-foreground/60" />
-                <div>
-                  <p className="font-medium">Belum ada materi persiapan</p>
-                  <p className="mt-1 max-w-sm text-muted-foreground text-sm">
-                    Impor paket materi dari katalog. Tiap perusahaan punya modul persiapan sendiri.
-                  </p>
-                </div>
-                <Button onClick={() => setPrepImportOpen(true)}>
-                  <BookOpen />
-                  Impor materi
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+        <TabsContent value="general" className="mt-4">
+          <GeneralPrepPanel
+            questions={questions}
+            disabled={saving}
+            onAddQuestion={(ctx) =>
+              openQuestionDialog({
+                scope: "general",
+                category: ctx.category,
+                techGroup: ctx.techGroup,
+              })
+            }
+            onToggle={async (q, practiced) => {
+              if (!token) return;
+              await withSave(async () => {
+                await interviewsApi.updateQuestion(token, q.id, { is_practiced: practiced });
+              });
+            }}
+            onDelete={async (id) => {
+              if (!token) return;
+              await withSave(async () => {
+                await interviewsApi.deleteQuestion(token, id);
+              });
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="company" className="mt-4">
+          <CompanyPrepPanel
+            applications={data.applications}
+            prepGuides={prepGuides}
+            questions={questions}
+            selectedAppId={activePrepAppId}
+            onSelectApp={setSelectedPrepAppId}
+            onAddCompany={() => setAppDialogOpen(true)}
+            onImportPack={() => setPrepImportOpen(true)}
+            onAddCompanyQuestion={(applicationId) =>
+              openQuestionDialog({ scope: "company", applicationId, category: "company" })
+            }
+            disabled={saving}
+            onTogglePracticed={async (questionId, practiced) => {
+              if (!token) return;
+              await withSave(async () => {
+                await interviewsApi.updateQuestion(token, questionId, { is_practiced: practiced });
+              });
+            }}
+            onDeleteQuestion={async (id) => {
+              if (!token) return;
+              await withSave(async () => {
+                await interviewsApi.deleteQuestion(token, id);
+              });
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="pipeline" className="mt-4">
@@ -435,45 +447,6 @@ export function InterviewTracker() {
                   </div>
                 ))
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="questions" className="mt-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <CardTitle className="text-base">Soal tambahan</CardTitle>
-                  <CardDescription>
-                    Soal di luar materi perusahaan. {customQuestions.filter((q) => q.is_practiced).length}/
-                    {customQuestions.length} sudah dipraktikkan ({practicedPct}%).
-                  </CardDescription>
-                </div>
-                <Button size="sm" variant="outline" onClick={() => setQuestionDialogOpen(true)}>
-                  <Plus className="size-3.5" />
-                  Tambah
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <QuestionBank
-                questions={customQuestions}
-                applications={data.applications}
-                disabled={saving}
-                onToggle={async (q, practiced) => {
-                  if (!token) return;
-                  await withSave(async () => {
-                    await interviewsApi.updateQuestion(token, q.id, { is_practiced: practiced });
-                  });
-                }}
-                onDelete={async (id) => {
-                  if (!token) return;
-                  await withSave(async () => {
-                    await interviewsApi.deleteQuestion(token, id);
-                  });
-                }}
-              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -658,8 +631,14 @@ export function InterviewTracker() {
       <Dialog open={questionDialogOpen} onOpenChange={setQuestionDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Tambah soal</DialogTitle>
-            <DialogDescription>Simpan pertanyaan wawancara untuk latihan atau referensi.</DialogDescription>
+            <DialogTitle>
+              {questionContext.scope === "company" ? "Tambah soal perusahaan" : "Tambah soal umum"}
+            </DialogTitle>
+            <DialogDescription>
+              {questionContext.scope === "company"
+                ? "Bank soal khusus perusahaan, lengkap dengan jawaban referensi."
+                : "Bank soal reusable untuk semua lamaran. Ceritakan diri masuk kategori Behavioral."}
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => void handleCreateQuestion(e)} className="space-y-4">
             <Field label="Pertanyaan">
@@ -689,12 +668,30 @@ export function InterviewTracker() {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Catatan jawaban">
+            {questionDraft.category === "technical" && questionContext.scope === "general" ? (
+              <Field label="Grup teknis">
+                <Input
+                  value={questionDraft.tech_group ?? questionContext.techGroup ?? "Umum"}
+                  onChange={(e) => setQuestionDraft((d) => ({ ...d, tech_group: e.target.value }))}
+                  placeholder="Mobile, Backend, ..."
+                />
+              </Field>
+            ) : null}
+            {questionDraft.category === "behavioral" ? (
+              <Field label="Subtopik (opsional)">
+                <Input
+                  value={questionDraft.section_label ?? ""}
+                  onChange={(e) => setQuestionDraft((d) => ({ ...d, section_label: e.target.value }))}
+                  placeholder="Ceritakan diri, Motivasi, Kelebihan..."
+                />
+              </Field>
+            ) : null}
+            <Field label="Jawaban / catatan">
               <Textarea
                 value={questionDraft.answer_notes ?? ""}
                 onChange={(e) => setQuestionDraft((d) => ({ ...d, answer_notes: e.target.value }))}
                 rows={4}
-                placeholder="STAR method, poin penting..."
+                placeholder="STAR method, poin penting, jawaban lengkap..."
               />
             </Field>
             <DialogFooter>
@@ -741,73 +738,3 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
   );
 }
 
-function QuestionBank({
-  questions,
-  applications,
-  disabled,
-  onToggle,
-  onDelete,
-}: {
-  questions: InterviewQuestion[];
-  applications: InterviewApplicationWithRounds[];
-  disabled?: boolean;
-  onToggle: (q: InterviewQuestion, practiced: boolean) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
-}) {
-  if (questions.length === 0) {
-    return <p className="text-muted-foreground text-sm">Belum ada soal. Tambahkan pertanyaan untuk latihan.</p>;
-  }
-
-  const appName = (id: number | null) => {
-    if (!id) return null;
-    const app = applications.find((a) => a.id === id);
-    return app ? `${app.company}` : null;
-  };
-
-  return (
-    <div className="space-y-2">
-      {questions.map((q) => (
-        <div key={q.id} className="rounded-xl border p-3">
-          <div className="flex items-start gap-3">
-            <Switch
-              checked={q.is_practiced}
-              onCheckedChange={(v) => void onToggle(q, v)}
-              disabled={disabled}
-              aria-label="Sudah dipraktikkan"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline">{QUESTION_CATEGORY_LABEL[q.category]}</Badge>
-                {appName(q.application_id) ? (
-                  <Badge variant="outline" className="text-[10px]">
-                    {appName(q.application_id)}
-                  </Badge>
-                ) : null}
-                {q.is_practiced ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 text-xs dark:text-emerald-400">
-                    <CheckCircle2 className="size-3" />
-                    Sudah latihan
-                  </span>
-                ) : null}
-              </div>
-              <p className="mt-2 font-medium text-sm leading-snug">{q.question}</p>
-              {q.answer_notes ? (
-                <p className="mt-2 whitespace-pre-wrap text-muted-foreground text-xs">{q.answer_notes}</p>
-              ) : null}
-              <p className="mt-2 text-[11px] text-muted-foreground">Diperbarui {formatDate(q.updated_at)}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={() => void onDelete(q.id)}
-              disabled={disabled}
-              aria-label="Hapus soal"
-            >
-              <XCircle className="size-4 text-muted-foreground" />
-            </Button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}

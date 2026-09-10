@@ -90,6 +90,7 @@ export type InterviewQuestion = {
   difficulty: QuestionDifficulty;
   is_practiced: boolean;
   section_label: string | null;
+  tech_group: string | null;
   sort_order: number;
   source_guide: string | null;
   source_key: string | null;
@@ -199,6 +200,8 @@ export type CreateQuestionBody = {
   answer_notes?: string | null;
   difficulty?: QuestionDifficulty;
   is_practiced?: boolean;
+  section_label?: string | null;
+  tech_group?: string | null;
 };
 
 export type UpdateQuestionBody = Partial<CreateQuestionBody>;
