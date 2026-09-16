@@ -96,8 +96,14 @@ export function EventPreviewPopover({ open, anchor, event, onClose, onEdit, onDe
         aria-label="Event details"
       >
         <div className="flex items-center justify-end gap-0.5 border-b px-2 py-1.5">
-          {!isHoliday ? (
-            <Button type="button" size="icon-sm" variant="ghost" aria-label="Edit event" onClick={onEdit}>
+          {!isHoliday && onEdit ? (
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              aria-label={isKanban ? "Edit task" : "Edit event"}
+              onClick={onEdit}
+            >
               <Pencil />
             </Button>
           ) : null}
@@ -169,14 +175,6 @@ export function EventPreviewPopover({ open, anchor, event, onClose, onEdit, onDe
             </div>
           ) : null}
         </div>
-
-        {!isHoliday ? (
-          <div className="border-t px-4 py-3">
-            <Button type="button" className="w-full" onClick={onEdit}>
-              {isKanban ? "Edit task" : "Edit event"}
-            </Button>
-          </div>
-        ) : null}
       </div>
     </>
   );
