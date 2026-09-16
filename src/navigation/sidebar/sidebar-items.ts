@@ -99,6 +99,12 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/calendar",
         icon: Calendar,
       },
+      {
+        id: "subscriptions",
+        title: "Biaya Rutin",
+        url: "/dashboard/subscriptions",
+        icon: ReceiptText,
+      },
     ],
   },
   {
