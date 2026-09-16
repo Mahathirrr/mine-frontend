@@ -2,9 +2,10 @@
 
 import * as React from "react";
 
-import { FileUp, Loader2 } from "lucide-react";
+import { ChevronDown, FileUp, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Dialog,
   DialogContent,
@@ -91,17 +92,17 @@ export function CompanyImportTxtDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
+        <DialogHeader className="space-y-1 border-b px-6 py-5">
           <DialogTitle>Impor dari file .txt</DialogTitle>
           <DialogDescription>
-            Tempel teks atau unggah file berisi pertanyaan dan jawaban. Tidak perlu JSON atau format teknis lain.
+            Unggah atau tempel teks berisi pertanyaan dan jawaban. Format sederhana — tidak perlu JSON.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="space-y-3">
-            <div className="space-y-1.5">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="min-w-0 flex-1 space-y-1.5">
               <Label htmlFor="txt-fallback-category">Kategori default (jika tanpa # judul)</Label>
               <Select
                 value={fallbackCategory}
@@ -113,7 +114,7 @@ export function CompanyImportTxtDialog({
                 }}
               >
                 <SelectTrigger id="txt-fallback-category" className="w-full">
-                  <SelectValue />
+                  <SelectValue>{COMPANY_PREP_CATEGORY_LABEL[fallbackCategory]}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {COMPANY_PREP_CATEGORIES.map((cat) => (
@@ -124,69 +125,80 @@ export function CompanyImportTxtDialog({
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="txt-upload">Unggah file</Label>
-              <Button type="button" variant="outline" className="w-full justify-start" asChild>
-                <label htmlFor="txt-upload" className="cursor-pointer">
-                  <FileUp className="size-4" />
-                  Pilih file .txt
-                  <input
-                    id="txt-upload"
-                    type="file"
-                    accept=".txt,text/plain"
-                    className="sr-only"
-                    onChange={(e) => void handleFileChange(e)}
-                  />
-                </label>
-              </Button>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="txt-content">Atau tempel isi file</Label>
-              <Textarea
-                id="txt-content"
-                value={text}
-                onChange={(e) => handleParse(e.target.value)}
-                rows={10}
-                placeholder={"# Pengetahuan Perusahaan\nQ: Apa yang kamu tahu tentang perusahaan?\nA: Jawaban..."}
-                className="font-mono text-xs"
-              />
-            </div>
+            <Button type="button" variant="outline" className="w-full shrink-0 sm:w-auto" asChild>
+              <label htmlFor="txt-upload" className="cursor-pointer">
+                <FileUp className="size-4" />
+                Pilih file .txt
+                <input
+                  id="txt-upload"
+                  type="file"
+                  accept=".txt,text/plain"
+                  className="sr-only"
+                  onChange={(e) => void handleFileChange(e)}
+                />
+              </label>
+            </Button>
           </div>
 
-          <div className="space-y-3">
-            <div className="rounded-xl border bg-muted/30 p-3">
-              <p className="mb-2 font-medium text-xs">Format yang didukung</p>
-              <pre className="whitespace-pre-wrap text-[11px] text-muted-foreground leading-relaxed">
-                {INTERVIEW_TXT_FORMAT_HELP}
-              </pre>
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="txt-content">Isi file</Label>
+            <Textarea
+              id="txt-content"
+              value={text}
+              onChange={(e) => handleParse(e.target.value)}
+              rows={12}
+              placeholder={
+                "# Pengetahuan Perusahaan\nQ: Apa yang kamu tahu tentang perusahaan ini?\nA: Jawaban kamu...\n\n# HRD & Non-Teknis\nQ: Ceritakan tentang diri kamu\nA: Jawaban STAR..."
+              }
+              className="min-h-[220px] font-mono text-xs leading-relaxed"
+            />
+          </div>
 
-            <div className="min-h-[120px] rounded-xl border p-3">
-              <p className="mb-2 font-medium text-sm">Pratinjau ({preview.length} soal)</p>
-              {parseError ? <p className="text-destructive text-sm">{parseError}</p> : null}
-              {!parseError && preview.length === 0 ? (
-                <p className="text-muted-foreground text-sm">Pratinjau muncul setelah teks valid dibaca.</p>
-              ) : null}
-              {preview.length > 0 ? (
-                <ul className="max-h-40 space-y-2 overflow-y-auto text-sm">
-                  {preview.slice(0, 8).map((item) => (
-                    <li key={`${item.category}:${item.question}`} className="border-b pb-2 last:border-0">
-                      <p className="font-medium leading-snug">{item.question}</p>
-                      <p className="mt-0.5 line-clamp-2 text-muted-foreground text-xs">{item.answer || "—"}</p>
-                    </li>
-                  ))}
-                  {preview.length > 8 ? (
-                    <li className="text-muted-foreground text-xs">+{preview.length - 8} soal lainnya</li>
-                  ) : null}
-                </ul>
-              ) : null}
+          <Collapsible>
+            <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left text-sm">
+              <span className="font-medium">Lihat contoh format .txt</span>
+              <ChevronDown className="size-4 text-muted-foreground" />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-2 rounded-lg border bg-muted/30 p-4">
+                <pre className="whitespace-pre-wrap text-[11px] text-muted-foreground leading-relaxed">
+                  {INTERVIEW_TXT_FORMAT_HELP}
+                </pre>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <div className="rounded-xl border p-4">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="font-medium text-sm">Pratinjau</p>
+              <span className="text-muted-foreground text-xs tabular-nums">{preview.length} soal</span>
             </div>
+            {parseError ? <p className="text-destructive text-sm">{parseError}</p> : null}
+            {!parseError && preview.length === 0 ? (
+              <p className="text-muted-foreground text-sm">Pratinjau muncul otomatis setelah teks valid dibaca.</p>
+            ) : null}
+            {preview.length > 0 ? (
+              <ul className="max-h-48 space-y-3 overflow-y-auto text-sm">
+                {preview.slice(0, 10).map((item) => (
+                  <li key={`${item.category}:${item.question}`} className="rounded-lg border bg-muted/20 p-3">
+                    <div className="mb-1 flex flex-wrap gap-1.5">
+                      <span className="rounded-md bg-background px-2 py-0.5 text-[10px] text-muted-foreground">
+                        {COMPANY_PREP_CATEGORY_LABEL[item.category] ?? item.category}
+                      </span>
+                    </div>
+                    <p className="font-medium leading-snug">{item.question}</p>
+                    <p className="mt-1 line-clamp-2 text-muted-foreground text-xs">{item.answer || "—"}</p>
+                  </li>
+                ))}
+                {preview.length > 10 ? (
+                  <li className="text-center text-muted-foreground text-xs">+{preview.length - 10} soal lainnya</li>
+                ) : null}
+              </ul>
+            ) : null}
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2 border-t px-6 py-4">
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={importing}>
             Batal
           </Button>
