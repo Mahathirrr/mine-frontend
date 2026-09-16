@@ -32,6 +32,7 @@ import { Route as mainDashboardFinanceRouteRouteImport } from './routes/(main)/d
 import { Route as mainDashboardInfrastructureRouteRouteImport } from './routes/(main)/dashboard/infrastructure/route'
 import { Route as mainDashboardInterviewsRouteRouteImport } from './routes/(main)/dashboard/interviews/route'
 import { Route as mainDashboardInvoiceRouteRouteImport } from './routes/(main)/dashboard/invoice/route'
+import { Route as mainDashboardJournalRouteRouteImport } from './routes/(main)/dashboard/journal/route'
 import { Route as mainDashboardKanbanRouteRouteImport } from './routes/(main)/dashboard/kanban/route'
 import { Route as mainDashboardLeetcodeRouteRouteImport } from './routes/(main)/dashboard/leetcode/route'
 import { Route as mainDashboardLogisticsRouteRouteImport } from './routes/(main)/dashboard/logistics/route'
@@ -178,6 +179,12 @@ const mainDashboardInvoiceRouteRoute =
     path: '/invoice',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
+const mainDashboardJournalRouteRoute =
+  mainDashboardJournalRouteRouteImport.update({
+    id: '/journal',
+    path: '/journal',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardKanbanRouteRoute =
   mainDashboardKanbanRouteRouteImport.update({
     id: '/kanban',
@@ -307,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
   '/dashboard/logistics': typeof mainDashboardLogisticsRouteRoute
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
   '/dashboard/logistics': typeof mainDashboardLogisticsRouteRoute
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/(main)/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/(main)/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/(main)/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/(main)/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/(main)/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
   '/(main)/dashboard/logistics': typeof mainDashboardLogisticsRouteRoute
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
     | '/dashboard/logistics'
@@ -484,6 +495,7 @@ export interface FileRouteTypes {
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
     | '/dashboard/logistics'
@@ -528,6 +540,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/infrastructure'
     | '/(main)/dashboard/interviews'
     | '/(main)/dashboard/invoice'
+    | '/(main)/dashboard/journal'
     | '/(main)/dashboard/kanban'
     | '/(main)/dashboard/leetcode'
     | '/(main)/dashboard/logistics'
@@ -727,6 +740,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardInvoiceRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/journal': {
+      id: '/(main)/dashboard/journal'
+      path: '/journal'
+      fullPath: '/dashboard/journal'
+      preLoaderRoute: typeof mainDashboardJournalRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/kanban': {
       id: '/(main)/dashboard/kanban'
       path: '/kanban'
@@ -877,6 +897,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardInfrastructureRouteRoute: typeof mainDashboardInfrastructureRouteRoute
   mainDashboardInterviewsRouteRoute: typeof mainDashboardInterviewsRouteRoute
   mainDashboardInvoiceRouteRoute: typeof mainDashboardInvoiceRouteRoute
+  mainDashboardJournalRouteRoute: typeof mainDashboardJournalRouteRoute
   mainDashboardKanbanRouteRoute: typeof mainDashboardKanbanRouteRoute
   mainDashboardLeetcodeRouteRoute: typeof mainDashboardLeetcodeRouteRoute
   mainDashboardLogisticsRouteRoute: typeof mainDashboardLogisticsRouteRoute
@@ -910,6 +931,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardInfrastructureRouteRoute: mainDashboardInfrastructureRouteRoute,
   mainDashboardInterviewsRouteRoute: mainDashboardInterviewsRouteRoute,
   mainDashboardInvoiceRouteRoute: mainDashboardInvoiceRouteRoute,
+  mainDashboardJournalRouteRoute: mainDashboardJournalRouteRoute,
   mainDashboardKanbanRouteRoute: mainDashboardKanbanRouteRoute,
   mainDashboardLeetcodeRouteRoute: mainDashboardLeetcodeRouteRoute,
   mainDashboardLogisticsRouteRoute: mainDashboardLogisticsRouteRoute,

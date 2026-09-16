@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 
 import {
   Banknote,
+  BookOpen,
   BriefcaseBusiness,
   Calendar,
   ChartBar,
@@ -110,6 +111,12 @@ export const sidebarItems: NavGroup[] = [
         title: "Biaya Rutin",
         url: "/dashboard/subscriptions",
         icon: ReceiptText,
+      },
+      {
+        id: "journal",
+        title: "Jurnal",
+        url: "/dashboard/journal",
+        icon: BookOpen,
       },
     ],
   },
