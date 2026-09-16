@@ -11,21 +11,14 @@ import {
   ArrowUpRight,
   Bell,
   ChevronRight,
-  Loader2,
-  PiggyBank,
   Plus,
   ReceiptText,
   Target,
-  TrendingDown,
-  TrendingUp,
-  Wallet,
 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
@@ -42,7 +35,17 @@ import type {
 import { financeApi } from "@/lib/api/finance";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
+import { BalanceDistributionCard } from "./balance-distribution-card";
+import { CashFlowOverview } from "./cash-flow-overview";
+import { FinanceNotification } from "./finance-notification";
+import { IncomeBreakdown } from "./income-breakdown";
 import {
+  buildAccountAllocation,
+  buildCashFlowChartData,
+  buildCategorySpending,
+  buildDailyFlowChart,
+  buildIncomeBreakdown,
+  buildMonthlyExpenseTrend,
   categoryName,
   currentMonthKey,
   expenseCategories,
@@ -54,48 +57,14 @@ import {
   txTypeLabel,
 } from "./mine-finance-utils";
 import { MineTransactionFormDialog } from "./mine-transaction-form-dialog";
-
-const cashFlowConfig = {
-  income: { label: "Pemasukan", color: "var(--chart-2)" },
-  expense: { label: "Pengeluaran", color: "var(--chart-4)" },
-} satisfies ChartConfig;
-
-function StatCard({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  tone,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  tone: "emerald" | "red" | "violet" | "blue";
-}) {
-  const tones = {
-    emerald: "text-emerald-600 bg-emerald-500/10",
-    red: "text-red-600 bg-red-500/10",
-    violet: "text-violet-600 bg-violet-500/10",
-    blue: "text-blue-600 bg-blue-500/10",
-  };
-  return (
-    <div className="flex items-center gap-3 rounded-xl border px-4 py-3">
-      <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", tones[tone])}>
-        <Icon className="size-5" />
-      </div>
-      <div className="min-w-0">
-        <p className="font-bold text-xl tabular-nums tracking-tight">{value}</p>
-        <p className="text-muted-foreground text-xs">{label}</p>
-        {sub ? <p className="text-[11px] text-muted-foreground">{sub}</p> : null}
-      </div>
-    </div>
-  );
-}
+import { OverviewKpis } from "./overview-kpis";
+import { SpendingActivityCard } from "./spending-activity-card";
+import { TransactionsOverviewCard } from "./transactions-overview-card";
 
 export function MineFinanceHub() {
   const token = useAuthStore((s) => s.token);
   const [data, setData] = React.useState<FinanceOverviewResponse | null>(null);
+  const [monthTransactions, setMonthTransactions] = React.useState(data?.recent_transactions ?? []);
   const [transactions, setTransactions] = React.useState(data?.recent_transactions ?? []);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -119,11 +88,11 @@ export function MineFinanceHub() {
     try {
       const overview = await financeApi.overview(token, monthKey);
       setData(overview);
-      const txRes = await financeApi.listTransactions(token, {
-        month: monthKey,
-        type: txFilter === "all" ? undefined : txFilter,
-      });
-      setTransactions(txRes.transactions);
+      const txRes = await financeApi.listTransactions(token, { month: monthKey });
+      setMonthTransactions(txRes.transactions);
+      setTransactions(
+        txFilter === "all" ? txRes.transactions : txRes.transactions.filter((tx) => tx.transaction_type === txFilter),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat data");
     } finally {
@@ -223,39 +192,19 @@ export function MineFinanceHub() {
   }
 
   const defaultAccount = data.accounts.find((a) => a.is_default) ?? data.accounts[0];
-  const pieData = data.spending_by_category.map((row, i) => ({
-    name: row.category_name,
-    value: row.amount,
-    fill: row.color ?? `var(--chart-${(i % 5) + 1})`,
-  }));
+  const dailyFlow = buildDailyFlowChart(monthTransactions, monthKey);
+  const incomeRows = buildIncomeBreakdown(monthTransactions, data.categories);
+  const accountRows = buildAccountAllocation(data.accounts);
+  const categoryRows = buildCategorySpending(data.spending_by_category);
+  const cashFlowChart = buildCashFlowChartData(data.cash_flow);
+  const expenseTrend = buildMonthlyExpenseTrend(data.cash_flow);
+  const budgetTotal = data.budgets.reduce((sum, row) => sum + row.amount_limit, 0);
+  const budgetSpent = data.budgets.reduce((sum, row) => sum + row.spent, 0);
+  const primaryInsight = data.insights[0] ?? null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 flex-1">
-          <StatCard label="Total saldo" value={formatIDR(data.stats.total_balance)} icon={Wallet} tone="violet" />
-          <StatCard
-            label="Pemasukan bulan ini"
-            value={formatIDR(data.stats.month_income)}
-            sub={`Net: ${formatIDR(data.stats.month_net)}`}
-            icon={TrendingUp}
-            tone="emerald"
-          />
-          <StatCard
-            label="Pengeluaran bulan ini"
-            value={formatIDR(data.stats.month_expense)}
-            icon={TrendingDown}
-            tone="red"
-          />
-          <StatCard
-            label="Tingkat tabungan"
-            value={`${Math.round(data.stats.savings_rate)}%`}
-            sub={`Setelah langganan: ${formatIDR(data.planning.projected_after_subs)}`}
-            icon={PiggyBank}
-            tone="blue"
-          />
-        </div>
-      </div>
+      <OverviewKpis stats={data.stats} />
 
       <div className="flex flex-wrap gap-2">
         <Button size="sm" onClick={() => openTx("expense")}>
@@ -288,13 +237,32 @@ export function MineFinanceHub() {
         </TabsList>
 
         <TabsContent value="dashboard" className="mt-4 space-y-4">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="font-normal">Dompet & perencanaan</CardTitle>
-                <CardDescription>Saldo saat ini dan proyeksi setelah tagihan rutin</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+            <div className="xl:col-span-7">
+              <TransactionsOverviewCard chartData={dailyFlow} monthKey={monthKey} />
+            </div>
+            <div className="flex flex-col gap-4 xl:col-span-5">
+              <IncomeBreakdown rows={incomeRows} />
+              <FinanceNotification insight={primaryInsight} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+            <div className="xl:col-span-7">
+              <BalanceDistributionCard title="Alokasi rekening" rows={accountRows} totalLabel="Saldo" />
+            </div>
+            <div className="xl:col-span-5">
+              <BalanceDistributionCard title="Pengeluaran per kategori" rows={categoryRows} totalLabel="Total" />
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-normal">Proyeksi & dompet</CardTitle>
+              <CardDescription>Saldo saat ini dan estimasi setelah biaya rutin</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-3">
                 {data.accounts.map((acc) => (
                   <div key={acc.id} className="flex items-center justify-between rounded-lg border px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -307,31 +275,17 @@ export function MineFinanceHub() {
                     <p className="font-semibold tabular-nums">{formatIDR(acc.balance)}</p>
                   </div>
                 ))}
-                <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm">
-                  <p className="font-medium">Proyeksi bulan ini</p>
-                  <ul className="mt-2 space-y-1 text-muted-foreground">
-                    <li>Langganan bulanan: {formatIDR(data.planning.subscription_monthly_idr)}</li>
-                    <li>Tagihan 7 hari ke depan: {formatIDR(data.planning.subscription_due_week_idr)}</li>
-                    <li>Saldo setelah langganan: {formatIDR(data.planning.projected_after_subs)}</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-normal">Insights</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {data.insights.slice(0, 4).map((ins) => (
-                  <div key={ins.id} className={cn("rounded-lg border px-3 py-2 text-sm", insightTone(ins.severity))}>
-                    <p className="font-medium">{ins.title}</p>
-                    <p className="text-muted-foreground text-xs">{ins.message}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+              <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm">
+                <p className="font-medium">Proyeksi bulan ini</p>
+                <ul className="mt-2 space-y-1 text-muted-foreground">
+                  <li>Langganan bulanan: {formatIDR(data.planning.subscription_monthly_idr)}</li>
+                  <li>Tagihan 7 hari ke depan: {formatIDR(data.planning.subscription_due_week_idr)}</li>
+                  <li>Saldo setelah langganan: {formatIDR(data.planning.projected_after_subs)}</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
@@ -476,49 +430,25 @@ export function MineFinanceHub() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="mt-4 grid gap-4 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-normal">Cash flow (6 bulan)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={cashFlowConfig} className="h-[280px] w-full">
-                <BarChart data={data.cash_flow}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} />
-                  <YAxis tickFormatter={(v) => `${Math.round(Number(v) / 1000)}k`} />
-                  <ChartTooltip content={<ChartTooltipContent formatter={(v) => formatIDR(Number(v))} />} />
-                  <Bar dataKey="income" fill="var(--color-income)" radius={4} />
-                  <Bar dataKey="expense" fill="var(--color-expense)" radius={4} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-normal">Pengeluaran per kategori</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {pieData.length === 0 ? (
-                <p className="py-12 text-center text-muted-foreground text-sm">Belum ada pengeluaran bulan ini.</p>
-              ) : (
-                <ChartContainer
-                  config={{ amount: { label: "Nominal" } }}
-                  className="mx-auto h-[280px] w-full max-w-[320px]"
-                >
-                  <PieChart>
-                    <ChartTooltip content={<ChartTooltipContent formatter={(v) => formatIDR(Number(v))} />} />
-                    <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90}>
-                      {pieData.map((entry) => (
-                        <Cell key={entry.name} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="analytics" className="mt-4 space-y-4">
+          <SpendingActivityCard
+            chartData={expenseTrend}
+            monthExpense={data.stats.month_expense}
+            monthBudgetTotal={budgetTotal}
+            monthBudgetSpent={budgetSpent}
+          />
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+            <div className="xl:col-span-7">
+              <CashFlowOverview
+                chartData={cashFlowChart}
+                totalIncome={data.cash_flow.reduce((sum, row) => sum + row.income, 0)}
+                totalExpense={data.cash_flow.reduce((sum, row) => sum + row.expense, 0)}
+              />
+            </div>
+            <div className="xl:col-span-5">
+              <BalanceDistributionCard title="Komposisi pengeluaran" rows={categoryRows} totalLabel="Total" />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="goals" className="mt-4 space-y-4">
