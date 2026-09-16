@@ -1,4 +1,4 @@
-import { endOfDay, endOfMonth, endOfWeek, format, parseISO, startOfDay, startOfMonth, startOfWeek } from "date-fns";
+import { endOfDay, format, parseISO, subMilliseconds } from "date-fns";
 
 import type { CalendarEventRecord, HolidayCalendarEvent, TaskCalendarEvent } from "@/lib/api/tasks";
 
@@ -180,47 +180,65 @@ export function isoFromFormValues(
   };
 }
 
-export type ClearPeriod = "day" | "week" | "month";
+export type ClearScope = "day" | "week" | "month" | "year";
 
-export function clearPeriodRange(anchor: Date, period: ClearPeriod) {
-  switch (period) {
-    case "day":
-      return { start: startOfDay(anchor), end: endOfDay(anchor) };
-    case "week":
-      return {
-        start: startOfWeek(anchor, { weekStartsOn: 1 }),
-        end: endOfWeek(anchor, { weekStartsOn: 1 }),
-      };
-    case "month":
-      return { start: startOfMonth(anchor), end: endOfMonth(anchor) };
+export type VisibleRange = { start: Date; end: Date };
+
+export function resolveClearScope(viewType: string): ClearScope {
+  switch (viewType) {
+    case "timeGridDay":
+      return "day";
+    case "timeGridWeek":
+    case "listWeek":
+      return "week";
+    case "multiMonthYear":
+      return "year";
+    default:
+      return "month";
   }
 }
 
-export function clearPeriodTitle(period: ClearPeriod) {
-  switch (period) {
+export function visibleRangeEndInclusive(range: VisibleRange) {
+  return subMilliseconds(range.end, 1);
+}
+
+export function bulkDeleteRange(range: VisibleRange) {
+  const endInclusive = visibleRangeEndInclusive(range);
+  return {
+    start: range.start,
+    end: endOfDay(endInclusive),
+  };
+}
+
+export function clearScopeTitle(scope: ClearScope) {
+  switch (scope) {
     case "day":
       return "Hapus event hari ini";
     case "week":
       return "Hapus event minggu ini";
     case "month":
       return "Hapus event bulan ini";
+    case "year":
+      return "Hapus event tahun ini";
   }
 }
 
-export function clearPeriodDescription(period: ClearPeriod, anchor: Date) {
-  switch (period) {
+export function clearScopeDescription(scope: ClearScope, range: VisibleRange) {
+  const endInclusive = visibleRangeEndInclusive(range);
+  switch (scope) {
     case "day":
-      return format(anchor, "EEEE, d MMMM yyyy");
-    case "week": {
-      const { start, end } = clearPeriodRange(anchor, "week");
-      return `${format(start, "d MMM")} – ${format(end, "d MMM yyyy")}`;
-    }
+      return format(range.start, "EEEE, d MMMM yyyy");
+    case "week":
+      return `${format(range.start, "d MMM")} – ${format(endInclusive, "d MMM yyyy")}`;
     case "month":
-      return format(anchor, "MMMM yyyy");
+      return format(range.start, "MMMM yyyy");
+    case "year":
+      return format(range.start, "yyyy");
   }
 }
 
-export function countClearableEvents(events: CalendarUiEvent[], start: Date, end: Date) {
+export function countClearableEvents(events: CalendarUiEvent[], range: VisibleRange) {
+  const { start, end } = bulkDeleteRange(range);
   return events.filter((event) => {
     if (event.extendedProps.source === "holiday") return false;
     const eventStart = parseCalendarDate(event.start);

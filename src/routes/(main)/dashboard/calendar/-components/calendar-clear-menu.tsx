@@ -15,15 +15,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import { type ClearPeriod, clearPeriodDescription, clearPeriodTitle } from "./calendar-utils";
+import { type ClearScope, clearScopeDescription, clearScopeTitle, type VisibleRange } from "./calendar-utils";
 
 function confirmActionLabel(clearing: boolean, countLoading: boolean, pendingCount: number) {
   if (clearing) return "Menghapus...";
@@ -33,28 +26,27 @@ function confirmActionLabel(clearing: boolean, countLoading: boolean, pendingCou
 }
 
 type CalendarClearMenuProps = {
-  anchorDate: Date;
+  scope: ClearScope;
+  range: VisibleRange;
   clearing: boolean;
-  onClear: (period: ClearPeriod) => Promise<void>;
-  onCount: (period: ClearPeriod) => Promise<number>;
+  onClear: () => Promise<void>;
+  onCount: () => Promise<number>;
 };
 
-const periods: ClearPeriod[] = ["day", "week", "month"];
-
-export function CalendarClearMenu({ anchorDate, clearing, onClear, onCount }: CalendarClearMenuProps) {
-  const [pendingPeriod, setPendingPeriod] = React.useState<ClearPeriod | null>(null);
+export function CalendarClearMenu({ scope, range, clearing, onClear, onCount }: CalendarClearMenuProps) {
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [pendingCount, setPendingCount] = React.useState(0);
   const [countLoading, setCountLoading] = React.useState(false);
 
   React.useEffect(() => {
-    if (!pendingPeriod) {
+    if (!confirmOpen) {
       setPendingCount(0);
       return;
     }
 
     let cancelled = false;
     setCountLoading(true);
-    void onCount(pendingPeriod)
+    void onCount()
       .then((count) => {
         if (!cancelled) setPendingCount(count);
       })
@@ -65,55 +57,31 @@ export function CalendarClearMenu({ anchorDate, clearing, onClear, onCount }: Ca
     return () => {
       cancelled = true;
     };
-  }, [onCount, pendingPeriod]);
+  }, [confirmOpen, onCount]);
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="outline" disabled={clearing}>
-              {clearing ? <Loader2 className="animate-spin" /> : <Eraser />}
-              Bersihkan
-            </Button>
-          }
-        />
-        <DropdownMenuContent align="end">
-          <DropdownMenuGroup>
-            {periods.map((period) => (
-              <DropdownMenuItem key={period} variant="destructive" onClick={() => setPendingPeriod(period)}>
-                {clearPeriodTitle(period)}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button variant="outline" disabled={clearing} onClick={() => setConfirmOpen(true)}>
+        {clearing ? <Loader2 className="animate-spin" /> : <Eraser />}
+        Bersihkan
+      </Button>
 
-      <AlertDialog open={pendingPeriod !== null} onOpenChange={(open) => !open && setPendingPeriod(null)}>
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{pendingPeriod ? clearPeriodTitle(pendingPeriod) : "Hapus event"}</AlertDialogTitle>
+            <AlertDialogTitle>{clearScopeTitle(scope)}</AlertDialogTitle>
             <AlertDialogDescription>
-              {pendingPeriod ? (
-                <>
-                  Semua event dan due date task pada periode{" "}
-                  <span className="font-medium text-foreground">
-                    {clearPeriodDescription(pendingPeriod, anchorDate)}
-                  </span>{" "}
-                  akan dihapus sekaligus
-                  {countLoading ? " (menghitung...)" : ` (${pendingCount} item)`}. Tanggal merah tidak ikut terhapus.
-                </>
-              ) : null}
+              Semua event dan due date task pada periode{" "}
+              <span className="font-medium text-foreground">{clearScopeDescription(scope, range)}</span> akan dihapus
+              sekaligus
+              {countLoading ? " (menghitung...)" : ` (${pendingCount} item)`}. Tanggal merah tidak ikut terhapus.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={clearing}>Batal</AlertDialogCancel>
             <AlertDialogAction
               disabled={clearing || countLoading || pendingCount === 0}
-              onClick={() => {
-                if (!pendingPeriod) return;
-                void onClear(pendingPeriod).finally(() => setPendingPeriod(null));
-              }}
+              onClick={() => void onClear().finally(() => setConfirmOpen(false))}
             >
               {confirmActionLabel(clearing, countLoading, pendingCount)}
             </AlertDialogAction>
