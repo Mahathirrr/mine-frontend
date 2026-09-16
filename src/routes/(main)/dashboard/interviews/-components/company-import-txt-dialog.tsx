@@ -41,6 +41,7 @@ export function CompanyImportTxtDialog({
   const [fallbackCategory, setFallbackCategory] = React.useState<QuestionCategory>(defaultCategory);
   const [parseError, setParseError] = React.useState<string | null>(null);
   const [preview, setPreview] = React.useState<ParsedTxtQuestion[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     if (!open) return;
@@ -101,8 +102,8 @@ export function CompanyImportTxtDialog({
         </DialogHeader>
 
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div className="space-y-1.5">
               <Label htmlFor="txt-fallback-category">Kategori default (jika tanpa # judul)</Label>
               <Select
                 value={fallbackCategory}
@@ -113,7 +114,7 @@ export function CompanyImportTxtDialog({
                   handleParse(text, nextCategory);
                 }}
               >
-                <SelectTrigger id="txt-fallback-category" className="w-full">
+                <SelectTrigger id="txt-fallback-category" className="h-9 w-full">
                   <SelectValue>{COMPANY_PREP_CATEGORY_LABEL[fallbackCategory]}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -125,19 +126,26 @@ export function CompanyImportTxtDialog({
                 </SelectContent>
               </Select>
             </div>
-            <Button type="button" variant="outline" className="w-full shrink-0 sm:w-auto" asChild>
-              <label htmlFor="txt-upload" className="cursor-pointer">
-                <FileUp className="size-4" />
+            <div className="space-y-1.5">
+              <Label htmlFor="txt-upload">Unggah file</Label>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 w-full gap-2 px-3 sm:w-auto"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FileUp className="size-4 shrink-0" />
                 Pilih file .txt
-                <input
-                  id="txt-upload"
-                  type="file"
-                  accept=".txt,text/plain"
-                  className="sr-only"
-                  onChange={(e) => void handleFileChange(e)}
-                />
-              </label>
-            </Button>
+              </Button>
+              <input
+                ref={fileInputRef}
+                id="txt-upload"
+                type="file"
+                accept=".txt,text/plain"
+                className="sr-only"
+                onChange={(e) => void handleFileChange(e)}
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -198,7 +206,7 @@ export function CompanyImportTxtDialog({
           </div>
         </div>
 
-        <DialogFooter className="gap-2 border-t px-6 py-4">
+        <DialogFooter className="-mx-0 -mb-0 shrink-0 gap-3 border-t bg-muted/50 px-6 py-5 sm:flex-row sm:justify-end">
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={importing}>
             Batal
           </Button>
