@@ -258,11 +258,15 @@ export function EventFormDialog({
                 name="title"
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="pt-4">
+                    <FieldLabel htmlFor="calendar-event-title" className="text-muted-foreground text-xs">
+                      Title
+                    </FieldLabel>
                     <Input
                       {...field}
+                      id="calendar-event-title"
                       placeholder="Add title"
                       aria-invalid={fieldState.invalid}
-                      className="h-auto rounded-none border-0 border-input border-b px-0 py-2.5 font-normal text-2xl leading-tight shadow-none focus-visible:ring-0"
+                      className="h-auto border-input bg-background px-3 py-3 font-medium text-xl leading-tight md:text-2xl"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
