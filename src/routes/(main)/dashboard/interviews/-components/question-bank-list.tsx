@@ -59,51 +59,77 @@ export function QuestionBankList({
                     onCheckedChange={(v) => void onToggle(q, v)}
                     disabled={disabled}
                     aria-label="Sudah dipraktikkan"
-                    className="mt-0.5"
+                    className="mt-0.5 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
                   />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {showCategoryBadge ? (
-                        <Badge variant="outline" className="text-[10px]">
-                          {QUESTION_CATEGORY_LABEL[q.category]}
-                        </Badge>
-                      ) : null}
-                      {q.tech_group ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {q.tech_group}
-                        </Badge>
-                      ) : null}
-                      {q.section_label ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {q.section_label}
-                        </Badge>
-                      ) : null}
-                      {q.is_practiced ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-600 text-xs dark:text-emerald-400">
-                          <CheckCircle2 className="size-3" />
-                          Sudah latihan
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-2 font-medium text-sm leading-snug">{q.question}</p>
-                    {hasAnswer ? (
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="mt-1 h-7 gap-1 px-2 text-xs">
-                          <ChevronDown className={`size-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-                          {isOpen ? "Sembunyikan jawaban" : "Lihat jawaban"}
-                        </Button>
-                      </CollapsibleTrigger>
-                    ) : (
+                  {hasAnswer ? (
+                    <CollapsibleTrigger className="min-w-0 flex-1 cursor-pointer text-left">
+                      <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {showCategoryBadge ? (
+                              <Badge variant="outline" className="text-[10px]">
+                                {QUESTION_CATEGORY_LABEL[q.category]}
+                              </Badge>
+                            ) : null}
+                            {q.tech_group ? (
+                              <Badge variant="secondary" className="text-[10px]">
+                                {q.tech_group}
+                              </Badge>
+                            ) : null}
+                            {q.section_label ? (
+                              <Badge variant="secondary" className="text-[10px]">
+                                {q.section_label}
+                              </Badge>
+                            ) : null}
+                            {q.is_practiced ? (
+                              <span className="inline-flex items-center gap-1 text-emerald-600 text-xs dark:text-emerald-400">
+                                <CheckCircle2 className="size-3" />
+                                Sudah latihan
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="mt-2 font-medium text-sm leading-snug">{q.question}</p>
+                        </div>
+                        <ChevronDown
+                          className={`mt-1 size-4 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                    </CollapsibleTrigger>
+                  ) : (
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {showCategoryBadge ? (
+                          <Badge variant="outline" className="text-[10px]">
+                            {QUESTION_CATEGORY_LABEL[q.category]}
+                          </Badge>
+                        ) : null}
+                        {q.tech_group ? (
+                          <Badge variant="secondary" className="text-[10px]">
+                            {q.tech_group}
+                          </Badge>
+                        ) : null}
+                        {q.section_label ? (
+                          <Badge variant="secondary" className="text-[10px]">
+                            {q.section_label}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <p className="mt-2 font-medium text-sm leading-snug">{q.question}</p>
                       <p className="mt-2 text-muted-foreground text-xs italic">Belum ada catatan jawaban.</p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   {onDelete ? (
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      onClick={() => void onDelete(q.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void onDelete(q.id);
+                      }}
                       disabled={disabled}
                       aria-label="Hapus soal"
+                      className="shrink-0"
                     >
                       <XCircle className="size-4 text-muted-foreground" />
                     </Button>
@@ -111,7 +137,7 @@ export function QuestionBankList({
                 </div>
                 {hasAnswer ? (
                   <CollapsibleContent>
-                    <div className="border-t bg-muted/30 px-3 py-3">
+                    <div className="border-t bg-muted/30 px-3 py-3 pl-12">
                       <p className="mb-1 font-medium text-muted-foreground text-xs uppercase tracking-wide">Jawaban</p>
                       <p className="whitespace-pre-wrap text-sm leading-relaxed">{q.answer_notes}</p>
                     </div>
