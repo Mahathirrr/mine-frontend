@@ -222,11 +222,24 @@ export function EventFormDialog({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl" showCloseButton={false}>
-          <div className="flex items-center justify-between border-b px-4 py-3">
-            <Button type="button" size="icon-sm" variant="ghost" aria-label="Close" onClick={() => onOpenChange(false)}>
+          <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              className="shrink-0"
+              aria-label="Close"
+              onClick={() => onOpenChange(false)}
+            >
               <X />
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+              {isKanban ? <Badge variant="secondary">Task</Badge> : null}
+              <span className="truncate text-muted-foreground text-sm">
+                {mode === "edit" ? (isKanban ? "Edit task" : "Edit event") : "Create event"}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
               {mode === "edit" && onDelete && !isKanban ? (
                 <Button type="button" variant="outline" onClick={() => setDeleteOpen(true)} disabled={saving}>
                   Delete
@@ -238,25 +251,18 @@ export function EventFormDialog({
             </div>
           </div>
 
-          <form id="calendar-event-form" noValidate onSubmit={form.handleSubmit(handleSubmit)} className="px-6 py-5">
-            <div className="mb-6 flex flex-wrap items-center gap-2">
-              {isKanban ? <Badge variant="secondary">Task</Badge> : null}
-              <p className="text-muted-foreground text-sm">
-                {mode === "edit" ? (isKanban ? "Edit task" : "Edit event") : "Create event"}
-              </p>
-            </div>
-
+          <form id="calendar-event-form" noValidate onSubmit={form.handleSubmit(handleSubmit)} className="px-6 pb-5">
             <FieldGroup className="gap-6">
               <Controller
                 control={form.control}
                 name="title"
                 render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
+                  <Field data-invalid={fieldState.invalid} className="pt-4">
                     <Input
                       {...field}
                       placeholder="Add title"
                       aria-invalid={fieldState.invalid}
-                      className="h-auto rounded-none border-0 border-input border-b px-0 font-normal text-2xl shadow-none focus-visible:ring-0"
+                      className="h-auto rounded-none border-0 border-input border-b px-0 py-2.5 font-normal text-2xl leading-tight shadow-none focus-visible:ring-0"
                     />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
