@@ -22,7 +22,13 @@ import { tasksApi } from "@/lib/api/tasks";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
 import { CalendarClearMenu } from "./calendar-clear-menu";
-import { calendarColors, calendarFilters, calendarViews, timeGridOptions } from "./calendar-config";
+import {
+  calendarColors,
+  calendarEventTimeFormat,
+  calendarFilters,
+  calendarViews,
+  timeGridOptions,
+} from "./calendar-config";
 import {
   type CalendarUiEvent,
   type ClearPeriod,
@@ -466,9 +472,10 @@ export function Calendar() {
           selectable
           selectMirror
           unselectAuto
-          dayMaxEvents={3}
+          dayMaxEvents={4}
           displayEventTime
           displayEventEnd={false}
+          eventTimeFormat={calendarEventTimeFormat}
           allDaySlot
           slotEventOverlap={false}
           {...timeGridOptions}
