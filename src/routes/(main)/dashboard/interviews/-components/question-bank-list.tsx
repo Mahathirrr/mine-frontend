@@ -11,12 +11,12 @@ import { Switch } from "@/components/ui/switch";
 import type { InterviewQuestion } from "@/lib/api/interviews";
 
 import { QUESTION_CATEGORY_LABEL } from "./interview-constants";
-import { formatDate } from "./interview-utils";
 
 type QuestionBankListProps = {
   questions: InterviewQuestion[];
   disabled?: boolean;
   emptyMessage?: string;
+  showCategoryBadge?: boolean;
   onToggle: (q: InterviewQuestion, practiced: boolean) => Promise<void>;
   onDelete?: (id: number) => Promise<void>;
 };
@@ -25,6 +25,7 @@ export function QuestionBankList({
   questions,
   disabled,
   emptyMessage = "Belum ada soal di kategori ini.",
+  showCategoryBadge = true,
   onToggle,
   onDelete,
 }: QuestionBankListProps) {
@@ -62,9 +63,11 @@ export function QuestionBankList({
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <Badge variant="outline" className="text-[10px]">
-                        {QUESTION_CATEGORY_LABEL[q.category]}
-                      </Badge>
+                      {showCategoryBadge ? (
+                        <Badge variant="outline" className="text-[10px]">
+                          {QUESTION_CATEGORY_LABEL[q.category]}
+                        </Badge>
+                      ) : null}
                       {q.tech_group ? (
                         <Badge variant="secondary" className="text-[10px]">
                           {q.tech_group}
@@ -93,7 +96,6 @@ export function QuestionBankList({
                     ) : (
                       <p className="mt-2 text-muted-foreground text-xs italic">Belum ada catatan jawaban.</p>
                     )}
-                    <p className="mt-1 text-[11px] text-muted-foreground">Diperbarui {formatDate(q.updated_at)}</p>
                   </div>
                   {onDelete ? (
                     <Button

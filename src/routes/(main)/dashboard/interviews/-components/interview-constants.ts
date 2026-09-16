@@ -87,6 +87,23 @@ export const GENERAL_PREP_CATEGORY_DESC: Partial<Record<QuestionCategory, string
 
 export const DEFAULT_TECH_GROUPS = ["Umum", "Mobile", "Backend", "Frontend", "DevOps"] as const;
 
+/** Company-specific prep tabs (mirrors typical interview pack structure). */
+export const COMPANY_PREP_CATEGORIES: QuestionCategory[] = ["company", "behavioral", "technical", "other"];
+
+export const COMPANY_PREP_CATEGORY_LABEL: Partial<Record<QuestionCategory, string>> = {
+  company: "Pengetahuan Perusahaan",
+  behavioral: "HRD & Non-Teknis",
+  technical: "Teknis",
+  other: "Lainnya",
+};
+
+export const COMPANY_PREP_CATEGORY_DESC: Partial<Record<QuestionCategory, string>> = {
+  company: "Profil perusahaan, produk, visi, dan konteks role",
+  behavioral: "Perkenalan diri, motivasi, STAR, sikap kerja",
+  technical: "Soal teknis sesuai posisi yang dilamar",
+  other: "Topik tambahan di luar tiga kategori utama",
+};
+
 export const TECH_GROUP_STORAGE_KEY = "mine-interview-tech-groups";
 
 export const PRIORITY_LABEL: Record<number, string> = {

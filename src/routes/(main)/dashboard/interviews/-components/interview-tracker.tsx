@@ -43,31 +43,33 @@ import {
   type CreateQuestionBody,
   type InterviewApplicationWithRounds,
   type InterviewOverviewResponse,
-  type InterviewQuestion,
   interviewsApi,
+  type QuestionCategory,
   type WorkType,
 } from "@/lib/api/interviews";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
 import { ApplicationDetailSheet } from "./application-detail-sheet";
-import { ImportPrepDialog } from "./import-prep-dialog";
+import { CompanyPrepPanel } from "./company-prep-panel";
+import { GeneralPrepPanel } from "./general-prep-panel";
 import {
   APP_STATUS_LABEL,
   APP_STATUS_ORDER,
   APP_STATUS_TONE,
+  COMPANY_PREP_CATEGORIES,
+  COMPANY_PREP_CATEGORY_LABEL,
   QUESTION_CATEGORY_LABEL,
   ROUND_TYPE_LABEL,
   WORK_TYPE_LABEL,
 } from "./interview-constants";
-import { appRounds, formatDate, formatDateTime, formatRelativeSchedule, upcomingRounds } from "./interview-utils";
-import { CompanyPrepPanel } from "./company-prep-panel";
-import { GeneralPrepPanel } from "./general-prep-panel";
+import { appRounds, formatDateTime, formatRelativeSchedule, upcomingRounds } from "./interview-utils";
+import type { ParsedTxtQuestion } from "./parse-interview-txt";
 import { PipelineBoard } from "./pipeline-board";
 
 function normalizeOverview(data: InterviewOverviewResponse): InterviewOverviewResponse {
   return {
     ...data,
-    prep_guides: data.prep_guides ?? [],
+    prep_guides: data.prep_guides,
     applications: data.applications.map((app) => ({
       ...app,
       rounds: appRounds(app),
@@ -134,8 +136,8 @@ export function InterviewTracker() {
   const [questionDialogOpen, setQuestionDialogOpen] = React.useState(false);
   const [appDraft, setAppDraft] = React.useState<CreateApplicationBody>(EMPTY_APP);
   const [questionDraft, setQuestionDraft] = React.useState<CreateQuestionBody>(EMPTY_QUESTION);
-  const [prepImportOpen, setPrepImportOpen] = React.useState(false);
   const [selectedPrepAppId, setSelectedPrepAppId] = React.useState<number | null>(null);
+  const [importing, setImporting] = React.useState(false);
   const [questionContext, setQuestionContext] = React.useState<{
     scope: "general" | "company";
     applicationId?: number;
@@ -239,6 +241,37 @@ export function InterviewTracker() {
     setQuestionDialogOpen(true);
   }
 
+  async function importCompanyQuestions(
+    applicationId: number,
+    items: Array<{
+      question: string;
+      answer_notes?: string | null;
+      category?: CreateQuestionBody["category"];
+      tech_group?: string | null;
+      section_label?: string | null;
+    }>,
+    targetCategory?: CreateQuestionBody["category"],
+  ) {
+    if (!token || items.length === 0) return;
+    setImporting(true);
+    try {
+      for (const item of items) {
+        await interviewsApi.createQuestion(token, {
+          application_id: applicationId,
+          question: item.question.trim(),
+          answer_notes: item.answer_notes?.trim() || null,
+          category: targetCategory ?? item.category ?? "company",
+          tech_group: item.tech_group?.trim() || null,
+          section_label: item.section_label?.trim() || null,
+          is_practiced: false,
+        });
+      }
+      await reload();
+    } finally {
+      setImporting(false);
+    }
+  }
+
   async function handleCreateQuestion(e: React.FormEvent) {
     e.preventDefault();
     if (!token || !questionDraft.question.trim()) return;
@@ -249,8 +282,7 @@ export function InterviewTracker() {
         answer_notes: questionDraft.answer_notes?.trim() || null,
         application_id: questionContext.scope === "company" ? questionContext.applicationId : null,
         section_label: questionDraft.section_label?.trim() || null,
-        tech_group:
-          questionDraft.category === "technical" ? questionDraft.tech_group?.trim() || "Umum" : null,
+        tech_group: questionDraft.category === "technical" ? questionDraft.tech_group?.trim() || "Umum" : null,
       });
       setQuestionDraft(EMPTY_QUESTION);
       setQuestionDialogOpen(false);
@@ -263,8 +295,8 @@ export function InterviewTracker() {
     return (
       <div className="flex flex-col gap-4">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+          {(["stat-a", "stat-b", "stat-c", "stat-d", "stat-e"] as const).map((id) => (
+            <Skeleton key={id} className="h-20 rounded-xl" />
           ))}
         </div>
         <Skeleton className="h-72 w-full rounded-xl" />
@@ -296,10 +328,6 @@ export function InterviewTracker() {
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setPrepImportOpen(true)}>
-            <BookOpen />
-            Impor materi
-          </Button>
           <Button variant="outline" onClick={() => openQuestionDialog({ scope: "general", category: "behavioral" })}>
             <ClipboardList />
             Tambah soal umum
@@ -376,21 +404,46 @@ export function InterviewTracker() {
             applications={data.applications}
             prepGuides={prepGuides}
             questions={questions}
+            generalQuestions={questions.filter((q) => !q.application_id && !q.source_guide)}
             selectedAppId={activePrepAppId}
             onSelectApp={setSelectedPrepAppId}
             onAddCompany={() => setAppDialogOpen(true)}
-            onImportPack={() => setPrepImportOpen(true)}
-            onAddCompanyQuestion={(applicationId) =>
-              openQuestionDialog({ scope: "company", applicationId, category: "company" })
+            onAddQuestion={({ applicationId, category, techGroup }) =>
+              openQuestionDialog({ scope: "company", applicationId, category, techGroup })
             }
+            onImportFromGeneral={async (applicationId, items, targetCategory) => {
+              await importCompanyQuestions(
+                applicationId,
+                items.map((q) => ({
+                  question: q.question,
+                  answer_notes: q.answer_notes,
+                  category: targetCategory,
+                  tech_group: q.tech_group,
+                  section_label: q.section_label,
+                })),
+                targetCategory,
+              );
+            }}
+            onImportFromTxt={async (applicationId, items: ParsedTxtQuestion[]) => {
+              await importCompanyQuestions(
+                applicationId,
+                items.map((item) => ({
+                  question: item.question,
+                  answer_notes: item.answer,
+                  category: item.category,
+                  section_label: item.section_label,
+                })),
+              );
+            }}
             disabled={saving}
-            onTogglePracticed={async (questionId, practiced) => {
+            importing={importing}
+            onToggle={async (q, practiced) => {
               if (!token) return;
               await withSave(async () => {
-                await interviewsApi.updateQuestion(token, questionId, { is_practiced: practiced });
+                await interviewsApi.updateQuestion(token, q.id, { is_practiced: practiced });
               });
             }}
-            onDeleteQuestion={async (id) => {
+            onDelete={async (id) => {
               if (!token) return;
               await withSave(async () => {
                 await interviewsApi.deleteQuestion(token, id);
@@ -660,15 +713,20 @@ export function InterviewTracker() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(QUESTION_CATEGORY_LABEL) as Array<keyof typeof QUESTION_CATEGORY_LABEL>).map((k) => (
+                  {(questionContext.scope === "company"
+                    ? COMPANY_PREP_CATEGORIES
+                    : (Object.keys(QUESTION_CATEGORY_LABEL) as QuestionCategory[])
+                  ).map((k) => (
                     <SelectItem key={k} value={k}>
-                      {QUESTION_CATEGORY_LABEL[k]}
+                      {questionContext.scope === "company"
+                        ? (COMPANY_PREP_CATEGORY_LABEL[k] ?? QUESTION_CATEGORY_LABEL[k])
+                        : QUESTION_CATEGORY_LABEL[k]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </Field>
-            {questionDraft.category === "technical" && questionContext.scope === "general" ? (
+            {questionDraft.category === "technical" ? (
               <Field label="Grup teknis">
                 <Input
                   value={questionDraft.tech_group ?? questionContext.techGroup ?? "Umum"}
@@ -705,10 +763,6 @@ export function InterviewTracker() {
           </form>
         </DialogContent>
       </Dialog>
-
-      {token ? (
-        <ImportPrepDialog open={prepImportOpen} onOpenChange={setPrepImportOpen} token={token} onImported={reload} />
-      ) : null}
     </div>
   );
 }
@@ -737,4 +791,3 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
     </div>
   );
 }
-
