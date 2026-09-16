@@ -83,6 +83,7 @@ export type TaskCalendarEvent = {
   task_id: number;
   title: string;
   start: string;
+  end?: string;
   allDay: boolean;
   calendar_slug: string;
   color: string;
@@ -209,5 +210,12 @@ export const tasksApi = {
 
   deleteCalendarEvent(token: string, id: number) {
     return request<{ ok: boolean }>(`/calendar/events/${id}`, token, { method: "DELETE" });
+  },
+
+  bulkDeleteCalendarEvents(token: string, body: { start: string; end: string; clear_task_due_dates?: boolean }) {
+    return request<{ deleted_events: number; cleared_tasks: number }>("/calendar/events/bulk", token, {
+      method: "DELETE",
+      body,
+    });
   },
 };

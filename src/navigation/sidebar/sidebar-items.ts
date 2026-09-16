@@ -12,7 +12,6 @@ import {
   Gauge,
   GraduationCap,
   HeartPulse,
-  Kanban,
   LayoutDashboard,
   ListTodo,
   Lock,
@@ -90,9 +89,9 @@ export const sidebarItems: NavGroup[] = [
       },
       {
         id: "kanban",
-        title: "Kanban",
+        title: "Task",
         url: "/dashboard/kanban",
-        icon: Kanban,
+        icon: CheckSquare,
       },
       {
         id: "calendar",

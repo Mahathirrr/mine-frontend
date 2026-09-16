@@ -17,6 +17,27 @@ const getShortDayCellBottomClass = (info: DayCellInfo) => cn(
   !info.isNarrow && 'min-h-0.5'
 )
 
+const monthListItemClasses: CalendarOptions = {
+  listItemEventClass: (info) => cn(
+    'mb-0.5 overflow-hidden rounded-sm group',
+    info.isNarrow ? 'mx-0.5' : 'mx-1',
+    'hover:bg-muted/50',
+    info.isSelected && 'ring-2 ring-ring/60 bg-muted/40',
+  ),
+  listItemEventBeforeClass: 'size-1.5 shrink-0 rounded-full bg-(--fc-event-color) ms-0.5',
+  listItemEventInnerClass: (info) => cn(
+    'flex min-w-0 flex-row items-center gap-1',
+    info.isNarrow
+      ? `px-0.5 py-px ${xxsTextClass}`
+      : 'px-1 py-0.5 text-xs',
+  ),
+  listItemEventTimeClass: (info) => cn(
+    'shrink-0 whitespace-nowrap font-normal lowercase text-muted-foreground',
+    !info.timeText && 'hidden',
+  ),
+  listItemEventTitleClass: 'min-w-0 flex-1 truncate font-medium text-foreground',
+}
+
 const dayRowCommonClasses: CalendarOptions = {
 
   /* Day Row > List-Item Event
@@ -107,11 +128,6 @@ export function EventCalendarViews({
             ? `p-1 ${xxsTextClass}`
             : 'p-2 text-xs',
         )}
-
-        /* List-Item Event
-        ----------------------------------------------------------------------------------------- */
-
-        listItemEventTimeClass='text-muted-foreground'
 
         /* Block Event
         ----------------------------------------------------------------------------------------- */
@@ -403,6 +419,7 @@ export function EventCalendarViews({
           ...userViews,
           dayGrid: {
             ...dayRowCommonClasses,
+            ...monthListItemClasses,
             tableHeaderClass: 'bg-background',
             dayHeaderAlign: (info) => info.inPopover ? 'start' : info.isNarrow ? 'center' : 'end',
             dayHeaderDividerClass: 'border-b',
@@ -411,6 +428,7 @@ export function EventCalendarViews({
           },
           multiMonth: {
             ...dayRowCommonClasses,
+            ...monthListItemClasses,
             className: 'bg-foreground/3',
             tableHeaderClass: (info) => cn(info.multiMonthColumns === 1 && 'bg-background'),
             dayHeaderAlign: (info) => info.inPopover ? 'start' : info.isNarrow ? 'center' : 'end',
