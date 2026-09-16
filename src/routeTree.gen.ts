@@ -40,6 +40,7 @@ import { Route as mainDashboardPatientMonitoringRouteRouteImport } from './route
 import { Route as mainDashboardProductivityRouteRouteImport } from './routes/(main)/dashboard/productivity/route'
 import { Route as mainDashboardProfileRouteRouteImport } from './routes/(main)/dashboard/profile/route'
 import { Route as mainDashboardRolesRouteRouteImport } from './routes/(main)/dashboard/roles/route'
+import { Route as mainDashboardSubscriptionsRouteRouteImport } from './routes/(main)/dashboard/subscriptions/route'
 import { Route as mainDashboardTasksRouteRouteImport } from './routes/(main)/dashboard/tasks/route'
 import { Route as mainDashboardUsersRouteRouteImport } from './routes/(main)/dashboard/users/route'
 import { Route as mainAuthV1LoginRouteRouteImport } from './routes/(main)/auth/v1/login/route'
@@ -223,6 +224,12 @@ const mainDashboardRolesRouteRoute = mainDashboardRolesRouteRouteImport.update({
   path: '/roles',
   getParentRoute: () => mainDashboardRouteRoute,
 } as any)
+const mainDashboardSubscriptionsRouteRoute =
+  mainDashboardSubscriptionsRouteRouteImport.update({
+    id: '/subscriptions',
+    path: '/subscriptions',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardTasksRouteRoute = mainDashboardTasksRouteRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
@@ -394,6 +403,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/(main)/dashboard/profile': typeof mainDashboardProfileRouteRoute
   '/(main)/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/(main)/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/(main)/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/(main)/dashboard/users': typeof mainDashboardUsersRouteRoute
   '/(main)/dashboard/$': typeof mainDashboardSplatRoute
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/dashboard/productivity'
     | '/dashboard/profile'
     | '/dashboard/roles'
+    | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
     | '/dashboard/$'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/dashboard/productivity'
     | '/dashboard/profile'
     | '/dashboard/roles'
+    | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
     | '/dashboard/$'
@@ -524,6 +536,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/productivity'
     | '/(main)/dashboard/profile'
     | '/(main)/dashboard/roles'
+    | '/(main)/dashboard/subscriptions'
     | '/(main)/dashboard/tasks'
     | '/(main)/dashboard/users'
     | '/(main)/dashboard/$'
@@ -770,6 +783,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardRolesRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/subscriptions': {
+      id: '/(main)/dashboard/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/dashboard/subscriptions'
+      preLoaderRoute: typeof mainDashboardSubscriptionsRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/tasks': {
       id: '/(main)/dashboard/tasks'
       path: '/tasks'
@@ -865,6 +885,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardProductivityRouteRoute: typeof mainDashboardProductivityRouteRoute
   mainDashboardProfileRouteRoute: typeof mainDashboardProfileRouteRoute
   mainDashboardRolesRouteRoute: typeof mainDashboardRolesRouteRoute
+  mainDashboardSubscriptionsRouteRoute: typeof mainDashboardSubscriptionsRouteRoute
   mainDashboardTasksRouteRoute: typeof mainDashboardTasksRouteRoute
   mainDashboardUsersRouteRoute: typeof mainDashboardUsersRouteRoute
   mainDashboardSplatRoute: typeof mainDashboardSplatRoute
@@ -898,6 +919,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardProductivityRouteRoute: mainDashboardProductivityRouteRoute,
   mainDashboardProfileRouteRoute: mainDashboardProfileRouteRoute,
   mainDashboardRolesRouteRoute: mainDashboardRolesRouteRoute,
+  mainDashboardSubscriptionsRouteRoute: mainDashboardSubscriptionsRouteRoute,
   mainDashboardTasksRouteRoute: mainDashboardTasksRouteRoute,
   mainDashboardUsersRouteRoute: mainDashboardUsersRouteRoute,
   mainDashboardSplatRoute: mainDashboardSplatRoute,
