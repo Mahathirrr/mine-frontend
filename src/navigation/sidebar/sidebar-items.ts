@@ -100,6 +100,12 @@ export const sidebarItems: NavGroup[] = [
         icon: Calendar,
       },
       {
+        id: "finance",
+        title: "Keuangan",
+        url: "/dashboard/finance",
+        icon: Banknote,
+      },
+      {
         id: "subscriptions",
         title: "Biaya Rutin",
         url: "/dashboard/subscriptions",
