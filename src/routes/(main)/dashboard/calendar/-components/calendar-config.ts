@@ -42,6 +42,7 @@ export const timeGridOptions = {
   eventTimeFormat: {
     hour: "numeric" as const,
     minute: "2-digit" as const,
-    meridiem: "short" as const,
+    meridiem: "narrow" as const,
+    hour12: true,
   },
 };

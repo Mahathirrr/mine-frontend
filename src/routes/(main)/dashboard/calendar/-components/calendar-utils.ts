@@ -1,4 +1,4 @@
-import { format, parseISO } from "date-fns";
+import { endOfDay, endOfMonth, endOfWeek, format, parseISO, startOfDay, startOfMonth, startOfWeek } from "date-fns";
 
 import type { CalendarEventRecord, HolidayCalendarEvent, TaskCalendarEvent } from "@/lib/api/tasks";
 
@@ -60,7 +60,8 @@ export function mapApiEvents(
       id: event.id,
       title: event.title,
       start: event.start,
-      allDay: true,
+      end: event.end,
+      allDay: event.allDay,
       backgroundColor: calendarColors.kanban,
       borderColor: calendarColors.kanban,
       textColor: "#ffffff",
@@ -177,6 +178,55 @@ export function isoFromFormValues(
     start_at: new Date(startAt).toISOString(),
     end_at: endAt ? new Date(endAt).toISOString() : null,
   };
+}
+
+export type ClearPeriod = "day" | "week" | "month";
+
+export function clearPeriodRange(anchor: Date, period: ClearPeriod) {
+  switch (period) {
+    case "day":
+      return { start: startOfDay(anchor), end: endOfDay(anchor) };
+    case "week":
+      return {
+        start: startOfWeek(anchor, { weekStartsOn: 1 }),
+        end: endOfWeek(anchor, { weekStartsOn: 1 }),
+      };
+    case "month":
+      return { start: startOfMonth(anchor), end: endOfMonth(anchor) };
+  }
+}
+
+export function clearPeriodTitle(period: ClearPeriod) {
+  switch (period) {
+    case "day":
+      return "Hapus event hari ini";
+    case "week":
+      return "Hapus event minggu ini";
+    case "month":
+      return "Hapus event bulan ini";
+  }
+}
+
+export function clearPeriodDescription(period: ClearPeriod, anchor: Date) {
+  switch (period) {
+    case "day":
+      return format(anchor, "EEEE, d MMMM yyyy");
+    case "week": {
+      const { start, end } = clearPeriodRange(anchor, "week");
+      return `${format(start, "d MMM")} – ${format(end, "d MMM yyyy")}`;
+    }
+    case "month":
+      return format(anchor, "MMMM yyyy");
+  }
+}
+
+export function countClearableEvents(events: CalendarUiEvent[], start: Date, end: Date) {
+  return events.filter((event) => {
+    if (event.extendedProps.source === "holiday") return false;
+    const eventStart = parseCalendarDate(event.start);
+    if (!eventStart) return false;
+    return eventStart >= start && eventStart <= end;
+  }).length;
 }
 
 export function defaultEndFromStart(start: string, allDay: boolean): string {

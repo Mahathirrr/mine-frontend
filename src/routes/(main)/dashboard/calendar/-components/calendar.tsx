@@ -21,9 +21,13 @@ import { ApiError } from "@/lib/api/api-error";
 import { tasksApi } from "@/lib/api/tasks";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
+import { CalendarClearMenu } from "./calendar-clear-menu";
 import { calendarColors, calendarFilters, calendarViews, timeGridOptions } from "./calendar-config";
 import {
   type CalendarUiEvent,
+  type ClearPeriod,
+  clearPeriodRange,
+  countClearableEvents,
   defaultEndFromStart,
   defaultTimedStart,
   mapApiEvents,
@@ -54,6 +58,8 @@ export function Calendar() {
   const [events, setEvents] = React.useState<CalendarUiEvent[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
+  const [clearing, setClearing] = React.useState(false);
+  const [anchorDate, setAnchorDate] = React.useState(() => new Date());
   const [formOpen, setFormOpen] = React.useState(false);
   const [formMode, setFormMode] = React.useState<"create" | "edit">("create");
   const [editingEvent, setEditingEvent] = React.useState<EditingEventState | null>(null);
@@ -241,6 +247,45 @@ export function Calendar() {
     }
   }
 
+  const countClearableInPeriod = React.useCallback(
+    async (period: ClearPeriod) => {
+      if (!token) return 0;
+      const { start, end } = clearPeriodRange(anchorDate, period);
+      const res = await tasksApi.listCalendarEvents(token, start.toISOString(), end.toISOString());
+      const scoped = mapApiEvents(res.events, res.task_events, res.holiday_events);
+      return countClearableEvents(scoped, start, end);
+    },
+    [anchorDate, token],
+  );
+
+  async function handleBulkClear(period: ClearPeriod) {
+    if (!token) return;
+    const { start, end } = clearPeriodRange(anchorDate, period);
+    setClearing(true);
+    try {
+      const result = await tasksApi.bulkDeleteCalendarEvents(token, {
+        start: start.toISOString(),
+        end: end.toISOString(),
+        clear_task_due_dates: true,
+      });
+      await loadEvents();
+      toast.add({
+        title: "Kalender dibersihkan",
+        description: `${result.deleted_events} event dihapus, ${result.cleared_tasks} due date task dihapus.`,
+        type: "success",
+      });
+    } catch (e) {
+      toast.add({
+        title: "Gagal membersihkan kalender",
+        description: e instanceof ApiError ? e.message : "Something went wrong.",
+        type: "error",
+      });
+      throw e;
+    } finally {
+      setClearing(false);
+    }
+  }
+
   async function handleDeleteEvent() {
     if (!token || !editingEvent?.eventId) return;
     setSaving(true);
@@ -391,6 +436,12 @@ export function Calendar() {
               </SelectGroup>
             </SelectContent>
           </Select>
+          <CalendarClearMenu
+            anchorDate={anchorDate}
+            clearing={clearing}
+            onClear={handleBulkClear}
+            onCount={countClearableInPeriod}
+          />
           <Button onClick={() => openCreateDialog()}>
             <Plus />
             Add event
@@ -444,6 +495,8 @@ export function Calendar() {
               days: differenceInCalendarDays(info.view.currentEnd, info.view.currentStart),
             });
             setRange({ start: info.start, end: info.end });
+            const mid = new Date((info.start.getTime() + info.end.getTime()) / 2);
+            setAnchorDate(mid);
           }}
         />
       </div>
