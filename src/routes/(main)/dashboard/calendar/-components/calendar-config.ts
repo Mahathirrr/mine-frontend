@@ -33,16 +33,18 @@ export const calendarColors: Record<string, string> = {
   holidaysJoint: "#ea580c",
 };
 
+export const calendarEventTimeFormat = {
+  hour: "numeric" as const,
+  minute: "2-digit" as const,
+  meridiem: "short" as const,
+  hour12: true,
+};
+
 export const timeGridOptions = {
   slotMinTime: "06:00:00",
   slotMaxTime: "22:00:00",
   scrollTime: "08:00:00",
   slotDuration: "00:30:00",
   snapDuration: "00:15:00",
-  eventTimeFormat: {
-    hour: "numeric" as const,
-    minute: "2-digit" as const,
-    meridiem: "narrow" as const,
-    hour12: true,
-  },
+  eventTimeFormat: calendarEventTimeFormat,
 };

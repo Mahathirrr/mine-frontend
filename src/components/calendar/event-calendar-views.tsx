@@ -17,25 +17,38 @@ const getShortDayCellBottomClass = (info: DayCellInfo) => cn(
   !info.isNarrow && 'min-h-0.5'
 )
 
+const monthEventTextClass = 'text-[11px] leading-4'
+
 const monthListItemClasses: CalendarOptions = {
   listItemEventClass: (info) => cn(
-    'mb-0.5 overflow-hidden rounded-sm group',
-    info.isNarrow ? 'mx-0.5' : 'mx-1',
-    'hover:bg-muted/50',
-    info.isSelected && 'ring-2 ring-ring/60 bg-muted/40',
+    'group mb-px flex min-w-0 flex-row items-center gap-1.5 overflow-hidden rounded-[3px] px-1 py-px',
+    info.isNarrow ? 'mx-0.5' : 'mx-1.5',
+    'hover:bg-muted/60',
+    info.isSelected && 'bg-muted/60 ring-1 ring-ring/40',
   ),
-  listItemEventBeforeClass: 'size-1.5 shrink-0 rounded-full bg-(--fc-event-color) ms-0.5',
-  listItemEventInnerClass: (info) => cn(
-    'flex min-w-0 flex-row items-center gap-1',
-    info.isNarrow
-      ? `px-0.5 py-px ${xxsTextClass}`
-      : 'px-1 py-0.5 text-xs',
+  listItemEventBeforeClass: 'size-2 shrink-0 rounded-full bg-(--fc-event-color)',
+  listItemEventInnerClass: cn(
+    'flex min-w-0 flex-1 flex-row items-center gap-1.5 overflow-hidden',
+    monthEventTextClass,
   ),
   listItemEventTimeClass: (info) => cn(
-    'shrink-0 whitespace-nowrap font-normal lowercase text-muted-foreground',
+    'shrink-0 whitespace-nowrap tabular-nums text-muted-foreground',
     !info.timeText && 'hidden',
   ),
-  listItemEventTitleClass: 'min-w-0 flex-1 truncate font-medium text-foreground',
+  listItemEventTitleClass: 'min-w-0 flex-1 truncate font-normal text-foreground',
+}
+
+const monthRowEventClasses: CalendarOptions = {
+  rowEventClass: (info) => cn(
+    'mb-0.5 border-0 bg-(--fc-event-color) hover:brightness-95',
+    info.isStart && (info.isNarrow ? 'ms-1.5' : 'ms-2'),
+    info.isEnd && (info.isNarrow ? 'me-1.5' : 'me-2'),
+    info.isStart && 'rounded-s-[3px]',
+    info.isEnd && 'rounded-e-[3px]',
+  ),
+  rowEventInnerClass: cn('flex h-[18px] items-center overflow-hidden px-1.5', monthEventTextClass),
+  rowEventTitleClass: 'truncate font-medium text-(--fc-event-contrast-color)',
+  rowEventTimeClass: 'hidden',
 }
 
 const dayRowCommonClasses: CalendarOptions = {
@@ -420,6 +433,7 @@ export function EventCalendarViews({
           dayGrid: {
             ...dayRowCommonClasses,
             ...monthListItemClasses,
+            ...monthRowEventClasses,
             tableHeaderClass: 'bg-background',
             dayHeaderAlign: (info) => info.inPopover ? 'start' : info.isNarrow ? 'center' : 'end',
             dayHeaderDividerClass: 'border-b',
@@ -429,6 +443,7 @@ export function EventCalendarViews({
           multiMonth: {
             ...dayRowCommonClasses,
             ...monthListItemClasses,
+            ...monthRowEventClasses,
             className: 'bg-foreground/3',
             tableHeaderClass: (info) => cn(info.multiMonthColumns === 1 && 'bg-background'),
             dayHeaderAlign: (info) => info.inPopover ? 'start' : info.isNarrow ? 'center' : 'end',
