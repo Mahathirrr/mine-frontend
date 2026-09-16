@@ -30,13 +30,13 @@ import {
   timeGridOptions,
 } from "./calendar-config";
 import {
+  bulkDeleteRange,
   type CalendarUiEvent,
-  type ClearPeriod,
-  clearPeriodRange,
   countClearableEvents,
   defaultEndFromStart,
   defaultTimedStart,
   mapApiEvents,
+  resolveClearScope,
   toDatetimeLocalValue,
 } from "./calendar-utils";
 import { EventFormDialog, type EventFormValues } from "./event-form-dialog";
@@ -65,7 +65,7 @@ export function Calendar() {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [clearing, setClearing] = React.useState(false);
-  const [anchorDate, setAnchorDate] = React.useState(() => new Date());
+  const [currentView, setCurrentView] = React.useState(calendarViews[0].value);
   const [formOpen, setFormOpen] = React.useState(false);
   const [formMode, setFormMode] = React.useState<"create" | "edit">("create");
   const [editingEvent, setEditingEvent] = React.useState<EditingEventState | null>(null);
@@ -253,20 +253,18 @@ export function Calendar() {
     }
   }
 
-  const countClearableInPeriod = React.useCallback(
-    async (period: ClearPeriod) => {
-      if (!token) return 0;
-      const { start, end } = clearPeriodRange(anchorDate, period);
-      const res = await tasksApi.listCalendarEvents(token, start.toISOString(), end.toISOString());
-      const scoped = mapApiEvents(res.events, res.task_events, res.holiday_events);
-      return countClearableEvents(scoped, start, end);
-    },
-    [anchorDate, token],
-  );
+  const clearScope = React.useMemo(() => resolveClearScope(currentView), [currentView]);
 
-  async function handleBulkClear(period: ClearPeriod) {
+  const countClearableInView = React.useCallback(async () => {
+    if (!token) return 0;
+    const res = await tasksApi.listCalendarEvents(token, range.start.toISOString(), range.end.toISOString());
+    const scoped = mapApiEvents(res.events, res.task_events, res.holiday_events);
+    return countClearableEvents(scoped, range);
+  }, [range, token]);
+
+  async function handleBulkClear() {
     if (!token) return;
-    const { start, end } = clearPeriodRange(anchorDate, period);
+    const { start, end } = bulkDeleteRange(range);
     setClearing(true);
     try {
       const result = await tasksApi.bulkDeleteCalendarEvents(token, {
@@ -425,7 +423,10 @@ export function Calendar() {
           <Select
             value={controller.view?.type ?? calendarViews[0].value}
             onValueChange={(value) => {
-              if (value !== null) controller.changeView(value);
+              if (value !== null) {
+                controller.changeView(value);
+                setCurrentView(value);
+              }
             }}
             items={calendarViews}
           >
@@ -443,10 +444,11 @@ export function Calendar() {
             </SelectContent>
           </Select>
           <CalendarClearMenu
-            anchorDate={anchorDate}
+            scope={clearScope}
+            range={range}
             clearing={clearing}
             onClear={handleBulkClear}
-            onCount={countClearableInPeriod}
+            onCount={countClearableInView}
           />
           <Button onClick={() => openCreateDialog()}>
             <Plus />
@@ -502,8 +504,7 @@ export function Calendar() {
               days: differenceInCalendarDays(info.view.currentEnd, info.view.currentStart),
             });
             setRange({ start: info.start, end: info.end });
-            const mid = new Date((info.start.getTime() + info.end.getTime()) / 2);
-            setAnchorDate(mid);
+            setCurrentView(info.view.type);
           }}
         />
       </div>
