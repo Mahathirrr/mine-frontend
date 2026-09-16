@@ -26,16 +26,13 @@ import {
   QUESTION_CATEGORY_LABEL,
   TECH_GROUP_STORAGE_KEY,
 } from "./interview-constants";
+import { PrepProgressSummary } from "./prep-progress-summary";
 import { QuestionBankList } from "./question-bank-list";
 
 type GeneralPrepPanelProps = {
   questions: InterviewQuestion[];
   disabled?: boolean;
-  onAddQuestion: (ctx: {
-    category: QuestionCategory;
-    techGroup?: string | null;
-    sectionLabel?: string | null;
-  }) => void;
+  onAddQuestion: (ctx: { category: QuestionCategory; techGroup?: string | null; sectionLabel?: string | null }) => void;
   onToggle: (q: InterviewQuestion, practiced: boolean) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 };
@@ -55,13 +52,7 @@ function saveTechGroups(groups: string[]) {
   localStorage.setItem(TECH_GROUP_STORAGE_KEY, JSON.stringify(groups));
 }
 
-export function GeneralPrepPanel({
-  questions,
-  disabled,
-  onAddQuestion,
-  onToggle,
-  onDelete,
-}: GeneralPrepPanelProps) {
+export function GeneralPrepPanel({ questions, disabled, onAddQuestion, onToggle, onDelete }: GeneralPrepPanelProps) {
   const [category, setCategory] = React.useState<QuestionCategory>("behavioral");
   const [techGroup, setTechGroup] = React.useState<string>("Umum");
   const [techGroups, setTechGroups] = React.useState<string[]>(() => loadTechGroups());
@@ -88,6 +79,9 @@ export function GeneralPrepPanel({
     });
   }, [generalQuestions, category, techGroup, search]);
 
+  const practicedAll = generalQuestions.filter((q) => q.is_practiced).length;
+  const practicedFiltered = filtered.filter((q) => q.is_practiced).length;
+
   function handleAddGroup(e: React.FormEvent) {
     e.preventDefault();
     const name = newGroupName.trim();
@@ -104,25 +98,28 @@ export function GeneralPrepPanel({
     <Card>
       <CardHeader className="gap-3 pb-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
+          <div className="min-w-0">
             <CardTitle className="text-base">Materi umum</CardTitle>
             <CardDescription className="mt-1 max-w-xl">
               Bank soal reusable untuk semua lamaran: behavioral, teknis, system design, dan lainnya. Ceritakan diri
               masuk kategori Behavioral.
             </CardDescription>
           </div>
-          <Button
-            size="sm"
-            onClick={() =>
-              onAddQuestion({
-                category,
-                techGroup: category === "technical" ? techGroup : null,
-              })
-            }
-          >
-            <Plus className="size-3.5" />
-            Tambah soal
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <PrepProgressSummary practiced={practicedAll} total={generalQuestions.length} label="Semua materi" />
+            <Button
+              size="sm"
+              onClick={() =>
+                onAddQuestion({
+                  category,
+                  techGroup: category === "technical" ? techGroup : null,
+                })
+              }
+            >
+              <Plus className="size-3.5" />
+              Tambah soal
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5">
@@ -155,7 +152,13 @@ export function GeneralPrepPanel({
                 {group}
               </Button>
             ))}
-            <Button type="button" size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAddGroupOpen(true)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              onClick={() => setAddGroupOpen(true)}
+            >
               <Plus className="size-3" />
               Grup baru
             </Button>
@@ -163,6 +166,14 @@ export function GeneralPrepPanel({
         ) : null}
 
         <p className="text-muted-foreground text-xs">{GENERAL_PREP_CATEGORY_DESC[category]}</p>
+
+        <PrepProgressSummary
+          practiced={practicedFiltered}
+          total={filtered.length}
+          label={`${QUESTION_CATEGORY_LABEL[category]}${category === "technical" ? ` · ${techGroup}` : ""}`}
+          compact
+          className="max-w-md"
+        />
 
         <div className="relative max-w-md">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -188,9 +199,7 @@ export function GeneralPrepPanel({
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Grup teknis baru</DialogTitle>
-            <DialogDescription>
-              Contoh: Mobile, iOS, Android, Cloud. Hanya untuk kategori Teknis.
-            </DialogDescription>
+            <DialogDescription>Contoh: Mobile, iOS, Android, Cloud. Hanya untuk kategori Teknis.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddGroup} className="space-y-4">
             <div className="space-y-1.5">

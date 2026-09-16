@@ -9,6 +9,7 @@ import {
   BookOpen,
   Briefcase,
   CalendarClock,
+  CheckCircle2,
   ClipboardList,
   Kanban,
   Loader2,
@@ -80,11 +81,13 @@ function normalizeOverview(data: InterviewOverviewResponse): InterviewOverviewRe
 function StatCard({
   label,
   value,
+  suffix,
   icon: Icon,
   tone,
 }: {
   label: string;
   value: number;
+  suffix?: string;
   icon: React.ComponentType<{ className?: string }>;
   tone: "blue" | "amber" | "emerald" | "red" | "violet";
 }) {
@@ -102,7 +105,10 @@ function StatCard({
         <Icon className="size-5" />
       </div>
       <div className="min-w-0 text-left">
-        <p className="font-bold text-2xl tabular-nums leading-none tracking-tight">{value}</p>
+        <p className="font-bold text-2xl tabular-nums leading-none tracking-tight">
+          {value}
+          {suffix ? <span className="text-lg">{suffix}</span> : null}
+        </p>
         <p className="mt-1 text-muted-foreground text-xs">{label}</p>
       </div>
     </div>
@@ -294,8 +300,8 @@ export function InterviewTracker() {
   if (loading || !data) {
     return (
       <div className="flex flex-col gap-4">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {(["stat-a", "stat-b", "stat-c", "stat-d", "stat-e"] as const).map((id) => (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {(["stat-a", "stat-b", "stat-c", "stat-d", "stat-e", "stat-f"] as const).map((id) => (
             <Skeleton key={id} className="h-20 rounded-xl" />
           ))}
         </div>
@@ -306,13 +312,21 @@ export function InterviewTracker() {
 
   const { stats, questions } = data;
   const activePrepAppId = selectedPrepAppId ?? data.applications[0]?.id ?? null;
+  const prepPct = stats.questions > 0 ? Math.round((stats.practiced_qs / stats.questions) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Total lamaran" value={stats.total} icon={Briefcase} tone="blue" />
         <StatCard label="Aktif diproses" value={stats.active} icon={Sparkles} tone="violet" />
         <StatCard label="Jadwal 2 minggu" value={stats.upcoming} icon={CalendarClock} tone="amber" />
+        <StatCard
+          label={`Progress latihan · ${stats.practiced_qs}/${stats.questions} soal`}
+          value={prepPct}
+          suffix="%"
+          icon={CheckCircle2}
+          tone="emerald"
+        />
         <StatCard label="Offer diterima" value={stats.offers} icon={Trophy} tone="emerald" />
         <StatCard label="Ditolak" value={stats.rejected} icon={XCircle} tone="red" />
       </div>

@@ -29,6 +29,7 @@ import {
 } from "./interview-constants";
 import type { ParsedTxtQuestion } from "./parse-interview-txt";
 import { PrepMaterialsPanel } from "./prep-materials-panel";
+import { PrepProgressSummary } from "./prep-progress-summary";
 import { QuestionBankList } from "./question-bank-list";
 
 type CompanyPrepPanelProps = {
@@ -98,6 +99,9 @@ export function CompanyPrepPanel({
     });
   }, [category, companyQuestions, search, techGroup]);
 
+  const practicedAll = companyQuestions.filter((q) => q.is_practiced).length;
+  const practicedFiltered = filtered.filter((q) => q.is_practiced).length;
+
   const techGroups = React.useMemo(() => {
     const fromData = companyQuestions
       .filter((q) => q.category === "technical" && q.tech_group)
@@ -137,7 +141,9 @@ export function CompanyPrepPanel({
         </CardHeader>
         <CardContent className="space-y-1 p-2 pt-0">
           {applications.map((app) => {
-            const count = questions.filter((q) => q.application_id === app.id && !q.source_guide).length;
+            const appQuestions = questions.filter((q) => q.application_id === app.id && !q.source_guide);
+            const count = appQuestions.length;
+            const practiced = appQuestions.filter((q) => q.is_practiced).length;
             const selected = app.id === activeId;
             return (
               <button
@@ -156,7 +162,7 @@ export function CompanyPrepPanel({
                     {APP_STATUS_LABEL[app.status]}
                   </Badge>
                   <Badge variant="secondary" className="text-[10px] tabular-nums">
-                    {count} soal
+                    {practiced}/{count} latihan
                   </Badge>
                 </div>
               </button>
@@ -179,7 +185,12 @@ export function CompanyPrepPanel({
                 {application.location ? ` · ${application.location}` : ""}
               </CardDescription>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <PrepProgressSummary
+                practiced={practicedAll}
+                total={companyQuestions.length}
+                label="Semua soal perusahaan"
+              />
               {guidesForApp.length > 0 ? (
                 <Button type="button" size="sm" variant="outline" onClick={() => setReferenceOpen(true)}>
                   <BookOpen className="size-3.5" />
@@ -258,6 +269,14 @@ export function CompanyPrepPanel({
           ) : null}
 
           <p className="text-muted-foreground text-xs">{COMPANY_PREP_CATEGORY_DESC[category]}</p>
+
+          <PrepProgressSummary
+            practiced={practicedFiltered}
+            total={filtered.length}
+            label={`${COMPANY_PREP_CATEGORY_LABEL[category]}${category === "technical" ? ` · ${techGroup}` : ""}`}
+            compact
+            className="max-w-md"
+          />
 
           <div className="relative max-w-md">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
