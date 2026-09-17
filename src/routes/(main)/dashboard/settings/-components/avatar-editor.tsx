@@ -95,12 +95,12 @@ export function AvatarEditor({ user }: AvatarEditorProps) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
       <div className="relative">
-        <Avatar className="size-24 rounded-xl">
-          <AvatarImage src={displayUrl} alt={user?.name ?? "Profile"} className="rounded-xl" />
-          <AvatarFallback className="rounded-xl text-lg">{getInitials(user?.name ?? "?")}</AvatarFallback>
+        <Avatar className="size-24">
+          <AvatarImage src={displayUrl} alt={user?.name ?? "Profile"} />
+          <AvatarFallback className="text-lg">{getInitials(user?.name ?? "?")}</AvatarFallback>
         </Avatar>
         {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/70">
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/70">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
           </div>
         )}
@@ -108,9 +108,7 @@ export function AvatarEditor({ user }: AvatarEditorProps) {
 
       <div className="flex flex-1 flex-col gap-2">
         <p className="font-medium text-sm">Foto profil</p>
-        <p className="text-muted-foreground text-sm">
-          JPG, PNG, atau WEBP. Maks. 5 MB. Otomatis di-resize (512px) dan dikompresi untuk thumbnail sidebar.
-        </p>
+        <p className="text-muted-foreground text-sm">JPG, PNG, atau WEBP. Maks. 5 MB.</p>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
