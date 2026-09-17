@@ -52,13 +52,14 @@ export type SkillDomainSummary = {
 export type SkillChecklistItem = {
   id: number;
   title: string;
+  description?: string;
   sort_order: number;
   checked: boolean;
 };
 
 export type SkillMaterial = {
   id: number;
-  topic_id: number;
+  domain_id: number;
   title: string;
   material_type: "file" | "link" | "note";
   url?: string | null;
@@ -75,7 +76,6 @@ export type SkillTopic = {
   description: string;
   sort_order: number;
   checklist_items: SkillChecklistItem[];
-  materials: SkillMaterial[];
 };
 
 export type SkillPhase = {
@@ -106,6 +106,7 @@ export type SkillsOverview = {
 export type SkillDomainDetail = {
   domain: SkillDomainSummary;
   phases: SkillPhase[];
+  materials: SkillMaterial[];
   projects: SkillProject[];
 };
 
@@ -139,8 +140,12 @@ export const skillsApi = {
     return request<{ id: number }>("/skills/topics", { method: "POST", body, token });
   },
 
-  createChecklistItem(token: string, body: { topic_id: number; title: string }) {
+  createChecklistItem(token: string, body: { topic_id: number; title: string; description?: string }) {
     return request<{ id: number }>("/skills/checklist", { method: "POST", body, token });
+  },
+
+  updateChecklistItem(token: string, id: number, body: { title?: string; description?: string }) {
+    return request<{ id: number }>(`/skills/checklist/${id}`, { method: "PATCH", body, token });
   },
 
   toggleChecklistItem(token: string, id: number) {
@@ -149,15 +154,15 @@ export const skillsApi = {
 
   createMaterial(
     token: string,
-    body: { topic_id: number; title: string; material_type: "link" | "note"; url?: string; note_content?: string },
+    body: { domain_id: number; title: string; material_type: "link" | "note"; url?: string; note_content?: string },
   ) {
     return request<SkillMaterial>("/skills/materials", { method: "POST", body, token });
   },
 
-  async uploadMaterial(token: string, topicId: number, file: File, title?: string) {
+  async uploadMaterial(token: string, domainId: number, file: File, title?: string) {
     const form = new FormData();
     form.append("file", file);
-    form.append("topic_id", String(topicId));
+    form.append("domain_id", String(domainId));
     if (title) form.append("title", title);
     const res = await fetch(`${API_URL}/skills/materials/upload`, {
       method: "POST",

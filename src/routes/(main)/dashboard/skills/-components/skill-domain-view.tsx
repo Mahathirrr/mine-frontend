@@ -12,6 +12,7 @@ import {
   ExternalLink,
   FolderPlus,
   ListPlus,
+  Pencil,
   Plus,
   Trash2,
   Upload,
@@ -28,7 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import type { SkillDomainDetail, SkillMaterial, SkillProject, SkillTopic } from "@/lib/api/skills";
+import type { SkillChecklistItem, SkillDomainDetail, SkillMaterial, SkillProject, SkillTopic } from "@/lib/api/skills";
 import { parseTechStack, skillsApi } from "@/lib/api/skills";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
@@ -65,7 +66,7 @@ export function SkillDomainView({ domainId }: SkillDomainViewProps) {
   if (error) return <p className="text-destructive text-sm">{error}</p>;
   if (!data) return null;
 
-  const { domain, phases, projects } = data;
+  const { domain, phases, materials, projects } = data;
 
   return (
     <div className="space-y-6">
@@ -121,11 +122,16 @@ export function SkillDomainView({ domainId }: SkillDomainViewProps) {
       <Tabs defaultValue="roadmap">
         <TabsList>
           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+          <TabsTrigger value="materials">Materi ({materials.length})</TabsTrigger>
           <TabsTrigger value="projects">Projects ({projects.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="roadmap" className="space-y-4 pt-2">
           <RoadmapPanel domainId={domainId} phases={phases} onRefresh={load} />
+        </TabsContent>
+
+        <TabsContent value="materials" className="space-y-4 pt-2">
+          <MaterialsPanel domainId={domainId} materials={materials} onRefresh={load} />
         </TabsContent>
 
         <TabsContent value="projects" className="space-y-4 pt-2">
@@ -240,26 +246,173 @@ function AddTopicButton({
 
 function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => Promise<void> }) {
   const token = useAuthStore((s) => s.token);
-  const fileRef = React.useRef<HTMLInputElement>(null);
-  const [checklistTitle, setChecklistTitle] = React.useState("");
-  const [linkTitle, setLinkTitle] = React.useState("");
-  const [linkUrl, setLinkUrl] = React.useState("");
-  const [uploading, setUploading] = React.useState(false);
+  const [addOpen, setAddOpen] = React.useState(false);
+  const [newTitle, setNewTitle] = React.useState("");
+  const [newDescription, setNewDescription] = React.useState("");
 
   const checkedCount = topic.checklist_items?.filter((i) => i.checked).length ?? 0;
   const totalCount = topic.checklist_items?.length ?? 0;
 
   async function addChecklist() {
-    if (!token || !checklistTitle.trim()) return;
-    await skillsApi.createChecklistItem(token, { topic_id: topic.id, title: checklistTitle.trim() });
-    setChecklistTitle("");
+    if (!token || !newTitle.trim()) return;
+    await skillsApi.createChecklistItem(token, {
+      topic_id: topic.id,
+      title: newTitle.trim(),
+      description: newDescription.trim() || undefined,
+    });
+    setAddOpen(false);
+    setNewTitle("");
+    setNewDescription("");
     await onRefresh();
   }
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base">{topic.name}</CardTitle>
+          <span className="text-muted-foreground text-xs">
+            {checkedCount}/{totalCount}
+          </span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <ul className="space-y-3">
+          {(topic.checklist_items ?? []).map((item) => (
+            <ChecklistItemRow key={item.id} item={item} onRefresh={onRefresh} />
+          ))}
+        </ul>
+
+        <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
+          <ListPlus data-icon="inline-start" />
+          Tambah poin
+        </Button>
+
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Poin checklist baru</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label>Judul poin</Label>
+                <Input
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Mis. Binary search"
+                />
+              </div>
+              <div>
+                <Label>Detail / catatan (opsional)</Label>
+                <Textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="Penjelasan, referensi, atau catatan pribadi untuk poin ini..."
+                  rows={4}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => void addChecklist()}>Simpan</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChecklistItemRow({ item, onRefresh }: { item: SkillChecklistItem; onRefresh: () => Promise<void> }) {
+  const token = useAuthStore((s) => s.token);
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [title, setTitle] = React.useState(item.title);
+  const [description, setDescription] = React.useState(item.description ?? "");
+
+  React.useEffect(() => {
+    setTitle(item.title);
+    setDescription(item.description ?? "");
+  }, [item.title, item.description]);
+
+  async function save() {
+    if (!token) return;
+    await skillsApi.updateChecklistItem(token, item.id, {
+      title: title.trim(),
+      description: description.trim(),
+    });
+    setEditOpen(false);
+    await onRefresh();
+  }
+
+  return (
+    <li className="flex gap-2 rounded-md border p-3">
+      <Checkbox
+        className="mt-0.5"
+        checked={item.checked}
+        onCheckedChange={() => {
+          if (!token) return;
+          void skillsApi.toggleChecklistItem(token, item.id).then(onRefresh);
+        }}
+      />
+      <div className="min-w-0 flex-1">
+        <p className={`font-medium text-sm ${item.checked ? "text-muted-foreground line-through" : ""}`}>
+          {item.title}
+        </p>
+        {item.description && (
+          <p className="mt-1 whitespace-pre-wrap text-muted-foreground text-xs leading-relaxed">{item.description}</p>
+        )}
+      </div>
+      <Button size="icon" variant="ghost" className="size-7 shrink-0" onClick={() => setEditOpen(true)}>
+        <Pencil className="size-3.5" />
+      </Button>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit poin</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Judul</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+            </div>
+            <div>
+              <Label>Detail / catatan</Label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Penjelasan, tips, atau link catatan untuk poin ini..."
+                rows={5}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => void save()}>Simpan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </li>
+  );
+}
+
+function MaterialsPanel({
+  domainId,
+  materials,
+  onRefresh,
+}: {
+  domainId: number;
+  materials: SkillMaterial[];
+  onRefresh: () => Promise<void>;
+}) {
+  const token = useAuthStore((s) => s.token);
+  const fileRef = React.useRef<HTMLInputElement>(null);
+  const [linkTitle, setLinkTitle] = React.useState("");
+  const [linkUrl, setLinkUrl] = React.useState("");
+  const [uploading, setUploading] = React.useState(false);
 
   async function addLink() {
     if (!token || !linkTitle.trim() || !linkUrl.trim()) return;
     await skillsApi.createMaterial(token, {
-      topic_id: topic.id,
+      domain_id: domainId,
       title: linkTitle.trim(),
       material_type: "link",
       url: linkUrl.trim(),
@@ -273,7 +426,7 @@ function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => P
     if (!token) return;
     setUploading(true);
     try {
-      await skillsApi.uploadMaterial(token, topic.id, file);
+      await skillsApi.uploadMaterial(token, domainId, file);
       await onRefresh();
     } finally {
       setUploading(false);
@@ -281,67 +434,45 @@ function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => P
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base">{topic.name}</CardTitle>
-          <span className="text-muted-foreground text-xs">
-            {checkedCount}/{totalCount}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <ul className="space-y-2">
-          {(topic.checklist_items ?? []).map((item) => (
-            <li key={item.id} className="flex items-start gap-2">
-              <Checkbox
-                checked={item.checked}
-                onCheckedChange={() => {
-                  if (!token) return;
-                  void skillsApi.toggleChecklistItem(token, item.id).then(onRefresh);
-                }}
-              />
-              <span className={item.checked ? "text-muted-foreground line-through" : ""}>{item.title}</span>
-            </li>
-          ))}
-        </ul>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Semua materi domain ini</CardTitle>
+          <CardDescription>
+            Upload PDF, dokumen, atau link di satu tempat — tidak per topik/fase. Cocok untuk file gabungan seperti
+            ebook atau slide lengkap.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {materials.length === 0 ? (
+            <p className="text-muted-foreground text-sm">Belum ada materi. Upload PDF atau tambah link di bawah.</p>
+          ) : (
+            <div className="space-y-2">
+              {materials.map((m) => (
+                <MaterialRow key={m.id} material={m} onRefresh={onRefresh} />
+              ))}
+            </div>
+          )}
 
-        <div className="flex gap-2">
-          <Input
-            value={checklistTitle}
-            onChange={(e) => setChecklistTitle(e.target.value)}
-            placeholder="Item checklist baru"
-            className="h-8 text-sm"
-          />
-          <Button size="sm" variant="outline" onClick={() => void addChecklist()}>
-            <ListPlus className="size-4" />
-          </Button>
-        </div>
-
-        <div className="space-y-2 rounded-md border p-3">
-          <p className="font-medium text-sm">Materi</p>
-          {(topic.materials ?? []).map((m) => (
-            <MaterialRow key={m.id} material={m} onRefresh={onRefresh} />
-          ))}
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 border-t pt-4">
             <Input
               value={linkTitle}
               onChange={(e) => setLinkTitle(e.target.value)}
               placeholder="Judul link"
-              className="h-8 max-w-40 text-sm"
+              className="h-9 max-w-44 text-sm"
             />
             <Input
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               placeholder="https://..."
-              className="h-8 min-w-0 flex-1 text-sm"
+              className="h-9 min-w-0 flex-1 text-sm"
             />
             <Button size="sm" variant="outline" onClick={() => void addLink()}>
-              Link
+              Tambah link
             </Button>
-            <Button size="sm" variant="outline" disabled={uploading} onClick={() => fileRef.current?.click()}>
+            <Button size="sm" disabled={uploading} onClick={() => fileRef.current?.click()}>
               <Upload data-icon="inline-start" />
-              {uploading ? "..." : "PDF/File"}
+              {uploading ? "Mengupload..." : "Upload file"}
             </Button>
             <input
               ref={fileRef}
@@ -355,9 +486,9 @@ function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => P
               }}
             />
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
