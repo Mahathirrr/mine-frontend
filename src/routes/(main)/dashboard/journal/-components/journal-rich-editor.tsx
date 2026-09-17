@@ -8,8 +8,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { cn } from "cn";
 import { Bold, Italic, List, ListOrdered, Quote, Redo2, Strikethrough, Undo2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Toggle } from "@/components/ui/toggle";
 
 import { toEditorHtml } from "./journal-utils";
 
@@ -19,20 +19,31 @@ type JournalRichEditorProps = {
 };
 
 function ToolbarButton({
-  pressed,
+  active,
   label,
-  onClick,
+  onAction,
   children,
 }: {
-  pressed: boolean;
+  active: boolean;
   label: string;
-  onClick: () => void;
+  onAction: () => void;
   children: React.ReactNode;
 }) {
   return (
-    <Toggle size="sm" variant="outline" pressed={pressed} aria-label={label} onPressedChange={onClick}>
+    <Button
+      type="button"
+      size="sm"
+      variant={active ? "secondary" : "outline"}
+      aria-label={label}
+      aria-pressed={active}
+      className="size-8 shrink-0 p-0"
+      onMouseDown={(event) => {
+        event.preventDefault();
+        onAction();
+      }}
+    >
       {children}
-    </Toggle>
+    </Button>
   );
 }
 
@@ -44,6 +55,18 @@ export function JournalRichEditor({ content, onChange }: JournalRichEditorProps)
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        bulletList: {
+          HTMLAttributes: { class: "journal-bullet-list" },
+        },
+        orderedList: {
+          HTMLAttributes: { class: "journal-ordered-list" },
+        },
+        listItem: {
+          HTMLAttributes: { class: "journal-list-item" },
+        },
+        blockquote: {
+          HTMLAttributes: { class: "journal-blockquote" },
+        },
       }),
       Placeholder.configure({
         placeholder: "Mulai menulis di sini…",
@@ -80,23 +103,23 @@ export function JournalRichEditor({ content, onChange }: JournalRichEditorProps)
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-1 rounded-lg border bg-muted/25 p-1.5">
         <ToolbarButton
-          pressed={editor.isActive("bold")}
+          active={editor.isActive("bold")}
           label="Bold"
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onAction={() => editor.chain().focus().toggleBold().run()}
         >
           <Bold />
         </ToolbarButton>
         <ToolbarButton
-          pressed={editor.isActive("italic")}
+          active={editor.isActive("italic")}
           label="Italic"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onAction={() => editor.chain().focus().toggleItalic().run()}
         >
           <Italic />
         </ToolbarButton>
         <ToolbarButton
-          pressed={editor.isActive("strike")}
+          active={editor.isActive("strike")}
           label="Strikethrough"
-          onClick={() => editor.chain().focus().toggleStrike().run()}
+          onAction={() => editor.chain().focus().toggleStrike().run()}
         >
           <Strikethrough />
         </ToolbarButton>
@@ -104,33 +127,33 @@ export function JournalRichEditor({ content, onChange }: JournalRichEditorProps)
         <Separator orientation="vertical" className="mx-0.5 h-7" />
 
         <ToolbarButton
-          pressed={editor.isActive("bulletList")}
+          active={editor.isActive("bulletList")}
           label="Bullet list"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onAction={() => editor.chain().focus().toggleBulletList().run()}
         >
           <List />
         </ToolbarButton>
         <ToolbarButton
-          pressed={editor.isActive("orderedList")}
+          active={editor.isActive("orderedList")}
           label="Numbered list"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onAction={() => editor.chain().focus().toggleOrderedList().run()}
         >
           <ListOrdered />
         </ToolbarButton>
         <ToolbarButton
-          pressed={editor.isActive("blockquote")}
+          active={editor.isActive("blockquote")}
           label="Quote"
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          onAction={() => editor.chain().focus().toggleBlockquote().run()}
         >
           <Quote />
         </ToolbarButton>
 
         <Separator orientation="vertical" className="mx-0.5 h-7" />
 
-        <ToolbarButton pressed={false} label="Undo" onClick={() => editor.chain().focus().undo().run()}>
+        <ToolbarButton active={false} label="Undo" onAction={() => editor.chain().focus().undo().run()}>
           <Undo2 />
         </ToolbarButton>
-        <ToolbarButton pressed={false} label="Redo" onClick={() => editor.chain().focus().redo().run()}>
+        <ToolbarButton active={false} label="Redo" onAction={() => editor.chain().focus().redo().run()}>
           <Redo2 />
         </ToolbarButton>
       </div>
