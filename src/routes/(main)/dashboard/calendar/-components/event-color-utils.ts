@@ -1,4 +1,12 @@
-import { colorForCalendarSlug, colorForKanbanColumn, eventColorPalette } from "./calendar-config";
+import { colorForCalendarSlug, colorForKanbanColumn, findGoogleEventColor, googleEventColors } from "./calendar-config";
+
+export type EventDisplayStyle = {
+  color: string;
+  backgroundColor: string;
+  borderColor: string;
+  textColor: string;
+  accentColor: string;
+};
 
 function normalizeHex(color: string): string | null {
   const trimmed = color.trim();
@@ -8,31 +16,40 @@ function normalizeHex(color: string): string | null {
   return null;
 }
 
-export function resolveStoredEventColor(color: string | undefined, calendarSlug: string): string {
+export function resolveAccentColor(color: string | undefined, fallbackAccent: string): string {
   const hex = color ? normalizeHex(color) : null;
-  if (hex) return hex;
-  return colorForCalendarSlug(calendarSlug);
+  if (!hex) return fallbackAccent;
+  return findGoogleEventColor(hex).accent;
+}
+
+export function resolveStoredEventColor(color: string | undefined, calendarSlug: string): string {
+  return resolveAccentColor(color, colorForCalendarSlug(calendarSlug));
 }
 
 export function resolveKanbanEventColor(color: string | undefined, columnId: string | undefined): string {
-  const hex = color ? normalizeHex(color) : null;
-  if (hex && hex !== normalizeHex("#6366f1")) {
-    return hex;
-  }
-  return colorForKanbanColumn(columnId);
+  return resolveAccentColor(color, colorForKanbanColumn(columnId));
 }
 
-export function eventTextColor(backgroundHex: string): string {
-  const hex = normalizeHex(backgroundHex) ?? "#616161";
-  const r = Number.parseInt(hex.slice(1, 3), 16);
-  const g = Number.parseInt(hex.slice(3, 5), 16);
-  const b = Number.parseInt(hex.slice(5, 7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.62 ? "#1a1a1a" : "#ffffff";
+export function eventDisplayStyle(accent: string, isDark: boolean): EventDisplayStyle {
+  const entry = findGoogleEventColor(accent);
+  const surface = isDark ? entry.dark : entry.light;
+
+  return {
+    accentColor: entry.accent,
+    color: entry.accent,
+    backgroundColor: surface.background,
+    borderColor: entry.accent,
+    textColor: surface.text,
+  };
 }
 
 export function isPaletteColor(color: string): boolean {
   const hex = normalizeHex(color);
   if (!hex) return false;
-  return eventColorPalette.some((entry) => entry.hex === hex);
+  return googleEventColors.some((entry) => entry.accent.toLowerCase() === hex);
+}
+
+/** @deprecated use eventDisplayStyle */
+export function eventTextColor(backgroundHex: string): string {
+  return eventDisplayStyle(backgroundHex, false).textColor;
 }

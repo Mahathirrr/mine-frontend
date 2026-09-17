@@ -3,7 +3,7 @@ import { endOfDay, format, parseISO, subMilliseconds } from "date-fns";
 import type { CalendarEventRecord, HolidayCalendarEvent, TaskCalendarEvent } from "@/lib/api/tasks";
 
 import { colorForCalendarSlug } from "./calendar-config";
-import { eventTextColor, resolveKanbanEventColor, resolveStoredEventColor } from "./event-color-utils";
+import { eventDisplayStyle, resolveKanbanEventColor, resolveStoredEventColor } from "./event-color-utils";
 
 export type CalendarEventSource = "event" | "kanban" | "holiday";
 
@@ -29,6 +29,7 @@ export type CalendarUiEvent = {
     holidayType?: "national" | "joint_leave";
     sourceDoc?: string;
     holidayYear?: number;
+    accentColor: string;
   };
 };
 
@@ -36,27 +37,24 @@ export function mapApiEvents(
   events: CalendarEventRecord[],
   taskEvents: TaskCalendarEvent[],
   holidayEvents: HolidayCalendarEvent[] = [],
+  isDark = false,
 ): CalendarUiEvent[] {
-  const withColors = (hex: string) => {
-    const text = eventTextColor(hex);
-    return {
-      color: hex,
-      backgroundColor: hex,
-      borderColor: hex,
-      textColor: text,
-    };
+  const withColors = (accent: string) => {
+    const style = eventDisplayStyle(accent, isDark);
+    return style;
   };
 
   return [
     ...events.map((event) => {
-      const hex = resolveStoredEventColor(event.color, event.calendar_slug);
+      const accent = resolveStoredEventColor(event.color, event.calendar_slug);
+      const style = withColors(accent);
       return {
         id: String(event.id),
         title: event.title,
         start: event.start_at,
         end: event.end_at ?? undefined,
         allDay: event.all_day,
-        ...withColors(hex),
+        ...style,
         editable: true,
         durationEditable: !event.all_day,
         extendedProps: {
@@ -65,18 +63,20 @@ export function mapApiEvents(
           description: event.description,
           link: event.link ?? "",
           eventId: event.id,
+          accentColor: style.accentColor,
         },
       };
     }),
     ...taskEvents.map((event) => {
-      const hex = resolveKanbanEventColor(event.color, event.column_id);
+      const accent = resolveKanbanEventColor(event.color, event.column_id);
+      const style = withColors(accent);
       return {
         id: event.id,
         title: event.title,
         start: event.start,
         end: event.end,
         allDay: event.allDay,
-        ...withColors(hex),
+        ...style,
         editable: true,
         durationEditable: false,
         extendedProps: {
@@ -86,28 +86,46 @@ export function mapApiEvents(
           link: event.link ?? "",
           taskId: event.task_id,
           columnId: event.column_id,
+          accentColor: style.accentColor,
         },
       };
     }),
-    ...holidayEvents.map((event) => ({
-      id: event.id,
-      title: event.title,
-      start: event.start,
-      allDay: true,
-      ...withColors(event.color || colorForCalendarSlug("holidays")),
-      editable: false,
-      durationEditable: false,
-      extendedProps: {
-        source: "holiday" as const,
-        calendar_slug: "holidays",
-        description: event.description,
-        link: "",
-        holidayType: event.holiday_type,
-        sourceDoc: event.source_doc,
-        holidayYear: event.year,
-      },
-    })),
+    ...holidayEvents.map((event) => {
+      const accent = resolveStoredEventColor(event.color, "holidays");
+      const style = withColors(accent || colorForCalendarSlug("holidays"));
+      return {
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        allDay: true,
+        ...style,
+        editable: false,
+        durationEditable: false,
+        extendedProps: {
+          source: "holiday" as const,
+          calendar_slug: "holidays",
+          description: event.description,
+          link: "",
+          holidayType: event.holiday_type,
+          sourceDoc: event.source_doc,
+          holidayYear: event.year,
+          accentColor: style.accentColor,
+        },
+      };
+    }),
   ];
+}
+
+export function applyThemeToEvents(events: CalendarUiEvent[], isDark: boolean): CalendarUiEvent[] {
+  return events.map((event) => {
+    const accent = event.extendedProps.accentColor ?? event.borderColor;
+    const style = eventDisplayStyle(accent, isDark);
+    return {
+      ...event,
+      ...style,
+      extendedProps: { ...event.extendedProps, accentColor: style.accentColor },
+    };
+  });
 }
 
 export function parseCalendarDate(value: string | null | undefined): Date | null {

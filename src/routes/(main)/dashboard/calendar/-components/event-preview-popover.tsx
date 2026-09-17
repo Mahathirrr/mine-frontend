@@ -8,7 +8,7 @@ import { AlignLeft, CalendarDays, ExternalLink, Link2, Pencil, Trash2, X } from 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-import { calendarColors, calendarFilters, calendarOptions } from "./calendar-config";
+import { calendarFilters, calendarOptions, findGoogleEventColor } from "./calendar-config";
 import type { CalendarEventSource } from "./calendar-utils";
 import { formatEventRange, parseCalendarDate } from "./calendar-utils";
 
@@ -75,7 +75,7 @@ export function EventPreviewPopover({ open, anchor, event, onClose, onEdit, onDe
 
   const isHoliday = event.source === "holiday";
   const isKanban = event.source === "kanban";
-  const color = event.color || calendarColors[event.calendar_slug] || calendarColors.work;
+  const color = findGoogleEventColor(event.color).accent;
   const timeLabel = formatEventRange(event.start_at, event.end_at, event.all_day);
   const holidayStart = isHoliday ? parseCalendarDate(event.start_at) : null;
   const holidayDate = holidayStart ? format(holidayStart, "EEEE, d MMMM yyyy") : null;

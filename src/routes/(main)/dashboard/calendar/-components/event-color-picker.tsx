@@ -1,6 +1,6 @@
 import { cn } from "cn";
 
-import { eventColorPalette } from "./calendar-config";
+import { googleEventColors } from "./calendar-config";
 
 type EventColorPickerProps = {
   value: string;
@@ -11,8 +11,8 @@ type EventColorPickerProps = {
 export function EventColorPicker({ value, onChange, disabled }: EventColorPickerProps) {
   return (
     <div className="flex flex-wrap gap-2" role="listbox" aria-label="Event color">
-      {eventColorPalette.map((entry) => {
-        const selected = value.toLowerCase() === entry.hex;
+      {googleEventColors.map((entry) => {
+        const selected = value.toLowerCase() === entry.accent.toLowerCase();
         return (
           <button
             key={entry.id}
@@ -22,13 +22,13 @@ export function EventColorPicker({ value, onChange, disabled }: EventColorPicker
             aria-label={entry.label}
             disabled={disabled}
             title={entry.label}
-            onClick={() => onChange(entry.hex)}
+            onClick={() => onChange(entry.accent)}
             className={cn(
-              "size-7 rounded-full border-2 transition-transform hover:scale-105",
-              selected ? "border-foreground ring-2 ring-ring/40" : "border-transparent",
+              "size-8 rounded-full border-2 transition-[transform,box-shadow] hover:scale-105 hover:shadow-sm",
+              selected ? "border-foreground ring-2 ring-ring/50" : "border-background shadow-sm",
               disabled && "pointer-events-none opacity-50",
             )}
-            style={{ backgroundColor: entry.hex }}
+            style={{ backgroundColor: entry.accent }}
           />
         );
       })}

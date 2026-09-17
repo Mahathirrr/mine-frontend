@@ -1,17 +1,98 @@
-/** Google Calendar-style event palette (11 default swatches). */
-export const eventColorPalette = [
-  { id: "lavender", hex: "#7986cb", label: "Lavender" },
-  { id: "sage", hex: "#33b679", label: "Sage" },
-  { id: "grape", hex: "#8e24aa", label: "Grape" },
-  { id: "flamingo", hex: "#e67c73", label: "Flamingo" },
-  { id: "banana", hex: "#f6bf26", label: "Banana" },
-  { id: "tangerine", hex: "#f4511e", label: "Tangerine" },
-  { id: "peacock", hex: "#039be5", label: "Peacock" },
-  { id: "graphite", hex: "#616161", label: "Graphite" },
-  { id: "blueberry", hex: "#3f51b5", label: "Blueberry" },
-  { id: "basil", hex: "#0b8043", label: "Basil" },
-  { id: "tomato", hex: "#d50000", label: "Tomato" },
-] as const;
+/** Google Calendar event colors (accent = stored value, surfaces tuned for light/dark). */
+export type GoogleEventColor = {
+  id: string;
+  label: string;
+  accent: string;
+  light: { background: string; text: string };
+  dark: { background: string; text: string };
+};
+
+export const googleEventColors: GoogleEventColor[] = [
+  {
+    id: "lavender",
+    label: "Lavender",
+    accent: "#7986cb",
+    light: { background: "#e8eaf6", text: "#3c4043" },
+    dark: { background: "#3c4458", text: "#d2e3fc" },
+  },
+  {
+    id: "sage",
+    label: "Sage",
+    accent: "#33b679",
+    light: { background: "#e6f4ea", text: "#137333" },
+    dark: { background: "#2e4034", text: "#81c995" },
+  },
+  {
+    id: "grape",
+    label: "Grape",
+    accent: "#8e24aa",
+    light: { background: "#f3e8fd", text: "#7627bb" },
+    dark: { background: "#442255", text: "#e9c6ff" },
+  },
+  {
+    id: "flamingo",
+    label: "Flamingo",
+    accent: "#e67c73",
+    light: { background: "#fce8e6", text: "#c5221f" },
+    dark: { background: "#4a3230", text: "#f9ab9e" },
+  },
+  {
+    id: "banana",
+    label: "Banana",
+    accent: "#f6bf26",
+    light: { background: "#fef7e0", text: "#8a6d00" },
+    dark: { background: "#4a4328", text: "#fdd663" },
+  },
+  {
+    id: "tangerine",
+    label: "Tangerine",
+    accent: "#f4511e",
+    light: { background: "#feefe3", text: "#e8710a" },
+    dark: { background: "#4a3228", text: "#fcad70" },
+  },
+  {
+    id: "peacock",
+    label: "Peacock",
+    accent: "#039be5",
+    light: { background: "#e1f5fe", text: "#01579b" },
+    dark: { background: "#1e3a47", text: "#8ad4f7" },
+  },
+  {
+    id: "graphite",
+    label: "Graphite",
+    accent: "#616161",
+    light: { background: "#f1f3f4", text: "#3c4043" },
+    dark: { background: "#3c4043", text: "#e8eaed" },
+  },
+  {
+    id: "blueberry",
+    label: "Blueberry",
+    accent: "#3f51b5",
+    light: { background: "#e8eaf6", text: "#283593" },
+    dark: { background: "#333752", text: "#aeb8f8" },
+  },
+  {
+    id: "basil",
+    label: "Basil",
+    accent: "#0b8043",
+    light: { background: "#e6f4ea", text: "#0d652d" },
+    dark: { background: "#2a4032", text: "#7fc89a" },
+  },
+  {
+    id: "tomato",
+    label: "Tomato",
+    accent: "#d50000",
+    light: { background: "#fce8e6", text: "#b31412" },
+    dark: { background: "#4a2c2a", text: "#f28b82" },
+  },
+];
+
+/** @deprecated use googleEventColors */
+export const eventColorPalette = googleEventColors.map((entry) => ({
+  id: entry.id,
+  hex: entry.accent,
+  label: entry.label,
+}));
 
 export const calendarViews = [
   { value: "dayGridMonth", label: "Month" },
@@ -38,7 +119,6 @@ export const calendarOptions = [
   { value: "focus", label: "Focus time" },
 ] as const;
 
-/** Default color per calendar (like Google Calendar calendar colors). */
 export const calendarColors: Record<string, string> = {
   work: "#039be5",
   personal: "#33b679",
@@ -49,7 +129,6 @@ export const calendarColors: Record<string, string> = {
   holidaysJoint: "#f4511e",
 };
 
-/** Kanban due-date blocks colored by board column. */
 export const kanbanColumnColors: Record<string, string> = {
   backlog: "#7986cb",
   todo: "#039be5",
@@ -57,8 +136,29 @@ export const kanbanColumnColors: Record<string, string> = {
   done: "#33b679",
 };
 
+export function findGoogleEventColor(accent: string): GoogleEventColor {
+  const normalized = accent.trim().toLowerCase();
+  const exact = googleEventColors.find((entry) => entry.accent.toLowerCase() === normalized);
+  if (exact) return exact;
+
+  const legacy: Record<string, string> = {
+    "#3d8064": "#0b8043",
+    "#6366f1": "#3f51b5",
+    "#f59e0b": "#f6bf26",
+    "#ec4899": "#8e24aa",
+    "#dc2626": "#d50000",
+    "#ea580c": "#f4511e",
+  };
+  const mapped = legacy[normalized];
+  if (mapped) {
+    return findGoogleEventColor(mapped);
+  }
+
+  return googleEventColors[6];
+}
+
 export function colorForCalendarSlug(slug: string): string {
-  return calendarColors[slug] ?? eventColorPalette[0].hex;
+  return calendarColors[slug] ?? googleEventColors[6].accent;
 }
 
 export function colorForKanbanColumn(columnId: string | undefined): string {
@@ -71,9 +171,9 @@ export function colorForKanbanColumn(columnId: string | undefined): string {
 export function pickDefaultEventColor(seed: string): string {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
-    hash = (hash + seed.charCodeAt(i) * (i + 1)) % eventColorPalette.length;
+    hash = (hash + seed.charCodeAt(i) * (i + 1)) % googleEventColors.length;
   }
-  return eventColorPalette[hash]?.hex ?? eventColorPalette[0].hex;
+  return googleEventColors[hash]?.accent ?? googleEventColors[0].accent;
 }
 
 export const calendarEventTimeFormat = {
