@@ -29,18 +29,7 @@ const { count, size, warnings } = await generateSW({
     },
     {
       urlPattern: ({ url }) => url.pathname.startsWith("/assets/"),
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "hashed-assets",
-        networkTimeoutSeconds: 5,
-        expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 60 * 60,
-        },
-        cacheableResponse: {
-          statuses: [200],
-        },
-      },
+      handler: "NetworkOnly",
     },
     {
       urlPattern: ({ url }) => url.pathname.startsWith("/api/"),

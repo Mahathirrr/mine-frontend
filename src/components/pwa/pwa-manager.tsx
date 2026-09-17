@@ -28,7 +28,13 @@ export function PwaManager() {
           const keys = await caches.keys();
           await Promise.all(
             keys
-              .filter((key) => key === "pages-html" || key === "api-data" || key.startsWith("workbox-precache"))
+              .filter(
+                (key) =>
+                  key === "pages-html" ||
+                  key === "api-data" ||
+                  key === "hashed-assets" ||
+                  key.startsWith("workbox-precache"),
+              )
               .map((key) => caches.delete(key)),
           );
         }

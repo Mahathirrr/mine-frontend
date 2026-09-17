@@ -9,6 +9,7 @@ RSYNC_RSH="ssh -i $SSH_KEY -p $SSH_PORT -o BatchMode=yes -o StrictHostKeyCheckin
 
 cd "$ROOT"
 echo "Building production bundle (same-origin /api)..."
+rm -rf .output
 npm run build
 
 echo "Syncing to VPS..."
