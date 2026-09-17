@@ -74,14 +74,16 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-8 pb-10 pt-4">
-          <div className="relative w-full max-w-sm rounded-[2rem] bg-gradient-to-b from-white/80 to-orange-500/[0.04] px-4 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:from-white/[0.03] dark:to-orange-500/[0.06] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+          <div className="relative w-full max-w-[340px] rounded-[2rem] bg-gradient-to-b from-stone-100/90 via-background to-orange-500/[0.03] px-2 py-8 dark:from-stone-900/80 dark:via-background dark:to-orange-950/20">
             <FastingTimerRing
               progress={progress}
+              elapsedHours={elapsed}
+              goalHours={data.profile.goal_hours}
               label={formatDuration(elapsed)}
-              sublabel={`Elapsed · ${Math.round(progress * 100)}% dari goal`}
+              sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
               zoneLabel={zone?.label}
               zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
-              goalHours={data.profile.goal_hours}
+              allZones={data.zone?.all_zones}
             />
           </div>
 
