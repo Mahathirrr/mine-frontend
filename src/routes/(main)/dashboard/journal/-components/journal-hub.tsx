@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { cn } from "cn";
-import { BookOpen, Loader2, PenLine, Plus, Sparkles, Tags } from "lucide-react";
+import { ArrowLeft, BookOpen, PenLine, Plus, Sparkles, Tags } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,9 @@ export function JournalHub() {
   const [data, setData] = React.useState<JournalOverviewResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  const [tab, setTab] = React.useState("write");
+  const [isEditorOpen, setIsEditorOpen] = React.useState(false);
 
   const [activeEntry, setActiveEntry] = React.useState<JournalEntry | null>(null);
   const [activeTopic, setActiveTopic] = React.useState<JournalTopic | null>(null);
@@ -73,7 +76,7 @@ export function JournalHub() {
     void load();
   }, [load]);
 
-  const editorEntry: JournalEntry | null = activeEntry
+  const editorEntry: JournalEntry = activeEntry
     ? {
         ...activeEntry,
         title: draft.title,
@@ -83,32 +86,32 @@ export function JournalHub() {
         topic_id: draft.topic_id,
         word_count: draft.content.trim().split(/\s+/).filter(Boolean).length,
       }
-    : activeTopic || draft.title || draft.content
-      ? {
-          id: 0,
-          user_id: 0,
-          topic_id: draft.topic_id,
-          title: draft.title,
-          content: draft.content,
-          word_count: 0,
-          mood: draft.mood,
-          status: draft.status,
-          created_at: "",
-          updated_at: "",
-        }
-      : null;
+    : {
+        id: 0,
+        user_id: 0,
+        topic_id: draft.topic_id,
+        title: draft.title,
+        content: draft.content,
+        word_count: draft.content.trim().split(/\s+/).filter(Boolean).length,
+        mood: draft.mood,
+        status: draft.status,
+        created_at: "",
+        updated_at: "",
+      };
 
-  function resetDraft(topic?: JournalTopic | null) {
+  function startWriting(topic?: JournalTopic | null) {
     setActiveEntry(null);
     setActiveTopic(topic ?? null);
     setDraft({
-      title: topic ? `${topic.title} — ` : "",
+      title: topic ? `${topic.title}` : "",
       content: "",
       mood: null,
       status: "draft",
       topic_id: topic?.id ?? null,
     });
     setSaveState("idle");
+    setIsEditorOpen(true);
+    setTab("write");
   }
 
   function openEntry(entry: JournalEntry) {
@@ -122,6 +125,16 @@ export function JournalHub() {
       status: entry.status,
       topic_id: entry.topic_id,
     });
+    setSaveState("idle");
+    setIsEditorOpen(true);
+    setTab("write");
+  }
+
+  function closeEditor() {
+    setIsEditorOpen(false);
+    setActiveEntry(null);
+    setActiveTopic(null);
+    setDraft({ title: "", content: "", mood: null, status: "draft", topic_id: null });
     setSaveState("idle");
   }
 
@@ -158,7 +171,7 @@ export function JournalHub() {
   function scheduleSave() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      if (draft.content.trim() || draft.title.trim()) void persistEntry();
+      if (isEditorOpen && (draft.content.trim() || draft.title.trim())) void persistEntry();
     }, 1500);
   }
 
@@ -169,18 +182,29 @@ export function JournalHub() {
   }
 
   async function handleSpin() {
-    if (!token) return;
+    if (!token || spinning) return;
     setSpinning(true);
     setSpinResult(null);
     try {
       const res = await journalApi.spin(token);
-      setTimeout(() => {
-        setSpinResult(res.topic);
-        setSpinning(false);
+      setSpinResult(res.topic);
+      window.setTimeout(() => {
+        setSpinning((current) => {
+          if (current) return false;
+          return current;
+        });
       }, 4200);
     } catch {
       setSpinning(false);
     }
+  }
+
+  function handleSpinEnd() {
+    setSpinning(false);
+  }
+
+  function handleWriteFromWheel(topic: JournalTopic) {
+    startWriting(topic);
   }
 
   async function handleAddTopic() {
@@ -211,7 +235,7 @@ export function JournalHub() {
   async function deleteEntry() {
     if (!token || !activeEntry || !confirm("Hapus essay ini?")) return;
     await journalApi.deleteEntry(token, activeEntry.id);
-    resetDraft();
+    closeEditor();
     await load();
   }
 
@@ -226,8 +250,6 @@ export function JournalHub() {
       </Card>
     );
   }
-
-  const showEditor = Boolean(editorEntry);
 
   return (
     <div className="flex flex-col gap-4">
@@ -245,7 +267,7 @@ export function JournalHub() {
         ))}
       </div>
 
-      <Tabs defaultValue={showEditor ? "write" : "wheel"}>
+      <Tabs value={tab} onValueChange={setTab}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabsList>
             <TabsTrigger value="write">
@@ -265,31 +287,42 @@ export function JournalHub() {
               Arsip
             </TabsTrigger>
           </TabsList>
-          <Button size="sm" onClick={() => resetDraft()}>
+          <Button size="sm" onClick={() => startWriting()}>
             <Plus className="size-4" />
             Essay baru
           </Button>
         </div>
 
         <TabsContent value="write" className="mt-4">
-          {showEditor ? (
-            <JournalEditor
-              entry={editorEntry}
-              topic={activeTopic}
-              topics={data.topics}
-              saveState={saveState}
-              onChange={handleDraftChange}
-              onSave={persistEntry}
-              onDelete={activeEntry ? deleteEntry : undefined}
-            />
+          {isEditorOpen ? (
+            <div className="space-y-2">
+              <Button size="sm" variant="ghost" className="gap-1.5" onClick={closeEditor}>
+                <ArrowLeft className="size-4" />
+                Kembali
+              </Button>
+              <JournalEditor
+                entry={editorEntry}
+                topic={activeTopic}
+                topics={data.topics}
+                saveState={saveState}
+                onChange={handleDraftChange}
+                onSave={persistEntry}
+                onDelete={activeEntry ? deleteEntry : undefined}
+              />
+            </div>
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
                 <PenLine className="size-10 text-muted-foreground" />
                 <p className="text-muted-foreground">Mulai essay baru atau pilih dari arsip / spin wheel.</p>
-                <div className="flex gap-2">
-                  <Button onClick={() => resetDraft()}>Essay kosong</Button>
-                  <Button variant="outline" onClick={() => void handleSpin()}>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button onClick={() => startWriting()}>Essay kosong</Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setTab("wheel");
+                    }}
+                  >
                     Spin topik
                   </Button>
                 </div>
@@ -310,10 +343,8 @@ export function JournalHub() {
                 spinning={spinning}
                 result={spinResult}
                 onSpin={() => void handleSpin()}
-                onWrite={(topic) => {
-                  resetDraft(topic);
-                  setSpinResult(topic);
-                }}
+                onSpinEnd={handleSpinEnd}
+                onWrite={handleWriteFromWheel}
               />
             </CardContent>
           </Card>
@@ -442,12 +473,6 @@ export function JournalHub() {
           )}
         </TabsContent>
       </Tabs>
-
-      {spinning ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-          <Loader2 className="size-8 animate-spin text-primary" />
-        </div>
-      ) : null}
     </div>
   );
 }
