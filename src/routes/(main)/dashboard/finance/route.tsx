@@ -18,7 +18,7 @@ function Page() {
         <div>
           <h2 className="text-3xl tracking-tight">Keuangan</h2>
           <p className="text-muted-foreground">
-            Kelola saldo, transaksi, budget, analytics, dan goals — terhubung dengan Biaya Rutin untuk perencanaan
+            Kelola saldo, transaksi, budget, analytics, dan goals, terhubung dengan Biaya Rutin untuk perencanaan
             lengkap.
           </p>
         </div>

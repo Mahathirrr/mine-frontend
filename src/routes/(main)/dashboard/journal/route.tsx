@@ -18,7 +18,7 @@ function Page() {
         <div>
           <h2 className="text-3xl tracking-tight">Jurnal</h2>
           <p className="text-muted-foreground">
-            Menulis essay & refleksi seperti Google Docs — dengan topik custom dan spin wheel untuk prompt acak.
+            Menulis essay & refleksi seperti Google Docs, dengan topik custom dan spin wheel untuk prompt acak.
           </p>
         </div>
       </div>

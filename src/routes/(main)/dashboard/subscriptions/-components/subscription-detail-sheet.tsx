@@ -129,7 +129,7 @@ export function SubscriptionDetailSheet({
             </p>
             {isReminderWindow(subscription) ? (
               <p className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-amber-800 text-sm dark:text-amber-200">
-                Pengingat aktif — jatuh tempo dalam {subscription.remind_days_before} hari ke depan
+                Pengingat aktif: jatuh tempo dalam {subscription.remind_days_before} hari ke depan
               </p>
             ) : null}
           </div>

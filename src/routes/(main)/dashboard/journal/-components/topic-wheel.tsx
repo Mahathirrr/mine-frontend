@@ -241,7 +241,7 @@ export function TopicWheel({ topics, spinning, result, onSpin, onSpinEnd, onWrit
         <p className="max-w-md text-center text-muted-foreground text-sm leading-relaxed">
           {activeTopics.length === 0
             ? "Aktifkan minimal satu topik di tab Topik."
-            : `${activeTopics.length} topik siap — putar untuk dapat prompt acak.`}
+            : `${activeTopics.length} topik siap. Putar untuk dapat prompt acak.`}
         </p>
       )}
     </div>
