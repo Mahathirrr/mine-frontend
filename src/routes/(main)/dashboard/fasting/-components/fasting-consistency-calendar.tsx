@@ -58,36 +58,36 @@ export function FastingConsistencyCalendar({ days }: Props) {
   const weeks = React.useMemo(() => buildCalendarWeeks(days), [days]);
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-7 gap-1.5">
+    <div className="space-y-2">
+      <div className="grid grid-cols-7 gap-0.5">
         {WEEKDAYS.map((d) => (
-          <div
-            key={d}
-            className="py-1 text-center font-medium text-[11px] text-muted-foreground uppercase tracking-wide"
-          >
+          <div key={d} className="py-0.5 text-center font-medium text-[9px] text-muted-foreground uppercase">
             {d}
           </div>
         ))}
       </div>
 
-      <div className="space-y-3">
-        {weeks.map((row, wi) => (
-          <React.Fragment key={wi}>
-            {row.month && <p className="font-medium text-muted-foreground text-xs">{row.month}</p>}
-            <div className="grid grid-cols-7 gap-1.5">
-              {row.week.map((cell, ci) =>
-                cell ? (
-                  <DayCell key={cell.date} cell={cell} />
-                ) : (
-                  <div key={`e-${wi}-${ci}`} className="aspect-square rounded-xl" />
-                ),
-              )}
-            </div>
-          </React.Fragment>
-        ))}
+      <div className="space-y-1.5">
+        {weeks.map((row) => {
+          const weekKey = row.week.map((c) => c?.date ?? "x").join("-");
+          return (
+            <React.Fragment key={weekKey}>
+              {row.month && <p className="font-medium text-[10px] text-muted-foreground">{row.month}</p>}
+              <div className="grid grid-cols-7 gap-0.5">
+                {row.week.map((cell, ci) =>
+                  cell ? (
+                    <DayCell key={cell.date} cell={cell} />
+                  ) : (
+                    <div key={`e-${weekKey}-${WEEKDAYS[ci]}`} className="h-7 rounded-md" />
+                  ),
+                )}
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 pt-1 text-muted-foreground text-xs">
+      <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[10px] text-muted-foreground">
         <LegendDot
           className="bg-gradient-to-br from-orange-500/30 to-orange-500/10 ring-1 ring-orange-500/30"
           label="Goal tercapai"
@@ -134,12 +134,12 @@ function DayCell({ cell }: { cell: FastingDayChartPoint }) {
     <Popover>
       <PopoverTrigger
         className={cn(
-          "relative flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-0 p-0 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-orange-500/45",
+          "relative flex h-7 cursor-pointer flex-col items-center justify-center rounded-md border-0 p-0 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-orange-500/45",
           cell.met_goal &&
             "bg-gradient-to-br from-orange-500/25 to-orange-500/8 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.25)]",
           !cell.met_goal && hasData && "bg-muted/60",
           !hasData && "bg-muted/20",
-          isToday && "ring-2 ring-orange-500/45 ring-offset-1 ring-offset-background",
+          isToday && "ring-1 ring-orange-500/50",
         )}
         render={
           <button
@@ -149,21 +149,18 @@ function DayCell({ cell }: { cell: FastingDayChartPoint }) {
           />
         }
       >
-        {(cell.continued || cell.capped_full_day) && (
-          <span className="absolute top-1 right-1 flex size-3.5 items-center justify-center rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400">
-            <Link2 className="size-2" />
+        {(Boolean(cell.continued) || Boolean(cell.capped_full_day)) && (
+          <span className="absolute top-0 right-0 flex size-2.5 items-center justify-center rounded-full bg-orange-500/25 text-orange-600">
+            <Link2 className="size-1.5" />
           </span>
         )}
-        <span className={cn("font-semibold text-sm tabular-nums", isToday && "text-orange-600 dark:text-orange-400")}>
-          {dayNum}
-        </span>
         <span
           className={cn(
-            "mt-0.5 text-[10px] tabular-nums",
-            hasData ? "font-medium text-muted-foreground" : "text-muted-foreground/40",
+            "font-semibold text-[10px] tabular-nums leading-none",
+            isToday && "text-orange-600 dark:text-orange-400",
           )}
         >
-          {hasData ? `${Math.round(cell.fasting_hours)}h` : "·"}
+          {dayNum}
         </span>
       </PopoverTrigger>
       <PopoverContent side="top" className="w-56 rounded-xl px-3 py-2 text-xs">

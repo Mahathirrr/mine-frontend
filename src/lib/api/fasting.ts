@@ -71,8 +71,21 @@ export type FastingMealLog = {
   protein_g: number;
   carbs_g: number;
   fat_g: number;
+  sodium_mg?: number;
   in_eating_window: boolean;
   notes: string;
+};
+
+export type FastingFoodPreset = {
+  id: number;
+  name: string;
+  serving_label: string;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  sodium_mg: number;
+  is_system: boolean;
 };
 
 export type FastingDayChartPoint = {
@@ -110,6 +123,7 @@ export type FastingOverview = {
   sessions: FastingSession[];
   weight_logs: FastingWeightLog[];
   meal_logs: FastingMealLog[];
+  food_presets: FastingFoodPreset[];
   stats: {
     total_fasts: number;
     total_hours: number;
@@ -183,5 +197,11 @@ export const fastingApi = {
   },
   deleteMeal(token: string, id: number) {
     return request<{ ok: boolean }>(`/fasting/meals/${id}`, token, { method: "DELETE" });
+  },
+  createPreset(token: string, body: Omit<FastingFoodPreset, "id" | "is_system">) {
+    return request<{ food_preset: FastingFoodPreset }>("/fasting/presets", token, { method: "POST", body });
+  },
+  deletePreset(token: string, id: number) {
+    return request<{ ok: boolean }>(`/fasting/presets/${id}`, token, { method: "DELETE" });
   },
 };

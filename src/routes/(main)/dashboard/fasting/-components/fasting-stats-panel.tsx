@@ -78,13 +78,11 @@ export function FastingStatsPanel({ data }: Props) {
         />
       </div>
 
-      <Card className="rounded-2xl">
-        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 space-y-0">
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <CardTitle>Fasting & eating charts</CardTitle>
-            <CardDescription>
-              {dateRange} · ketuk/hover bar untuk detail · ↺ = lanjutan fast multi-hari (48–72 jam)
-            </CardDescription>
+            <h3 className="font-semibold text-lg">Fasting & eating charts</h3>
+            <p className="text-muted-foreground text-sm">{dateRange} · ketuk bar untuk detail · ↺ = fast multi-hari</p>
           </div>
           <Tabs value={range} onValueChange={(v) => v && setRange(v as "week" | "month")}>
             <TabsList className="rounded-full">
@@ -96,22 +94,18 @@ export function FastingStatsPanel({ data }: Props) {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <PillChart title="Fasting time" data={chartData} dataKey="fasting_hours" max={24} accent />
-          <PillChart title="Eating window" data={chartData} dataKey="eating_hours" max={24} />
-        </CardContent>
-      </Card>
+        </div>
+        <PillChart title="Fasting time" data={chartData} dataKey="fasting_hours" max={24} accent />
+        <PillChart title="Eating window" data={chartData} dataKey="eating_hours" max={24} />
+      </div>
 
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle>Fasting calendar</CardTitle>
-          <CardDescription>30 hari · orange = goal · ↺ = lanjutan fast multi-hari</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FastingConsistencyCalendar days={data.calendar_heatmap} />
-        </CardContent>
-      </Card>
+      <div className="max-w-sm space-y-2">
+        <div>
+          <h3 className="font-semibold text-base">Fasting calendar</h3>
+          <p className="text-muted-foreground text-xs">30 hari · orange = goal</p>
+        </div>
+        <FastingConsistencyCalendar days={data.calendar_heatmap} />
+      </div>
 
       <Card className="rounded-2xl">
         <CardHeader>
@@ -230,7 +224,7 @@ function PillChart({
   return (
     <div>
       <p className="mb-3 font-medium">{title}</p>
-      <div className="relative rounded-2xl border border-border/60 bg-muted/15 px-3" style={{ height: chartHeight }}>
+      <div className="relative px-1" style={{ height: chartHeight }}>
         {gridLines.map((h) => {
           const y = CHART_BOTTOM + (h / max) * CHART_INNER_H;
           return (

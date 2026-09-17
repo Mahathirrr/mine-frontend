@@ -73,19 +73,17 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
             {protocol?.label ?? data.profile.protocol_slug} · target {data.profile.goal_hours} jam puasa
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-8 pb-10 pt-4">
-          <div className="relative w-full max-w-[340px] overflow-visible rounded-[2rem] bg-gradient-to-b from-stone-100/90 via-background to-orange-500/[0.03] px-4 py-10 dark:from-stone-900/80 dark:via-background dark:to-orange-950/20">
-            <FastingTimerRing
-              progress={progress}
-              elapsedHours={elapsed}
-              goalHours={data.profile.goal_hours}
-              label={formatDuration(elapsed)}
-              sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
-              zoneLabel={zone?.label}
-              zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
-              allZones={data.zone?.all_zones}
-            />
-          </div>
+        <CardContent className="flex flex-col items-center gap-8 overflow-visible pt-6 pb-12">
+          <FastingTimerRing
+            progress={progress}
+            elapsedHours={elapsed}
+            goalHours={data.profile.goal_hours}
+            label={formatDuration(elapsed)}
+            sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
+            zoneLabel={zone?.label}
+            zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
+            allZones={data.zone?.all_zones}
+          />
 
           <div className="grid w-full max-w-md grid-cols-2 gap-3">
             <div className="rounded-2xl border border-orange-500/10 bg-card/90 p-4 shadow-sm backdrop-blur-sm">
@@ -145,8 +143,8 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
             {data.stats.total_fasts} fast · rata-rata {data.stats.average_hours.toFixed(1)} jam
           </CardContent>
         </Card>
-        {data.insights.slice(0, 2).map((ins, i) => (
-          <div key={i} className="rounded-2xl border border-orange-500/10 bg-orange-500/[0.04] p-4 text-sm">
+        {data.insights.slice(0, 2).map((ins) => (
+          <div key={ins.title} className="rounded-2xl border border-orange-500/10 bg-orange-500/[0.04] p-4 text-sm">
             <p className="font-medium">{ins.title}</p>
             <p className="mt-1 text-muted-foreground">{ins.detail}</p>
           </div>

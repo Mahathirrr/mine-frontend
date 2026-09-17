@@ -19,6 +19,30 @@ type Props = {
   allZones?: FastingZone[];
 };
 
+function ZoneStatus({
+  reached,
+  active,
+  hour,
+  elapsedHours,
+}: {
+  reached: boolean;
+  active: boolean;
+  hour: number;
+  elapsedHours: number;
+}) {
+  if (!reached) {
+    return (
+      <span className="text-muted-foreground">
+        Tersisa ~{formatDurationShort(Math.max(0, hour - elapsedHours))} menuju zona ini
+      </span>
+    );
+  }
+  if (active) {
+    return <span className="text-orange-600 dark:text-orange-400">Zona aktif sekarang</span>;
+  }
+  return <span className="text-emerald-600 dark:text-emerald-400">Sudah dilewati</span>;
+}
+
 function markerPosition(size: number, ringInset: number, fraction: number) {
   const r = size / 2 - ringInset;
   const angle = fraction * 2 * Math.PI - Math.PI / 2;
@@ -52,9 +76,20 @@ export function FastingTimerRing({
     .filter((z) => z.end_hour < 72 && z.start_hour >= 0 && z.start_hour < goalHours)
     .map((z) => ({ zone: z, hour: z.start_hour, icon: zoneIcons[z.icon] ?? "•" }));
 
+  const pad = 24;
+
   return (
-    <div className="relative inline-flex items-center justify-center py-4" style={{ width: size, height: size + 32 }}>
-      <svg width={size} height={size} className="-rotate-90" aria-label="Fasting progress ring">
+    <div
+      className="relative mx-auto inline-flex items-center justify-center overflow-visible"
+      style={{ width: size + pad * 2, height: size + pad * 2 + 20, padding: pad }}
+    >
+      <svg
+        width={size}
+        height={size}
+        className="absolute -rotate-90"
+        style={{ left: pad, top: pad }}
+        aria-label="Fasting progress ring"
+      >
         <title>Fasting progress</title>
         <defs>
           <linearGradient id="fast-ring-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -109,6 +144,8 @@ export function FastingTimerRing({
       {milestones.map((m) => {
         const frac = Math.min(1, m.hour / goalHours);
         const pos = markerPosition(size, stroke / 2 + 2, frac);
+        const left = pos.left + pad;
+        const top = pos.top + pad;
         const reached = elapsedHours >= m.hour;
         const active = zoneLabel === m.zone.label;
         const endLabel = m.zone.end_hour >= 72 ? "72h+" : `${m.zone.end_hour}h`;
@@ -122,7 +159,7 @@ export function FastingTimerRing({
                 !active && reached && "bg-orange-500/15 text-base ring-1 ring-orange-500/40",
                 !active && !reached && "bg-muted/90 text-muted-foreground/70 ring-1 ring-border/60",
               )}
-              style={{ left: pos.left, top: pos.top }}
+              style={{ left, top }}
             >
               {m.icon}
             </PopoverTrigger>
@@ -138,17 +175,7 @@ export function FastingTimerRing({
               </div>
               <p className="mt-2 text-muted-foreground text-sm leading-relaxed">{m.zone.description}</p>
               <p className="mt-2 text-xs">
-                {reached ? (
-                  active ? (
-                    <span className="text-orange-600 dark:text-orange-400">Zona aktif sekarang</span>
-                  ) : (
-                    <span className="text-emerald-600 dark:text-emerald-400">Sudah dilewati</span>
-                  )
-                ) : (
-                  <span className="text-muted-foreground">
-                    Tersisa ~{formatDurationShort(Math.max(0, m.hour - elapsedHours))} menuju zona ini
-                  </span>
-                )}
+                <ZoneStatus reached={reached} active={active} hour={m.hour} elapsedHours={elapsedHours} />
               </p>
             </PopoverContent>
           </Popover>
@@ -158,11 +185,14 @@ export function FastingTimerRing({
       {clamped > 0.01 && (
         <div
           className="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
-          style={{ left: head.left, top: head.top }}
+          style={{ left: head.left + pad, top: head.top + pad }}
         />
       )}
 
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 pt-2 text-center">
+      <div
+        className="pointer-events-none absolute flex flex-col items-center justify-center px-8 pt-2 text-center"
+        style={{ left: pad, top: pad, width: size, height: size }}
+      >
         {zoneLabel && (
           <div className="mb-2 flex items-center gap-1.5 font-medium text-red-500 text-sm dark:text-red-400">
             {zoneIcon && <span className="text-base leading-none">{zoneIcon}</span>}
