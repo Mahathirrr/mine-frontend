@@ -3,10 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/app-config";
 import { redirectIfAuthenticated } from "@/lib/auth/guard";
 import { useRedirectIfAuthenticated } from "@/lib/auth/use-redirect-if-authenticated";
+import { privatePageHead } from "@/lib/seo/build-head";
 import { AuthPageLayout } from "@/routes/(main)/auth/-components/auth-page-layout";
 import { RegisterForm } from "@/routes/(main)/auth/-components/register-form";
 
 export const Route = createFileRoute("/(main)/register")({
+  head: () =>
+    privatePageHead({
+      title: "Daftar | Mine",
+      description: "Halaman pendaftaran pribadi Mine Personal Hub.",
+      path: "/register",
+    }),
   beforeLoad: () => {
     redirectIfAuthenticated();
   },

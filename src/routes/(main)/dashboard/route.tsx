@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { users } from "@/data/users";
 import { requireAuth } from "@/lib/auth/guard";
+import { privatePageHead } from "@/lib/seo/build-head";
 import { getDashboardLayout } from "@/server/server-actions";
 
 import { AccountSwitcher } from "./-components/header/account-switcher";
@@ -19,6 +20,12 @@ import { AppSidebar } from "./-components/sidebar/app-sidebar";
 
 export const Route = createFileRoute("/(main)/dashboard")({
   ssr: false,
+  head: () =>
+    privatePageHead({
+      title: "Dashboard | Mine",
+      description: "Area pribadi Mine Personal Hub.",
+      path: "/dashboard",
+    }),
   beforeLoad: () => {
     requireAuth();
   },

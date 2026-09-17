@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { Lock } from "lucide-react";
 
+import { privatePageHead } from "@/lib/seo/build-head";
+
 export const Route = createFileRoute("/(main)/unauthorized")({
+  head: () =>
+    privatePageHead({
+      title: "Akses Ditolak | Mine",
+      description: "Anda tidak memiliki akses ke halaman ini.",
+      path: "/unauthorized",
+    }),
   component: page,
 });
 

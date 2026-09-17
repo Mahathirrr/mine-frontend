@@ -7,8 +7,7 @@ export const APP_CONFIG = {
   version: packageJson.version,
   copyright: `© ${currentYear}, Mine.`,
   meta: {
-    title: "Mine Personal Hub",
-    description:
-      "Mine is a personal PWA for tracking English (TOEFL/IELTS), fasting, gym, LeetCode, coding skills, interviews, expenses, jobs, subscriptions, tasks, journaling, and documents. Built with TanStack Start and shadcn/ui.",
+    title: "Mine | Personal Hub",
+    description: "Mine adalah personal hub PWA pribadi untuk produktivitas, keuangan, jurnal, dan tracking harian.",
   },
 };

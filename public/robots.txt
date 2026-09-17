@@ -1,3 +1,13 @@
 # https://www.robotstxt.org/robotstxt.html
+# Mine is a private personal app. Crawlers should not index app pages.
 User-agent: *
-Disallow:
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /unauthorized
+Disallow: /auth/
+Disallow: /chat
+Disallow: /mail
+Disallow: /api/
+
+Sitemap: https://mine.mahathir.site/sitemap.xml
