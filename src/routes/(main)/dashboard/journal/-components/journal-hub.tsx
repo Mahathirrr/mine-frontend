@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { cn } from "cn";
-import { ArrowLeft, BookOpen, PenLine, Plus, Sparkles, Tags } from "lucide-react";
+import { BookOpen, PenLine, Plus, Sparkles, Tags } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -253,19 +253,21 @@ export function JournalHub() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-4">
-        {[
-          { label: "Essay", value: data.stats.total_entries },
-          { label: "Publish", value: data.stats.published_entries },
-          { label: "Total kata", value: data.stats.total_words },
-          { label: "Topik aktif", value: data.stats.active_topics },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border px-4 py-3">
-            <p className="font-bold text-2xl tabular-nums">{stat.value}</p>
-            <p className="text-muted-foreground text-xs">{stat.label}</p>
-          </div>
-        ))}
-      </div>
+      {!isEditorOpen ? (
+        <div className="grid gap-3 sm:grid-cols-4">
+          {[
+            { label: "Essay", value: data.stats.total_entries },
+            { label: "Publish", value: data.stats.published_entries },
+            { label: "Total kata", value: data.stats.total_words },
+            { label: "Topik aktif", value: data.stats.active_topics },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-xl border px-4 py-3">
+              <p className="font-bold text-2xl tabular-nums">{stat.value}</p>
+              <p className="text-muted-foreground text-xs">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <Tabs value={tab} onValueChange={setTab}>
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -293,23 +295,18 @@ export function JournalHub() {
           </Button>
         </div>
 
-        <TabsContent value="write" className="mt-4">
+        <TabsContent value="write" className={cn("mt-4", isEditorOpen && "mt-2")}>
           {isEditorOpen ? (
-            <div className="space-y-2">
-              <Button size="sm" variant="ghost" className="gap-1.5" onClick={closeEditor}>
-                <ArrowLeft className="size-4" />
-                Kembali
-              </Button>
-              <JournalEditor
-                entry={editorEntry}
-                topic={activeTopic}
-                isBlankEssay={!activeEntry && !activeTopic}
-                saveState={saveState}
-                onChange={handleDraftChange}
-                onSave={persistEntry}
-                onDelete={activeEntry ? deleteEntry : undefined}
-              />
-            </div>
+            <JournalEditor
+              entry={editorEntry}
+              topic={activeTopic}
+              isBlankEssay={!activeEntry && !activeTopic}
+              saveState={saveState}
+              onBack={closeEditor}
+              onChange={handleDraftChange}
+              onSave={persistEntry}
+              onDelete={activeEntry ? deleteEntry : undefined}
+            />
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
