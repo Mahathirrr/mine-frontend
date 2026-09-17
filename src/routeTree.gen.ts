@@ -28,6 +28,7 @@ import { Route as mainDashboardCrmRouteRouteImport } from './routes/(main)/dashb
 import { Route as mainDashboardDefaultRouteRouteImport } from './routes/(main)/dashboard/default/route'
 import { Route as mainDashboardEcommerceRouteRouteImport } from './routes/(main)/dashboard/ecommerce/route'
 import { Route as mainDashboardEnglishRouteRouteImport } from './routes/(main)/dashboard/english/route'
+import { Route as mainDashboardFastingRouteRouteImport } from './routes/(main)/dashboard/fasting/route'
 import { Route as mainDashboardFileManagerRouteRouteImport } from './routes/(main)/dashboard/file-manager/route'
 import { Route as mainDashboardFinanceRouteRouteImport } from './routes/(main)/dashboard/finance/route'
 import { Route as mainDashboardInfrastructureRouteRouteImport } from './routes/(main)/dashboard/infrastructure/route'
@@ -154,6 +155,12 @@ const mainDashboardEnglishRouteRoute =
   mainDashboardEnglishRouteRouteImport.update({
     id: '/english',
     path: '/english',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardFastingRouteRoute =
+  mainDashboardFastingRouteRouteImport.update({
+    id: '/fasting',
+    path: '/fasting',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardFileManagerRouteRoute =
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -362,6 +370,7 @@ export interface FileRoutesByTo {
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -409,6 +418,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/(main)/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/(main)/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/(main)/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/(main)/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/(main)/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/(main)/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/dashboard/default'
     | '/dashboard/ecommerce'
     | '/dashboard/english'
+    | '/dashboard/fasting'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/dashboard/default'
     | '/dashboard/ecommerce'
     | '/dashboard/english'
+    | '/dashboard/fasting'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
@@ -548,6 +560,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/default'
     | '/(main)/dashboard/ecommerce'
     | '/(main)/dashboard/english'
+    | '/(main)/dashboard/fasting'
     | '/(main)/dashboard/file-manager'
     | '/(main)/dashboard/finance'
     | '/(main)/dashboard/infrastructure'
@@ -723,6 +736,13 @@ declare module '@tanstack/react-router' {
       path: '/english'
       fullPath: '/dashboard/english'
       preLoaderRoute: typeof mainDashboardEnglishRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/fasting': {
+      id: '/(main)/dashboard/fasting'
+      path: '/fasting'
+      fullPath: '/dashboard/fasting'
+      preLoaderRoute: typeof mainDashboardFastingRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/file-manager': {
@@ -913,6 +933,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardDefaultRouteRoute: typeof mainDashboardDefaultRouteRoute
   mainDashboardEcommerceRouteRoute: typeof mainDashboardEcommerceRouteRoute
   mainDashboardEnglishRouteRoute: typeof mainDashboardEnglishRouteRoute
+  mainDashboardFastingRouteRoute: typeof mainDashboardFastingRouteRoute
   mainDashboardFileManagerRouteRoute: typeof mainDashboardFileManagerRouteRoute
   mainDashboardFinanceRouteRoute: typeof mainDashboardFinanceRouteRoute
   mainDashboardInfrastructureRouteRoute: typeof mainDashboardInfrastructureRouteRoute
@@ -948,6 +969,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardDefaultRouteRoute: mainDashboardDefaultRouteRoute,
   mainDashboardEcommerceRouteRoute: mainDashboardEcommerceRouteRoute,
   mainDashboardEnglishRouteRoute: mainDashboardEnglishRouteRoute,
+  mainDashboardFastingRouteRoute: mainDashboardFastingRouteRoute,
   mainDashboardFileManagerRouteRoute: mainDashboardFileManagerRouteRoute,
   mainDashboardFinanceRouteRoute: mainDashboardFinanceRouteRoute,
   mainDashboardInfrastructureRouteRoute: mainDashboardInfrastructureRouteRoute,
