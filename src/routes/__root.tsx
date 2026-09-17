@@ -1,10 +1,10 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import * as React from "react";
 
+import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+
+import { PwaManager } from "@/components/pwa/pwa-manager";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { PwaManager } from "@/components/pwa/pwa-manager";
 import { APP_CONFIG } from "@/config/app-config";
 import { PWA_CONFIG } from "@/config/pwa";
 import { fontRegistry } from "@/lib/fonts/registry";
@@ -104,6 +104,41 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 });
 
+function DevtoolsShell() {
+  return (
+    <>
+      {/* Loaded only in development to keep production bundles lean. */}
+      <LazyTanStackDevtools />
+    </>
+  );
+}
+
+function LazyTanStackDevtools() {
+  const [Devtools, setDevtools] = React.useState<React.ComponentType | null>(null);
+
+  React.useEffect(() => {
+    void Promise.all([import("@tanstack/react-devtools"), import("@tanstack/react-router-devtools")]).then(
+      ([devtoolsMod, routerDevtoolsMod]) => {
+        const TanStackDevtools = devtoolsMod.TanStackDevtools;
+        const TanStackRouterDevtoolsPanel = routerDevtoolsMod.TanStackRouterDevtoolsPanel;
+        setDevtools(() => () => (
+          <TanStackDevtools
+            config={{ position: "bottom-right" }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        ));
+      },
+    );
+  }, []);
+
+  return Devtools ? <Devtools /> : null;
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { theme_mode, theme_preset, content_layout, navbar_style, sidebar_variant, sidebar_collapsible, font } =
     PREFERENCE_DEFAULTS;
@@ -135,17 +170,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </PreferencesStoreProvider>
           </AuthStoreProvider>
         </TooltipProvider>
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        {import.meta.env.DEV ? <DevtoolsShell /> : null}
         <Scripts />
       </body>
     </html>

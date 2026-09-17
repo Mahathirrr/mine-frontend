@@ -18,6 +18,7 @@ import { ThemeSwitcher } from "./-components/header/theme-switcher";
 import { AppSidebar } from "./-components/sidebar/app-sidebar";
 
 export const Route = createFileRoute("/(main)/dashboard")({
+  ssr: false,
   beforeLoad: () => {
     requireAuth();
   },

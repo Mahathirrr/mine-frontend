@@ -6,6 +6,8 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
   server: {
@@ -17,14 +19,18 @@ const config = defineConfig({
     },
   },
   plugins: [
-    devtools({
-      injectSource: {
-        enabled: true,
-        ignore: {
-          components: ["FullCalendar"],
-        },
-      },
-    }),
+    ...(isProd
+      ? []
+      : [
+          devtools({
+            injectSource: {
+              enabled: true,
+              ignore: {
+                components: ["FullCalendar"],
+              },
+            },
+          }),
+        ]),
     tailwindcss(),
     tanstackStart(),
     nitro(),
