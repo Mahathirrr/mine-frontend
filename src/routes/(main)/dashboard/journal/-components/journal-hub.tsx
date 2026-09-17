@@ -19,7 +19,7 @@ import type { JournalEntry, JournalOverviewResponse, JournalTopic } from "@/lib/
 import { journalApi } from "@/lib/api/journal";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
-import { MOOD_EMOJI, PRESET_TOPIC_COLORS } from "./journal-constants";
+import { PRESET_TOPIC_COLORS } from "./journal-constants";
 import { JournalEditor } from "./journal-editor";
 import { excerpt, formatJournalDate, topicColor } from "./journal-utils";
 import { TopicWheel } from "./topic-wheel";
@@ -303,7 +303,7 @@ export function JournalHub() {
               <JournalEditor
                 entry={editorEntry}
                 topic={activeTopic}
-                topics={data.topics}
+                isBlankEssay={!activeEntry && !activeTopic}
                 saveState={saveState}
                 onChange={handleDraftChange}
                 onSave={persistEntry}
@@ -454,8 +454,7 @@ export function JournalHub() {
                     <ItemContent>
                       <ItemTitle className="flex flex-wrap items-center gap-2">
                         {entry.title.trim() || "Tanpa judul"}
-                        <Badge variant="outline">{entry.status}</Badge>
-                        {entry.mood ? <span>{MOOD_EMOJI[entry.mood]}</span> : null}
+                        <Badge variant="outline">{entry.status === "published" ? "Selesai" : "Draft"}</Badge>
                       </ItemTitle>
                       <ItemDescription>
                         {formatJournalDate(entry.updated_at)}
