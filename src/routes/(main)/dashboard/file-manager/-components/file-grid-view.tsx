@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState } from "react";
 
 import { cn } from "cn";
@@ -9,10 +10,27 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { type FileManagerFile, fileIcons, fileKindLabels } from "./data";
 import { FileActions } from "./file-actions";
 
-export function FileGridView({ files }: { files: FileManagerFile[] }) {
+type Props = {
+  files: FileManagerFile[];
+  onToggleStar?: (fileId: string) => void;
+  onDownload?: (fileId: string) => void;
+  onDelete?: (fileId: string) => void;
+};
+
+export function FileGridView({ files, onToggleStar, onDownload, onDelete }: Props) {
   const [gridFiles, setGridFiles] = useState(files);
-  const toggleStar = (fileId: string) =>
+
+  React.useEffect(() => {
+    setGridFiles(files);
+  }, [files]);
+
+  const toggleStar = (fileId: string) => {
+    if (onToggleStar) {
+      onToggleStar(fileId);
+      return;
+    }
     setGridFiles((current) => current.map((file) => (file.id === fileId ? { ...file, starred: !file.starred } : file)));
+  };
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -47,7 +65,12 @@ export function FileGridView({ files }: { files: FileManagerFile[] }) {
                 Modified {file.modifiedAt} by {file.owner}
               </CardDescription>
               <CardAction>
-                <FileActions file={file} onToggleStar={() => toggleStar(file.id)} />
+                <FileActions
+                  file={file}
+                  onToggleStar={() => toggleStar(file.id)}
+                  onDownload={onDownload ? () => onDownload(file.id) : undefined}
+                  onDelete={onDelete ? () => onDelete(file.id) : undefined}
+                />
               </CardAction>
             </CardHeader>
           </Card>

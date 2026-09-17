@@ -134,6 +134,13 @@ export const sidebarItems: NavGroup[] = [
         icon: Flame,
         badge: "new",
       },
+      {
+        id: "documents",
+        title: "Dokumen Penting",
+        url: "/dashboard/documents",
+        icon: FolderOpen,
+        badge: "new",
+      },
     ],
   },
   {
