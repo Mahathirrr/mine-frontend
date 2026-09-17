@@ -13,9 +13,12 @@ export type CalendarUiEvent = {
   start: string;
   end?: string;
   allDay: boolean;
+  color: string;
   backgroundColor: string;
   borderColor: string;
   textColor: string;
+  contrastColor: string;
+  style?: Record<string, string>;
   editable: boolean;
   durationEditable: boolean;
   extendedProps: {
@@ -41,7 +44,12 @@ export function mapApiEvents(
 ): CalendarUiEvent[] {
   const withColors = (accent: string) => {
     const style = eventDisplayStyle(accent, isDark);
-    return style;
+    return {
+      ...style,
+      style: {
+        "--fc-event-accent": style.accentColor,
+      },
+    };
   };
 
   return [
@@ -123,6 +131,9 @@ export function applyThemeToEvents(events: CalendarUiEvent[], isDark: boolean): 
     return {
       ...event,
       ...style,
+      style: {
+        "--fc-event-accent": style.accentColor,
+      },
       extendedProps: { ...event.extendedProps, accentColor: style.accentColor },
     };
   });

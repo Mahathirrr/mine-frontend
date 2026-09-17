@@ -7,15 +7,17 @@ const compactTextClass = xxsTextClass
 const eventTextClass = 'text-[13px] leading-[18px]'
 
 const gcalEventHover = [
-  'shadow-none transition-[box-shadow,filter] duration-150 ease-out',
-  'hover:shadow-[0_1px_3px_rgba(60,64,67,0.22)]',
+  'shadow-none transition-[box-shadow,transform] duration-150 ease-out',
+  'hover:shadow-[0_1px_2px_rgba(60,64,67,0.18),0_2px_6px_rgba(60,64,67,0.12)]',
   'hover:z-20',
 ]
 
+const gcalEventAccentBorder = 'border-0 border-s-[3px] border-solid border-s-[var(--fc-event-accent,var(--fc-event-color))]'
+
 const gcalEventSurface = [
   ...gcalEventHover,
-  'overflow-hidden rounded-[4px]',
-  'border-0 border-s-[3px] border-solid',
+  'overflow-hidden rounded-md',
+  gcalEventAccentBorder,
 ]
 
 const blockPointerResizerClass = 'absolute hidden group-hover:block'
@@ -54,15 +56,16 @@ const monthListItemClasses: CalendarOptions = {
 
 const monthRowEventClasses: CalendarOptions = {
   rowEventClass: (info) => cn(
-    'mb-0.5 bg-(--fc-event-color) border-0 border-s-[3px] border-solid',
+    'mb-0.5 bg-(--fc-event-color)',
+    gcalEventAccentBorder,
     ...gcalEventHover,
     info.isStart && (info.isNarrow ? 'ms-1.5' : 'ms-2'),
     info.isEnd && (info.isNarrow ? 'me-1.5' : 'me-2'),
-    info.isStart && 'rounded-s-[4px]',
-    info.isEnd && 'rounded-e-[4px]',
+    info.isStart && 'rounded-s-md',
+    info.isEnd && 'rounded-e-md',
   ),
-  rowEventInnerClass: cn('flex h-[22px] items-center overflow-hidden px-2', monthEventTextClass),
-  rowEventTitleClass: 'truncate font-semibold text-(--fc-event-contrast-color)',
+  rowEventInnerClass: cn('flex h-[22px] items-center overflow-hidden px-2.5', monthEventTextClass),
+  rowEventTitleClass: 'truncate font-medium text-(--fc-event-contrast-color)',
   rowEventTimeClass: 'hidden',
 }
 
@@ -72,16 +75,17 @@ const dayRowCommonClasses: CalendarOptions = {
   ----------------------------------------------------------------------------------------------- */
 
   listItemEventClass: (info) => cn(
-    'mb-0.5 overflow-hidden rounded-[4px] border-0 border-s-[3px] border-solid',
+    'mb-0.5 overflow-hidden rounded-md',
+    gcalEventAccentBorder,
     info.isNarrow ? 'mx-0.5' : 'mx-1',
     'bg-(--fc-event-color)',
     ...gcalEventHover,
-    info.isSelected && 'ring-2 ring-(--fc-border-color)/40',
+    info.isSelected && 'ring-2 ring-(--fc-event-accent)/35',
   ),
   listItemEventBeforeClass: 'hidden',
   listItemEventInnerClass: (info) => cn(
-    'flex flex-row items-center gap-1',
-    info.isNarrow ? `px-1 py-0.5 ${compactTextClass}` : `px-2 py-1 ${eventTextClass}`,
+    'flex min-h-[22px] flex-row items-center gap-1.5',
+    info.isNarrow ? `px-1.5 py-0.5 ${compactTextClass}` : `px-2.5 py-1 ${eventTextClass}`,
   ),
   listItemEventTimeClass: (info) => cn(
     'shrink-0 whitespace-nowrap font-medium tabular-nums text-(--fc-event-contrast-color)',
@@ -133,7 +137,7 @@ export function EventCalendarViews({
         /* Abstract Event
         ----------------------------------------------------------------------------------------- */
 
-        eventShortHeight={28}
+        eventShortHeight={32}
         eventClass={(info) => cn(
           info.isSelected
             ? ['outline-3', info.isDragging && 'shadow-lg']
@@ -162,9 +166,13 @@ export function EventCalendarViews({
           info.isInteractive && 'cursor-pointer',
           (info.isDragging && !info.isSelected) && 'opacity-80',
         )}
-        blockEventInnerClass={cn('flex flex-col gap-0.5 px-2 py-1', eventTextClass, 'text-(--fc-event-contrast-color) print:text-black')}
-        blockEventTimeClass='shrink-0 whitespace-nowrap font-medium tabular-nums opacity-90'
-        blockEventTitleClass='min-w-0 truncate font-semibold leading-[18px]'
+        blockEventInnerClass={cn(
+          'flex min-h-[22px] flex-col justify-center gap-0.5 px-2.5 py-1.5',
+          eventTextClass,
+          'text-(--fc-event-contrast-color) print:text-black',
+        )}
+        blockEventTimeClass='shrink-0 whitespace-nowrap font-medium tabular-nums opacity-80'
+        blockEventTitleClass='min-w-0 truncate font-medium leading-[18px]'
 
         /* Row Event
         ----------------------------------------------------------------------------------------- */
@@ -202,9 +210,8 @@ export function EventCalendarViews({
         ----------------------------------------------------------------------------------------- */
 
         columnEventClass={(info) => cn(
-          'ring-1 ring-background/80',
-          info.isStart && ['border-t rounded-t-[4px]', info.isNarrow ? 'mt-px' : 'mt-0.5'],
-          info.isEnd && ['border-b rounded-b-[4px]', info.isNarrow ? 'mb-px' : 'mb-0.5'],
+          info.isStart && ['rounded-t-md', info.isNarrow ? 'mt-px' : 'mt-0.5'],
+          info.isEnd && ['rounded-b-md', info.isNarrow ? 'mb-px' : 'mb-0.5'],
         )}
         columnEventBeforeClass={(info) => cn(
           info.isStartResizable && [
@@ -219,18 +226,18 @@ export function EventCalendarViews({
           ]
         )}
         columnEventInnerClass={(info) => cn(
-          'flex',
+          'flex min-h-[22px]',
           info.isShort
-            ? cn('flex-row items-center gap-1 px-2 py-1', eventTextClass)
-            : ['flex-col gap-0.5', info.isNarrow ? 'px-1.5 py-1' : 'px-2 py-1.5', eventTextClass],
+            ? cn('flex-row items-center gap-1.5 px-2.5 py-1', eventTextClass)
+            : ['flex-col justify-center gap-0.5', info.isNarrow ? 'px-2 py-1' : 'px-2.5 py-1.5', eventTextClass],
         )}
         columnEventTimeClass={(info) => cn(
           'font-medium tabular-nums text-(--fc-event-contrast-color) opacity-90',
           !info.isShort && (info.isNarrow ? 'pt-0.5' : 'pt-0.5'),
         )}
         columnEventTitleClass={(info) => cn(
-          !info.isShort && 'py-0.5',
-          'font-semibold text-(--fc-event-contrast-color)',
+          !info.isShort && 'py-px',
+          'min-w-0 truncate font-medium text-(--fc-event-contrast-color)',
         )}
 
         /* More-Link
@@ -518,7 +525,7 @@ export function EventCalendarViews({
               'group py-1 rounded-sm hover:bg-muted/50',
               info.isInteractive && 'focus-visible:bg-muted/50 -outline-offset-3',
             ),
-            listItemEventBeforeClass: 'w-1.5 bg-(--fc-event-color) rounded-full',
+            listItemEventBeforeClass: 'w-1.5 shrink-0 bg-[var(--fc-event-accent,var(--fc-event-color))] rounded-full',
             listItemEventInnerClass: '[display:contents]',
             listItemEventTimeClass: "-order-1 shrink-0 w-1/2 max-w-60 px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis text-sm",
             listItemEventTitleClass: (info) => cn(

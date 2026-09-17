@@ -5,6 +5,7 @@ export type EventDisplayStyle = {
   backgroundColor: string;
   borderColor: string;
   textColor: string;
+  contrastColor: string;
   accentColor: string;
 };
 
@@ -36,10 +37,11 @@ export function eventDisplayStyle(accent: string, isDark: boolean): EventDisplay
 
   return {
     accentColor: entry.accent,
-    color: entry.accent,
+    color: surface.background,
     backgroundColor: surface.background,
     borderColor: entry.accent,
     textColor: surface.text,
+    contrastColor: surface.text,
   };
 }
 
