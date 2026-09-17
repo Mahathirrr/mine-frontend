@@ -41,11 +41,18 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data as T;
 }
 
+export type UserAvatar = {
+  thumb_url: string;
+  full_url: string;
+};
+
 export type User = {
   id: number;
   name: string;
   email: string;
   created_at?: string;
+  has_avatar?: boolean;
+  avatar?: UserAvatar;
 };
 
 export type UserPreferences = {
@@ -69,6 +76,27 @@ export type MeResponse = {
 export type PreferencesResponse = {
   preferences: UserPreferences;
 };
+
+export type AvatarResponse = {
+  user: User;
+};
+
+async function uploadMultipart<T>(path: string, token: string, file: File): Promise<T> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  const data = await res.json().catch(() => ({}) as Record<string, unknown>);
+  if (!res.ok) {
+    throw new ApiError(friendlyApiMessage(res.status, extractErrorMessage(data)), res.status);
+  }
+  return data as T;
+}
 
 export const api = {
   register(name: string, email: string, password: string) {
@@ -101,5 +129,13 @@ export const api = {
       body,
       token,
     });
+  },
+
+  uploadAvatar(token: string, file: File) {
+    return uploadMultipart<AvatarResponse>("/auth/avatar", token, file);
+  },
+
+  deleteAvatar(token: string) {
+    return request<AvatarResponse>("/auth/avatar", { method: "DELETE", token });
   },
 };

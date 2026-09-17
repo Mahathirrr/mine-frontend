@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { mineMenuCatalog, pathForMenuId, resolveLandingPath } from "@/lib/navigation/mine-menu-catalog";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
+import { AvatarEditor } from "./avatar-editor";
 import { FeaturePicker } from "./feature-picker";
 
 export function SettingsHub() {
@@ -84,14 +85,17 @@ export function SettingsHub() {
           <CardTitle>Akun</CardTitle>
           <CardDescription>Informasi login kamu di Mine.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <p className="text-muted-foreground text-sm">Nama</p>
-            <p className="font-medium">{user?.name ?? "—"}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground text-sm">Email</p>
-            <p className="font-medium">{user?.email ?? "—"}</p>
+        <CardContent className="space-y-6">
+          <AvatarEditor user={user} />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-muted-foreground text-sm">Nama</p>
+              <p className="font-medium">{user?.name ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground text-sm">Email</p>
+              <p className="font-medium">{user?.email ?? "—"}</p>
+            </div>
           </div>
         </CardContent>
       </Card>

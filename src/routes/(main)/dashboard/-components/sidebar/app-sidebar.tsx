@@ -36,7 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const homePath = preferences ? resolveLandingPath(preferences) : "/dashboard/leetcode";
 
   const sidebarUser = authUser
-    ? { name: authUser.name, email: authUser.email, avatar: "" }
+    ? { name: authUser.name, email: authUser.email, avatar: authUser.avatar?.thumb_url ?? "" }
     : { name: "Guest", email: "", avatar: "" };
 
   return (

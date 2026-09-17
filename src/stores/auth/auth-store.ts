@@ -23,6 +23,8 @@ export type AuthState = {
       onboarding_completed: boolean;
     }>,
   ) => Promise<UserPreferences>;
+  uploadAvatar: (file: File) => Promise<User>;
+  deleteAvatar: () => Promise<User>;
 };
 
 export function createAuthStore() {
@@ -90,6 +92,22 @@ export function createAuthStore() {
       const res = await api.updatePreferences(token, body);
       set({ preferences: res.preferences });
       return res.preferences;
+    },
+
+    async uploadAvatar(file) {
+      const token = get().token;
+      if (!token) throw new Error("Not authenticated");
+      const res = await api.uploadAvatar(token, file);
+      set({ user: res.user });
+      return res.user;
+    },
+
+    async deleteAvatar() {
+      const token = get().token;
+      if (!token) throw new Error("Not authenticated");
+      const res = await api.deleteAvatar(token);
+      set({ user: res.user });
+      return res.user;
     },
   }));
 }
