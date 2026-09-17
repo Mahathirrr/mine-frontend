@@ -204,22 +204,55 @@
   margin-bottom: 0;
 }
 
+.journal-prose :is(ul, ol) {
+  margin: 0.35em 0 1.05em;
+  padding-left: 1.625rem;
+}
+
 .journal-prose ul,
-.journal-prose ol {
-  margin: 0 0 1.05em;
-  padding-left: 1.5rem;
+.journal-prose .journal-bullet-list {
+  list-style-type: disc;
+  list-style-position: outside;
 }
 
-.journal-prose li {
-  margin: 0.25em 0;
+.journal-prose ol,
+.journal-prose .journal-ordered-list {
+  list-style-type: decimal;
+  list-style-position: outside;
 }
 
-.journal-prose blockquote {
-  margin: 0 0 1.05em;
-  padding-left: 1rem;
-  border-left: 3px solid color-mix(in oklab, var(--primary) 35%, transparent);
+.journal-prose ul ul,
+.journal-prose .journal-bullet-list .journal-bullet-list {
+  list-style-type: circle;
+}
+
+.journal-prose ul ul ul,
+.journal-prose .journal-bullet-list .journal-bullet-list .journal-bullet-list {
+  list-style-type: square;
+}
+
+.journal-prose li,
+.journal-prose .journal-list-item {
+  display: list-item;
+  margin: 0.2em 0;
+}
+
+.journal-prose li > p {
+  margin: 0;
+}
+
+.journal-prose blockquote,
+.journal-prose .journal-blockquote {
+  margin: 0.5em 0 1.05em;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 3px solid color-mix(in oklab, var(--primary) 40%, transparent);
   color: var(--muted-foreground);
   font-style: italic;
+}
+
+.journal-prose blockquote > p,
+.journal-prose .journal-blockquote > p {
+  margin: 0.25em 0;
 }
 
 .journal-prose strong {
