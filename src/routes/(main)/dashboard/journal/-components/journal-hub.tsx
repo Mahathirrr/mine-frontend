@@ -355,7 +355,7 @@ export function JournalHub() {
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="font-normal">Topic Spin Wheel</CardTitle>
-              <CardDescription>Acak topik essay — cocok untuk latihan menulis & refleksi</CardDescription>
+              <CardDescription>Acak topik essay, cocok untuk latihan menulis & refleksi</CardDescription>
             </CardHeader>
             <CardContent>
               <TopicWheel
@@ -374,7 +374,7 @@ export function JournalHub() {
           <Card>
             <CardHeader>
               <CardTitle className="font-normal">Topik essay</CardTitle>
-              <CardDescription>Kelola prompt — nonaktifkan topik yang tidak mau muncul di spin wheel</CardDescription>
+              <CardDescription>Kelola prompt dan nonaktifkan topik yang tidak mau muncul di spin wheel</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {data.topics.map((topic, index) => (

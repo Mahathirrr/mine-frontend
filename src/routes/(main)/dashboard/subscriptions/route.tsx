@@ -18,7 +18,7 @@ function Page() {
         <div>
           <h2 className="text-3xl tracking-tight">Biaya Rutin</h2>
           <p className="text-muted-foreground">
-            Lacak langganan, pulsa, AI tools, dan tagihan berkala — dengan pengingat jatuh tempo & estimasi bulanan.
+            Lacak langganan, pulsa, AI tools, dan tagihan berkala, dengan pengingat jatuh tempo & estimasi bulanan.
           </p>
         </div>
       </div>

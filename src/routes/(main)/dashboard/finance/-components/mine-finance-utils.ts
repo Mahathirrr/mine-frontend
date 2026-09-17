@@ -45,12 +45,12 @@ export function txSign(type: FinanceTxType): string {
 }
 
 export function categoryName(categories: FinanceCategory[], id: number | null): string {
-  if (!id) return "—";
-  return categories.find((c) => c.id === id)?.name ?? "—";
+  if (!id) return "-";
+  return categories.find((c) => c.id === id)?.name ?? "-";
 }
 
 export function accountName(accounts: { id: number; name: string }[], id: number): string {
-  return accounts.find((a) => a.id === id)?.name ?? "—";
+  return accounts.find((a) => a.id === id)?.name ?? "-";
 }
 
 export function expenseCategories(categories: FinanceCategory[]): FinanceCategory[] {

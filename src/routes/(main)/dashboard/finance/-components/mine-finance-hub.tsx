@@ -374,7 +374,7 @@ export function MineFinanceHub() {
           <Card>
             <CardHeader>
               <CardTitle className="font-normal">Budget bulan {monthKey}</CardTitle>
-              <CardDescription>Batas pengeluaran per kategori — fleksibel untuk hiburan</CardDescription>
+              <CardDescription>Batas pengeluaran per kategori, fleksibel untuk hiburan</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {data.budgets.map((b) => (

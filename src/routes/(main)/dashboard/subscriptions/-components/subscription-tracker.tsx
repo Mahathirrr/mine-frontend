@@ -400,7 +400,7 @@ export function SubscriptionTracker() {
         <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm">
           <CreditCard className="size-4 shrink-0 text-red-600" />
           <span>
-            <strong>{stats.due_today}</strong> tagihan jatuh tempo hari ini — cek daftar mendatang di bawah.
+            <strong>{stats.due_today}</strong> tagihan jatuh tempo hari ini. Cek daftar mendatang di bawah.
           </span>
         </div>
       ) : null}
