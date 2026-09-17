@@ -74,6 +74,12 @@ export const mineMenuCatalog: MineMenuCatalogItem[] = [
     description: "Koleksi prompt AI reusable dengan copy sekali klik.",
     url: "/dashboard/prompt-vault",
   },
+  {
+    id: "skills",
+    title: "Skill Tracker",
+    description: "Roadmap IT, checklist penguasaan, materi, dan project portfolio.",
+    url: "/dashboard/skills",
+  },
 ];
 
 export const mineMenuIds = mineMenuCatalog.map((item) => item.id);

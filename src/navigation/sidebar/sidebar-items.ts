@@ -149,6 +149,13 @@ export const sidebarItems: NavGroup[] = [
         icon: Sparkles,
         badge: "new",
       },
+      {
+        id: "skills",
+        title: "Skill Tracker",
+        url: "/dashboard/skills",
+        icon: GraduationCap,
+        badge: "new",
+      },
     ],
   },
   {
