@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Flame, Pause, Pencil, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,14 @@ import { fastingApi } from "@/lib/api/fasting";
 import { FastingEndFastDialog } from "./fasting-end-fast-dialog";
 import { FastingGoalPresets } from "./fasting-goal-presets";
 import { FastingTimerRing } from "./fasting-timer-ring";
-import { formatDateTime, formatDuration, sessionDurationHours, zoneIcons } from "./fasting-utils";
+import {
+  formatDateTime,
+  formatDuration,
+  parseDate,
+  sessionDurationHours,
+  toLocalDatetimeInput,
+  zoneIcons,
+} from "./fasting-utils";
 
 type Props = {
   data: FastingOverview;
@@ -42,7 +49,8 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
   const goalHours = active?.goal_hours ?? data.profile.goal_hours;
   const elapsed = active ? sessionDurationHours(active, now) : 0;
   const progress = goalHours > 0 ? Math.min(1, elapsed / goalHours) : 0;
-  const goalEnd = active ? new Date(new Date(active.started_at).getTime() + goalHours * 3600000) : null;
+  const startDate = active ? parseDate(active.started_at) : null;
+  const goalEnd = startDate && isValid(startDate) ? new Date(startDate.getTime() + goalHours * 3600000) : null;
 
   async function startFast() {
     setBusy(true);
@@ -133,17 +141,15 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
                 canEdit={Boolean(active)}
                 onEdit={() => {
                   if (!active) return;
-                  const d = new Date(active.started_at);
-                  const pad = (n: number) => String(n).padStart(2, "0");
-                  setStartInput(
-                    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
-                  );
+                  setStartInput(toLocalDatetimeInput(active.started_at));
                   setEditStartOpen(true);
                 }}
               />
               <EditableTile
                 label="Goal"
-                value={goalEnd ? format(goalEnd, "EEE d, h:mm a") : `${Math.round(goalHours)}h target`}
+                value={
+                  goalEnd && isValid(goalEnd) ? format(goalEnd, "EEE d, h:mm a") : `${Math.round(goalHours)}h target`
+                }
                 canEdit={Boolean(active)}
                 onEdit={() => setEditGoalOpen(true)}
               />
@@ -201,7 +207,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
         </div>
       </div>
 
-      {active && (
+      {active && endOpen && (
         <FastingEndFastDialog
           open={endOpen}
           onOpenChange={setEndOpen}

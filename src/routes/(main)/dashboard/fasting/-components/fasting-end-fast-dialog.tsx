@@ -2,15 +2,18 @@
 
 import * as React from "react";
 
-import { format } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { FastingSession, FastingZone } from "@/lib/api/fasting";
 
-import { formatDurationHuman, zoneIcons } from "./fasting-utils";
+import {
+  formatDurationHuman,
+  formatLocalDatetimeDisplay,
+  parseLocalDatetimeInput,
+  toLocalDatetimeInput,
+  zoneIcons,
+} from "./fasting-utils";
 
 type Props = {
   open: boolean;
@@ -33,21 +36,22 @@ export function FastingEndFastDialog({
   onSave,
   onDelete,
 }: Props) {
-  const [startedAt, setStartedAt] = React.useState("");
-  const [endedAt, setEndedAt] = React.useState("");
+  const [startedAt, setStartedAt] = React.useState(() => toLocalDatetimeInput(session.started_at));
+  const [endedAt, setEndedAt] = React.useState(() => toLocalDatetimeInput(new Date().toISOString()));
   const [editStart, setEditStart] = React.useState(false);
   const [editEnd, setEditEnd] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) return;
-    setStartedAt(toLocalInput(session.started_at));
-    setEndedAt(toLocalInput(new Date().toISOString()));
+    setStartedAt(toLocalDatetimeInput(session.started_at));
+    setEndedAt(toLocalDatetimeInput(new Date().toISOString()));
     setEditStart(false);
     setEditEnd(false);
   }, [open, session.started_at]);
 
   const zoneLabel = zone?.label ?? "—";
   const zoneIcon = zone ? (zoneIcons[zone.icon] ?? "⏱") : "⏱";
+  const canSave = Boolean(parseLocalDatetimeInput(startedAt) && parseLocalDatetimeInput(endedAt));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,7 +76,7 @@ export function FastingEndFastDialog({
           <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
             <TimeRow
               label="Started fasting"
-              value={format(parseLocal(startedAt), "EEE, d MMM 'at' HH.mm", { locale: idLocale })}
+              value={formatLocalDatetimeDisplay(startedAt)}
               editing={editStart}
               inputValue={startedAt}
               onInputChange={setStartedAt}
@@ -82,7 +86,7 @@ export function FastingEndFastDialog({
             <div className="border-zinc-800 border-t border-dashed" />
             <TimeRow
               label="Ended fasting"
-              value={format(parseLocal(endedAt), "EEE, d MMM 'at' HH.mm", { locale: idLocale })}
+              value={formatLocalDatetimeDisplay(endedAt)}
               editing={editEnd}
               inputValue={endedAt}
               onInputChange={setEndedAt}
@@ -104,8 +108,13 @@ export function FastingEndFastDialog({
             <Button
               type="button"
               className="h-12 rounded-full bg-zinc-700 font-semibold text-white hover:bg-zinc-600"
-              disabled={busy}
-              onClick={() => void onSave(parseLocal(startedAt).toISOString(), parseLocal(endedAt).toISOString())}
+              disabled={busy || !canSave}
+              onClick={() => {
+                const start = parseLocalDatetimeInput(startedAt);
+                const end = parseLocalDatetimeInput(endedAt);
+                if (!start || !end) return;
+                void onSave(start.toISOString(), end.toISOString());
+              }}
             >
               Save
             </Button>
@@ -166,14 +175,4 @@ function TimeRow({
       )}
     </div>
   );
-}
-
-function toLocalInput(iso: string) {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function parseLocal(local: string) {
-  return new Date(local);
 }

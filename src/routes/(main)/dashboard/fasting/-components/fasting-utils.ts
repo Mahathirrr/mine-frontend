@@ -1,3 +1,6 @@
+import { format, isValid } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
+
 import type { FastingSession } from "@/lib/api/fasting";
 
 export const mealLabels: Record<string, string> = {
@@ -37,19 +40,50 @@ export function formatKg(n: number) {
 }
 
 export function sessionDurationHours(session: FastingSession, now = Date.now()) {
-  const start = new Date(session.started_at).getTime();
-  const end = session.ended_at ? new Date(session.ended_at).getTime() : now;
+  const startDate = parseDate(session.started_at);
+  if (!startDate) return 0;
+  const start = startDate.getTime();
+  const endDate = session.ended_at ? parseDate(session.ended_at) : null;
+  const end = endDate ? endDate.getTime() : now;
+  if (!Number.isFinite(end) || end < start) return 0;
   return Math.max(0, (end - start) / 3600000);
 }
 
+export function parseDate(iso: string | null | undefined): Date | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return isValid(d) ? d : null;
+}
+
+export function toLocalDatetimeInput(iso: string | null | undefined): string {
+  const d = parseDate(iso);
+  if (!d) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function parseLocalDatetimeInput(local: string): Date | null {
+  if (!local.trim()) return null;
+  const d = new Date(local);
+  return isValid(d) ? d : null;
+}
+
 export function formatDateTime(iso: string) {
+  const d = parseDate(iso);
+  if (!d) return "—";
   return new Intl.DateTimeFormat("id-ID", {
     weekday: "short",
     day: "numeric",
     month: "short",
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date(iso));
+  }).format(d);
+}
+
+export function formatLocalDatetimeDisplay(local: string) {
+  const d = parseLocalDatetimeInput(local);
+  if (!d) return "—";
+  return format(d, "EEE, d MMM 'at' HH.mm", { locale: idLocale });
 }
 
 export const zoneIcons: Record<string, string> = {
