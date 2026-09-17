@@ -25,18 +25,29 @@ export function FastingHub() {
   const [error, setError] = React.useState<string | null>(null);
   const [tab, setTab] = React.useState("timer");
 
-  const load = React.useCallback(async () => {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      setData(await fastingApi.overview(token));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat fasting tracker");
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
+  const load = React.useCallback(
+    async (opts?: { silent?: boolean }) => {
+      if (!token) return;
+      if (!opts?.silent) {
+        setLoading(true);
+        setError(null);
+      }
+      try {
+        setData(await fastingApi.overview(token));
+      } catch (err) {
+        if (!opts?.silent) {
+          setError(err instanceof Error ? err.message : "Gagal memuat fasting tracker");
+        }
+      } finally {
+        if (!opts?.silent) {
+          setLoading(false);
+        }
+      }
+    },
+    [token],
+  );
+
+  const refresh = React.useCallback(() => load({ silent: true }), [load]);
 
   React.useEffect(() => {
     void load();
@@ -109,25 +120,25 @@ export function FastingHub() {
         </TabsList>
 
         <TabsContent value="timer" className="mt-4">
-          <FastingTimerPanel data={data} token={authToken} onRefresh={load} />
+          <FastingTimerPanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
         <TabsContent value="stats" className="mt-4">
-          <FastingStatsPanel data={data} token={authToken} onRefresh={load} />
+          <FastingStatsPanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
         <TabsContent value="weight" className="mt-4">
-          <FastingWeightPanel data={data} token={authToken} onRefresh={load} />
+          <FastingWeightPanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
         <TabsContent value="meals" className="mt-4">
-          <FastingMealsPanel data={data} token={authToken} onRefresh={load} />
+          <FastingMealsPanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
         <TabsContent value="zones" className="mt-4">
           <FastingZonesPanel data={data} />
         </TabsContent>
         <TabsContent value="history" className="mt-4">
-          <FastingHistoryPanel data={data} token={authToken} onRefresh={load} />
+          <FastingHistoryPanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
         <TabsContent value="profile" className="mt-4">
-          <FastingProfilePanel data={data} token={authToken} onRefresh={load} />
+          <FastingProfilePanel data={data} token={authToken} onRefresh={refresh} />
         </TabsContent>
       </Tabs>
     </div>

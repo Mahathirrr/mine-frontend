@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { cn } from "cn";
-import { Save } from "lucide-react";
+import { Check, Loader2, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +20,8 @@ type Props = {
 };
 
 export function FastingProfilePanel({ data, token, onRefresh }: Props) {
-  const [saving, setSaving] = React.useState(false);
+  const [profileSaving, setProfileSaving] = React.useState(false);
+  const [savingSlug, setSavingSlug] = React.useState<string | null>(null);
   const [selected, setSelected] = React.useState(data.profile.protocol_slug);
   const [form, setForm] = React.useState({
     start_weight_kg: String(data.profile.start_weight_kg || ""),
@@ -42,8 +43,12 @@ export function FastingProfilePanel({ data, token, onRefresh }: Props) {
   }, [data.profile]);
 
   async function pickProtocol(slug: string, goal: number, eating: number) {
+    if (slug === selected && !savingSlug) return;
+
+    const previous = selected;
     setSelected(slug);
-    setSaving(true);
+    setSavingSlug(slug);
+
     try {
       await fastingApi.updateProfile(token, {
         protocol_slug: slug,
@@ -51,13 +56,15 @@ export function FastingProfilePanel({ data, token, onRefresh }: Props) {
         eating_window_hours: eating,
       });
       await onRefresh();
+    } catch {
+      setSelected(previous);
     } finally {
-      setSaving(false);
+      setSavingSlug(null);
     }
   }
 
   async function saveProfile() {
-    setSaving(true);
+    setProfileSaving(true);
     try {
       await fastingApi.updateProfile(token, {
         start_weight_kg: Number(form.start_weight_kg) || 0,
@@ -68,7 +75,7 @@ export function FastingProfilePanel({ data, token, onRefresh }: Props) {
       });
       await onRefresh();
     } finally {
-      setSaving(false);
+      setProfileSaving(false);
     }
   }
 
@@ -77,29 +84,43 @@ export function FastingProfilePanel({ data, token, onRefresh }: Props) {
       <Card>
         <CardHeader>
           <CardTitle>Pilih protocol</CardTitle>
-          <CardDescription>Tap untuk ganti goal fasting</CardDescription>
+          <CardDescription>Tap untuk ganti goal fasting default</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {data.protocols.map((p) => (
-              <button
-                key={p.slug}
-                type="button"
-                disabled={saving}
-                onClick={() => pickProtocol(p.slug, p.goal_hours, p.eating_hours)}
-                className={cn(
-                  "rounded-2xl border p-4 text-left transition-all hover:shadow-md",
-                  selected === p.slug && "ring-2 ring-orange-500/50",
-                )}
-                style={{ backgroundColor: `${p.color}18`, borderColor: `${p.color}40` }}
-              >
-                <p className="font-medium text-sm">{p.label}</p>
-                <p className="mt-2 font-bold text-3xl tabular-nums" style={{ color: p.color }}>
-                  {p.goal_hours}
-                </p>
-                <p className="text-muted-foreground text-xs">jam puasa · eating {p.eating_hours}h</p>
-              </button>
-            ))}
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {data.protocols.map((p) => {
+              const isSelected = selected === p.slug;
+              const isSaving = savingSlug === p.slug;
+
+              return (
+                <button
+                  key={p.slug}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => pickProtocol(p.slug, p.goal_hours, p.eating_hours)}
+                  className={cn(
+                    "rounded-xl border bg-card px-3.5 py-3 text-left",
+                    isSelected
+                      ? "border-orange-500/50 bg-orange-500/[0.04] ring-1 ring-orange-500/30"
+                      : "border-border/80",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-muted-foreground text-sm leading-snug">{p.label}</p>
+                    {isSaving ? (
+                      <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden />
+                    ) : isSelected ? (
+                      <Check className="size-4 shrink-0 text-orange-600 dark:text-orange-400" aria-hidden />
+                    ) : null}
+                  </div>
+                  <p className="mt-1.5 font-semibold text-2xl text-foreground tabular-nums leading-none">
+                    {Math.round(p.goal_hours)}
+                    <span className="ms-1 font-normal text-muted-foreground text-sm">jam</span>
+                  </p>
+                  <p className="mt-1.5 text-muted-foreground text-sm">eating window {p.eating_hours} jam</p>
+                </button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -142,9 +163,9 @@ export function FastingProfilePanel({ data, token, onRefresh }: Props) {
             <Label>Catatan strategi</Label>
             <Textarea value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} rows={3} />
           </div>
-          <Button onClick={saveProfile} disabled={saving} className="w-fit rounded-full">
-            <Save className="size-4" />
-            {saving ? "Menyimpan..." : "Simpan profil"}
+          <Button onClick={saveProfile} disabled={profileSaving} className="w-fit rounded-full">
+            {profileSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            {profileSaving ? "Menyimpan..." : "Simpan profil"}
           </Button>
         </CardContent>
       </Card>
