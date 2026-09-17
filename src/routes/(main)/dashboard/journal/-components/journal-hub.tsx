@@ -3,8 +3,19 @@
 import * as React from "react";
 
 import { cn } from "cn";
-import { BookOpen, PenLine, Plus, Sparkles, Tags } from "lucide-react";
+import { BookOpen, PenLine, Plus, Sparkles, Tags, Trash2 } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,6 +68,8 @@ export function JournalHub() {
   const [newTopicTitle, setNewTopicTitle] = React.useState("");
   const [newTopicPrompt, setNewTopicPrompt] = React.useState("");
   const [newTopicColor, setNewTopicColor] = React.useState(PRESET_TOPIC_COLORS[0]);
+  const [pendingDeleteTopicId, setPendingDeleteTopicId] = React.useState<number | null>(null);
+  const [deletingTopic, setDeletingTopic] = React.useState(false);
 
   const load = React.useCallback(async () => {
     if (!token) return;
@@ -227,17 +240,27 @@ export function JournalHub() {
   }
 
   async function deleteTopic(id: number) {
-    if (!token || !confirm("Hapus topik ini?")) return;
-    await journalApi.deleteTopic(token, id);
-    await load();
+    if (!token) return;
+    setDeletingTopic(true);
+    try {
+      await journalApi.deleteTopic(token, id);
+      setPendingDeleteTopicId(null);
+      await load();
+    } finally {
+      setDeletingTopic(false);
+    }
   }
 
   async function deleteEntry() {
-    if (!token || !activeEntry || !confirm("Hapus essay ini?")) return;
+    if (!token || !activeEntry) return;
     await journalApi.deleteEntry(token, activeEntry.id);
     closeEditor();
     await load();
   }
+
+  const pendingDeleteTopic = pendingDeleteTopicId
+    ? (data?.topics.find((topic) => topic.id === pendingDeleteTopicId) ?? null)
+    : null;
 
   if (loading && !data) {
     return <Skeleton className="h-[600px] rounded-xl" />;
@@ -385,7 +408,7 @@ export function JournalHub() {
                       size="sm"
                       variant="ghost"
                       className="text-destructive"
-                      onClick={() => void deleteTopic(topic.id)}
+                      onClick={() => setPendingDeleteTopicId(topic.id)}
                     >
                       Hapus
                     </Button>
@@ -469,6 +492,38 @@ export function JournalHub() {
           )}
         </TabsContent>
       </Tabs>
+
+      <AlertDialog
+        open={pendingDeleteTopicId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteTopicId(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <Trash2 />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Hapus topik?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Topik <span className="font-medium text-foreground">{pendingDeleteTopic?.title ?? "ini"}</span> akan
+              dihapus dari daftar spin wheel. Essay yang sudah ditulis tidak ikut terhapus.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingTopic}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              disabled={deletingTopic || pendingDeleteTopicId === null}
+              onClick={() => {
+                if (pendingDeleteTopicId !== null) void deleteTopic(pendingDeleteTopicId);
+              }}
+            >
+              {deletingTopic ? "Menghapus…" : "Hapus topik"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
