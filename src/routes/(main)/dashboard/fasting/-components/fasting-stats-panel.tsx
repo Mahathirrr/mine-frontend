@@ -103,13 +103,7 @@ export function FastingStatsPanel({ data }: Props) {
               <div
                 key={d.date}
                 title={`${d.date}: ${d.fasting_hours}h fasting`}
-                className={`flex aspect-square flex-col items-center justify-center rounded-full text-xs ${
-                  d.met_goal
-                    ? "bg-orange-500/20 ring-2 ring-orange-500/60"
-                    : d.fasting_hours > 0
-                      ? "bg-muted"
-                      : "bg-muted/40 text-muted-foreground"
-                }`}
+                className={`flex aspect-square flex-col items-center justify-center rounded-full text-xs ${heatmapDayClass(d)}`}
               >
                 <span className="font-medium">{d.date.slice(8)}</span>
                 {d.fasting_hours > 0 && <span className="text-[10px] opacity-70">{Math.round(d.fasting_hours)}h</span>}
@@ -131,6 +125,12 @@ function StatCard({ label, value }: { label: string; value: string }) {
       </CardHeader>
     </Card>
   );
+}
+
+function heatmapDayClass(d: { met_goal: boolean; fasting_hours: number }) {
+  if (d.met_goal) return "bg-orange-500/20 ring-2 ring-orange-500/60";
+  if (d.fasting_hours > 0) return "bg-muted";
+  return "bg-muted/40 text-muted-foreground";
 }
 
 function CompareRow({ label, hours, accent }: { label: string; hours: number; accent?: boolean }) {

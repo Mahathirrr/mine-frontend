@@ -5,7 +5,6 @@ import * as React from "react";
 import { format } from "date-fns";
 import { Flame, Pause, Play } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { FastingOverview } from "@/lib/api/fasting";
@@ -60,50 +59,64 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
   }
 
   const protocol = data.protocols.find((p) => p.slug === data.profile.protocol_slug);
+  const zone = data.zone?.zone;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <Card className="overflow-hidden border-0 bg-gradient-to-br from-orange-500/10 via-background to-background shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+      <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20">
+        <CardHeader className="pb-0 text-center sm:text-left">
+          <CardTitle className="flex items-center justify-center gap-2 sm:justify-start">
             <Flame className="size-5 text-orange-500" />
             {data.timer.is_fasting ? "Sedang fasting" : "Siap mulai fast?"}
           </CardTitle>
           <CardDescription>
-            Protocol {protocol?.label ?? data.profile.protocol_slug} · goal {data.profile.goal_hours} jam
+            {protocol?.label ?? data.profile.protocol_slug} · target {data.profile.goal_hours} jam puasa
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-6 pb-8">
-          <FastingTimerRing
-            progress={progress}
-            label={formatDuration(elapsed)}
-            sublabel={`Progress ${Math.round(progress * 100)}%`}
-            accent="#f97316"
-          />
-          {data.zone?.zone && (
-            <Badge variant="secondary" className="rounded-full px-3 py-1 text-sm">
-              {zoneIcons[data.zone.zone.icon] ?? "⏱"} {data.zone.zone.label}
-            </Badge>
-          )}
-          <div className="grid w-full max-w-md grid-cols-2 gap-3 text-sm">
-            <div className="rounded-2xl border bg-card/80 p-4">
-              <p className="text-muted-foreground text-xs uppercase tracking-wide">Started</p>
-              <p className="mt-1 font-medium">{active ? formatDateTime(active.started_at) : "Belum mulai"}</p>
+        <CardContent className="flex flex-col items-center gap-8 pb-10 pt-4">
+          <div className="relative w-full max-w-sm rounded-[2rem] bg-gradient-to-b from-white/80 to-orange-500/[0.04] px-4 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:from-white/[0.03] dark:to-orange-500/[0.06] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <FastingTimerRing
+              progress={progress}
+              label={formatDuration(elapsed)}
+              sublabel={`Elapsed · ${Math.round(progress * 100)}% dari goal`}
+              zoneLabel={zone?.label}
+              zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
+              goalHours={data.profile.goal_hours}
+            />
+          </div>
+
+          <div className="grid w-full max-w-md grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-orange-500/10 bg-card/90 p-4 shadow-sm backdrop-blur-sm">
+              <p className="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.12em]">Started</p>
+              <p className="mt-2 font-medium text-sm leading-snug">
+                {active ? formatDateTime(active.started_at) : "Belum mulai"}
+              </p>
             </div>
-            <div className="rounded-2xl border bg-card/80 p-4">
-              <p className="text-muted-foreground text-xs uppercase tracking-wide">Goal</p>
-              <p className="mt-1 font-medium">
+            <div className="rounded-2xl border border-orange-500/10 bg-card/90 p-4 shadow-sm backdrop-blur-sm">
+              <p className="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.12em]">Goal</p>
+              <p className="mt-2 font-medium text-sm leading-snug">
                 {goalEnd ? format(goalEnd, "EEE d, h:mm a") : `${data.profile.goal_hours}h target`}
               </p>
             </div>
           </div>
+
           {data.timer.is_fasting ? (
-            <Button size="lg" className="rounded-full px-8" onClick={endFast} disabled={busy}>
+            <Button
+              size="lg"
+              className="h-12 rounded-full bg-foreground px-10 text-background shadow-lg hover:bg-foreground/90"
+              onClick={endFast}
+              disabled={busy}
+            >
               <Pause className="size-4" />
               End Fast
             </Button>
           ) : (
-            <Button size="lg" className="rounded-full px-8" onClick={startFast} disabled={busy}>
+            <Button
+              size="lg"
+              className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-10 shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-orange-700"
+              onClick={startFast}
+              disabled={busy}
+            >
               <Play className="size-4" />
               Start Fast
             </Button>
@@ -112,26 +125,26 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
       </Card>
 
       <div className="grid gap-4">
-        <Card>
+        <Card className="rounded-2xl">
           <CardHeader className="pb-2">
             <CardDescription>Streak</CardDescription>
-            <CardTitle className="text-3xl">{data.stats.current_streak} hari</CardTitle>
+            <CardTitle className="text-3xl tabular-nums">{data.stats.current_streak} hari</CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground text-sm">
             Terpanjang {data.stats.longest_streak} hari
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-2xl">
           <CardHeader className="pb-2">
             <CardDescription>Total fasting</CardDescription>
-            <CardTitle className="text-3xl">{Math.round(data.stats.total_hours)} jam</CardTitle>
+            <CardTitle className="text-3xl tabular-nums">{Math.round(data.stats.total_hours)} jam</CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground text-sm">
             {data.stats.total_fasts} fast · rata-rata {data.stats.average_hours.toFixed(1)} jam
           </CardContent>
         </Card>
         {data.insights.slice(0, 2).map((ins, i) => (
-          <div key={i} className="rounded-2xl border bg-muted/30 p-4 text-sm">
+          <div key={i} className="rounded-2xl border border-orange-500/10 bg-orange-500/[0.04] p-4 text-sm">
             <p className="font-medium">{ins.title}</p>
             <p className="mt-1 text-muted-foreground">{ins.detail}</p>
           </div>
