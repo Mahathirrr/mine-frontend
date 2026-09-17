@@ -15,6 +15,15 @@ export function formatDuration(hours: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+export function formatDurationHuman(hours: number) {
+  const totalMin = Math.max(0, Math.round(hours * 60));
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m} menit`;
+  if (m === 0) return `${h} jam`;
+  return `${h} jam ${m} menit`;
+}
+
 export function formatDurationShort(hours: number) {
   const h = Math.floor(hours);
   const m = Math.round((hours - h) * 60);

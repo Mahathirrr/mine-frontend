@@ -13,15 +13,20 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { FastingDayChartPoint, FastingOverview } from "@/lib/api/fasting";
 
 import { FastingConsistencyCalendar } from "./fasting-consistency-calendar";
+import { FastingGoalPresets } from "./fasting-goal-presets";
 import { formatDurationShort } from "./fasting-utils";
 
-type Props = { data: FastingOverview };
+type Props = {
+  data: FastingOverview;
+  token: string;
+  onRefresh: () => Promise<void>;
+};
 
 const CHART_INNER_H = 140;
 const CHART_BOTTOM = 28;
 const CHART_TOP = 12;
 
-export function FastingStatsPanel({ data }: Props) {
+export function FastingStatsPanel({ data, token, onRefresh }: Props) {
   const [range, setRange] = React.useState<"week" | "month">("week");
   const chartData = range === "week" ? data.fasting_chart.slice(-7) : data.fasting_chart;
   const cmp = data.week_comparison;
@@ -34,6 +39,12 @@ export function FastingStatsPanel({ data }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
+      <Card className="rounded-2xl">
+        <CardContent className="pt-6">
+          <FastingGoalPresets data={data} token={token} onRefresh={onRefresh} />
+        </CardContent>
+      </Card>
+
       <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Summary</CardTitle>

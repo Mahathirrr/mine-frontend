@@ -112,7 +112,7 @@ export function FastingHub() {
           <FastingTimerPanel data={data} token={authToken} onRefresh={load} />
         </TabsContent>
         <TabsContent value="stats" className="mt-4">
-          <FastingStatsPanel data={data} />
+          <FastingStatsPanel data={data} token={authToken} onRefresh={load} />
         </TabsContent>
         <TabsContent value="weight" className="mt-4">
           <FastingWeightPanel data={data} token={authToken} onRefresh={load} />

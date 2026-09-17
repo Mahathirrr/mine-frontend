@@ -105,6 +105,7 @@ export type FastingProtocol = {
   goal_hours: number;
   eating_hours: number;
   color: string;
+  category?: "standard" | "longer" | "custom";
 };
 
 export type FastingZone = {
@@ -182,6 +183,19 @@ export const fastingApi = {
       method: "PATCH",
       body: body ?? {},
     });
+  },
+  updateSession(
+    token: string,
+    id: number,
+    body: {
+      started_at?: string;
+      ended_at?: string | null;
+      goal_hours?: number;
+      protocol_slug?: string;
+      notes?: string;
+    },
+  ) {
+    return request<{ session: FastingSession }>(`/fasting/sessions/${id}`, token, { method: "PATCH", body });
   },
   deleteSession(token: string, id: number) {
     return request<{ ok: boolean }>(`/fasting/sessions/${id}`, token, { method: "DELETE" });
