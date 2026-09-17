@@ -27,6 +27,7 @@ import { Route as mainDashboardComingSoonRouteRouteImport } from './routes/(main
 import { Route as mainDashboardCrmRouteRouteImport } from './routes/(main)/dashboard/crm/route'
 import { Route as mainDashboardDefaultRouteRouteImport } from './routes/(main)/dashboard/default/route'
 import { Route as mainDashboardEcommerceRouteRouteImport } from './routes/(main)/dashboard/ecommerce/route'
+import { Route as mainDashboardEnglishRouteRouteImport } from './routes/(main)/dashboard/english/route'
 import { Route as mainDashboardFileManagerRouteRouteImport } from './routes/(main)/dashboard/file-manager/route'
 import { Route as mainDashboardFinanceRouteRouteImport } from './routes/(main)/dashboard/finance/route'
 import { Route as mainDashboardInfrastructureRouteRouteImport } from './routes/(main)/dashboard/infrastructure/route'
@@ -147,6 +148,12 @@ const mainDashboardEcommerceRouteRoute =
   mainDashboardEcommerceRouteRouteImport.update({
     id: '/ecommerce',
     path: '/ecommerce',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardEnglishRouteRoute =
+  mainDashboardEnglishRouteRouteImport.update({
+    id: '/english',
+    path: '/english',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardFileManagerRouteRoute =
@@ -309,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -353,6 +361,7 @@ export interface FileRoutesByTo {
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -399,6 +408,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/(main)/dashboard/default': typeof mainDashboardDefaultRouteRoute
   '/(main)/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/(main)/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/(main)/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/(main)/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/(main)/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm'
     | '/dashboard/default'
     | '/dashboard/ecommerce'
+    | '/dashboard/english'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/dashboard/crm'
     | '/dashboard/default'
     | '/dashboard/ecommerce'
+    | '/dashboard/english'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
@@ -535,6 +547,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/crm'
     | '/(main)/dashboard/default'
     | '/(main)/dashboard/ecommerce'
+    | '/(main)/dashboard/english'
     | '/(main)/dashboard/file-manager'
     | '/(main)/dashboard/finance'
     | '/(main)/dashboard/infrastructure'
@@ -703,6 +716,13 @@ declare module '@tanstack/react-router' {
       path: '/ecommerce'
       fullPath: '/dashboard/ecommerce'
       preLoaderRoute: typeof mainDashboardEcommerceRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/english': {
+      id: '/(main)/dashboard/english'
+      path: '/english'
+      fullPath: '/dashboard/english'
+      preLoaderRoute: typeof mainDashboardEnglishRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/file-manager': {
@@ -892,6 +912,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardCrmRouteRoute: typeof mainDashboardCrmRouteRoute
   mainDashboardDefaultRouteRoute: typeof mainDashboardDefaultRouteRoute
   mainDashboardEcommerceRouteRoute: typeof mainDashboardEcommerceRouteRoute
+  mainDashboardEnglishRouteRoute: typeof mainDashboardEnglishRouteRoute
   mainDashboardFileManagerRouteRoute: typeof mainDashboardFileManagerRouteRoute
   mainDashboardFinanceRouteRoute: typeof mainDashboardFinanceRouteRoute
   mainDashboardInfrastructureRouteRoute: typeof mainDashboardInfrastructureRouteRoute
@@ -926,6 +947,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardCrmRouteRoute: mainDashboardCrmRouteRoute,
   mainDashboardDefaultRouteRoute: mainDashboardDefaultRouteRoute,
   mainDashboardEcommerceRouteRoute: mainDashboardEcommerceRouteRoute,
+  mainDashboardEnglishRouteRoute: mainDashboardEnglishRouteRoute,
   mainDashboardFileManagerRouteRoute: mainDashboardFileManagerRouteRoute,
   mainDashboardFinanceRouteRoute: mainDashboardFinanceRouteRoute,
   mainDashboardInfrastructureRouteRoute: mainDashboardInfrastructureRouteRoute,
