@@ -14,6 +14,7 @@ import { Route as mainChatRouteRouteImport } from './routes/(main)/chat/route'
 import { Route as mainDashboardRouteRouteImport } from './routes/(main)/dashboard/route'
 import { Route as mainLoginRouteImport } from './routes/(main)/login'
 import { Route as mainMailRouteRouteImport } from './routes/(main)/mail/route'
+import { Route as mainOnboardingRouteRouteImport } from './routes/(main)/onboarding/route'
 import { Route as mainRegisterRouteImport } from './routes/(main)/register'
 import { Route as mainUnauthorizedRouteImport } from './routes/(main)/unauthorized'
 import { Route as mainAuthV2RouteRouteImport } from './routes/(main)/auth/v2/route'
@@ -26,6 +27,7 @@ import { Route as mainDashboardChatRouteRouteImport } from './routes/(main)/dash
 import { Route as mainDashboardComingSoonRouteRouteImport } from './routes/(main)/dashboard/coming-soon/route'
 import { Route as mainDashboardCrmRouteRouteImport } from './routes/(main)/dashboard/crm/route'
 import { Route as mainDashboardDefaultRouteRouteImport } from './routes/(main)/dashboard/default/route'
+import { Route as mainDashboardDocumentsRouteRouteImport } from './routes/(main)/dashboard/documents/route'
 import { Route as mainDashboardEcommerceRouteRouteImport } from './routes/(main)/dashboard/ecommerce/route'
 import { Route as mainDashboardEnglishRouteRouteImport } from './routes/(main)/dashboard/english/route'
 import { Route as mainDashboardFastingRouteRouteImport } from './routes/(main)/dashboard/fasting/route'
@@ -42,7 +44,9 @@ import { Route as mainDashboardMailRouteRouteImport } from './routes/(main)/dash
 import { Route as mainDashboardPatientMonitoringRouteRouteImport } from './routes/(main)/dashboard/patient-monitoring/route'
 import { Route as mainDashboardProductivityRouteRouteImport } from './routes/(main)/dashboard/productivity/route'
 import { Route as mainDashboardProfileRouteRouteImport } from './routes/(main)/dashboard/profile/route'
+import { Route as mainDashboardPromptVaultRouteRouteImport } from './routes/(main)/dashboard/prompt-vault/route'
 import { Route as mainDashboardRolesRouteRouteImport } from './routes/(main)/dashboard/roles/route'
+import { Route as mainDashboardSettingsRouteRouteImport } from './routes/(main)/dashboard/settings/route'
 import { Route as mainDashboardSubscriptionsRouteRouteImport } from './routes/(main)/dashboard/subscriptions/route'
 import { Route as mainDashboardTasksRouteRouteImport } from './routes/(main)/dashboard/tasks/route'
 import { Route as mainDashboardUsersRouteRouteImport } from './routes/(main)/dashboard/users/route'
@@ -78,6 +82,11 @@ const mainLoginRoute = mainLoginRouteImport.update({
 const mainMailRouteRoute = mainMailRouteRouteImport.update({
   id: '/(main)/mail',
   path: '/mail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const mainOnboardingRouteRoute = mainOnboardingRouteRouteImport.update({
+  id: '/(main)/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const mainRegisterRoute = mainRegisterRouteImport.update({
@@ -143,6 +152,12 @@ const mainDashboardDefaultRouteRoute =
   mainDashboardDefaultRouteRouteImport.update({
     id: '/default',
     path: '/default',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardDocumentsRouteRoute =
+  mainDashboardDocumentsRouteRouteImport.update({
+    id: '/documents',
+    path: '/documents',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardEcommerceRouteRoute =
@@ -240,11 +255,23 @@ const mainDashboardProfileRouteRoute =
     path: '/profile',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
+const mainDashboardPromptVaultRouteRoute =
+  mainDashboardPromptVaultRouteRouteImport.update({
+    id: '/prompt-vault',
+    path: '/prompt-vault',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardRolesRouteRoute = mainDashboardRolesRouteRouteImport.update({
   id: '/roles',
   path: '/roles',
   getParentRoute: () => mainDashboardRouteRoute,
 } as any)
+const mainDashboardSettingsRouteRoute =
+  mainDashboardSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardSubscriptionsRouteRoute =
   mainDashboardSubscriptionsRouteRouteImport.update({
     id: '/subscriptions',
@@ -310,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof mainChatRouteRoute
   '/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/mail': typeof mainMailRouteRoute
+  '/onboarding': typeof mainOnboardingRouteRoute
   '/login': typeof mainLoginRoute
   '/register': typeof mainRegisterRoute
   '/unauthorized': typeof mainUnauthorizedRoute
@@ -322,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
@@ -338,7 +367,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -356,6 +387,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/chat': typeof mainChatRouteRoute
   '/mail': typeof mainMailRouteRoute
+  '/onboarding': typeof mainOnboardingRouteRoute
   '/login': typeof mainLoginRoute
   '/register': typeof mainRegisterRoute
   '/unauthorized': typeof mainUnauthorizedRoute
@@ -368,6 +400,7 @@ export interface FileRoutesByTo {
   '/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
@@ -384,7 +417,9 @@ export interface FileRoutesByTo {
   '/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -404,6 +439,7 @@ export interface FileRoutesById {
   '/(main)/chat': typeof mainChatRouteRoute
   '/(main)/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/(main)/mail': typeof mainMailRouteRoute
+  '/(main)/onboarding': typeof mainOnboardingRouteRoute
   '/(main)/login': typeof mainLoginRoute
   '/(main)/register': typeof mainRegisterRoute
   '/(main)/unauthorized': typeof mainUnauthorizedRoute
@@ -416,6 +452,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/(main)/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/(main)/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/(main)/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/(main)/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
   '/(main)/dashboard/english': typeof mainDashboardEnglishRouteRoute
   '/(main)/dashboard/fasting': typeof mainDashboardFastingRouteRoute
@@ -432,7 +469,9 @@ export interface FileRoutesById {
   '/(main)/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/(main)/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/(main)/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/(main)/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/(main)/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/(main)/dashboard/settings': typeof mainDashboardSettingsRouteRoute
   '/(main)/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/(main)/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/(main)/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -453,6 +492,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/mail'
+    | '/onboarding'
     | '/login'
     | '/register'
     | '/unauthorized'
@@ -465,6 +505,7 @@ export interface FileRouteTypes {
     | '/dashboard/coming-soon'
     | '/dashboard/crm'
     | '/dashboard/default'
+    | '/dashboard/documents'
     | '/dashboard/ecommerce'
     | '/dashboard/english'
     | '/dashboard/fasting'
@@ -481,7 +522,9 @@ export interface FileRouteTypes {
     | '/dashboard/patient-monitoring'
     | '/dashboard/productivity'
     | '/dashboard/profile'
+    | '/dashboard/prompt-vault'
     | '/dashboard/roles'
+    | '/dashboard/settings'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -499,6 +542,7 @@ export interface FileRouteTypes {
   to:
     | '/chat'
     | '/mail'
+    | '/onboarding'
     | '/login'
     | '/register'
     | '/unauthorized'
@@ -511,6 +555,7 @@ export interface FileRouteTypes {
     | '/dashboard/coming-soon'
     | '/dashboard/crm'
     | '/dashboard/default'
+    | '/dashboard/documents'
     | '/dashboard/ecommerce'
     | '/dashboard/english'
     | '/dashboard/fasting'
@@ -527,7 +572,9 @@ export interface FileRouteTypes {
     | '/dashboard/patient-monitoring'
     | '/dashboard/productivity'
     | '/dashboard/profile'
+    | '/dashboard/prompt-vault'
     | '/dashboard/roles'
+    | '/dashboard/settings'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -546,6 +593,7 @@ export interface FileRouteTypes {
     | '/(main)/chat'
     | '/(main)/dashboard'
     | '/(main)/mail'
+    | '/(main)/onboarding'
     | '/(main)/login'
     | '/(main)/register'
     | '/(main)/unauthorized'
@@ -558,6 +606,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/coming-soon'
     | '/(main)/dashboard/crm'
     | '/(main)/dashboard/default'
+    | '/(main)/dashboard/documents'
     | '/(main)/dashboard/ecommerce'
     | '/(main)/dashboard/english'
     | '/(main)/dashboard/fasting'
@@ -574,7 +623,9 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/patient-monitoring'
     | '/(main)/dashboard/productivity'
     | '/(main)/dashboard/profile'
+    | '/(main)/dashboard/prompt-vault'
     | '/(main)/dashboard/roles'
+    | '/(main)/dashboard/settings'
     | '/(main)/dashboard/subscriptions'
     | '/(main)/dashboard/tasks'
     | '/(main)/dashboard/users'
@@ -594,6 +645,7 @@ export interface RootRouteChildren {
   mainChatRouteRoute: typeof mainChatRouteRoute
   mainDashboardRouteRoute: typeof mainDashboardRouteRouteWithChildren
   mainMailRouteRoute: typeof mainMailRouteRoute
+  mainOnboardingRouteRoute: typeof mainOnboardingRouteRoute
   mainLoginRoute: typeof mainLoginRoute
   mainRegisterRoute: typeof mainRegisterRoute
   mainUnauthorizedRoute: typeof mainUnauthorizedRoute
@@ -638,6 +690,13 @@ declare module '@tanstack/react-router' {
       path: '/mail'
       fullPath: '/mail'
       preLoaderRoute: typeof mainMailRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(main)/onboarding': {
+      id: '/(main)/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof mainOnboardingRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(main)/register': {
@@ -722,6 +781,13 @@ declare module '@tanstack/react-router' {
       path: '/default'
       fullPath: '/dashboard/default'
       preLoaderRoute: typeof mainDashboardDefaultRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/documents': {
+      id: '/(main)/dashboard/documents'
+      path: '/documents'
+      fullPath: '/dashboard/documents'
+      preLoaderRoute: typeof mainDashboardDocumentsRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/ecommerce': {
@@ -836,11 +902,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardProfileRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/prompt-vault': {
+      id: '/(main)/dashboard/prompt-vault'
+      path: '/prompt-vault'
+      fullPath: '/dashboard/prompt-vault'
+      preLoaderRoute: typeof mainDashboardPromptVaultRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/roles': {
       id: '/(main)/dashboard/roles'
       path: '/roles'
       fullPath: '/dashboard/roles'
       preLoaderRoute: typeof mainDashboardRolesRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/settings': {
+      id: '/(main)/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof mainDashboardSettingsRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/subscriptions': {
@@ -931,6 +1011,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardComingSoonRouteRoute: typeof mainDashboardComingSoonRouteRoute
   mainDashboardCrmRouteRoute: typeof mainDashboardCrmRouteRoute
   mainDashboardDefaultRouteRoute: typeof mainDashboardDefaultRouteRoute
+  mainDashboardDocumentsRouteRoute: typeof mainDashboardDocumentsRouteRoute
   mainDashboardEcommerceRouteRoute: typeof mainDashboardEcommerceRouteRoute
   mainDashboardEnglishRouteRoute: typeof mainDashboardEnglishRouteRoute
   mainDashboardFastingRouteRoute: typeof mainDashboardFastingRouteRoute
@@ -947,7 +1028,9 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardPatientMonitoringRouteRoute: typeof mainDashboardPatientMonitoringRouteRoute
   mainDashboardProductivityRouteRoute: typeof mainDashboardProductivityRouteRoute
   mainDashboardProfileRouteRoute: typeof mainDashboardProfileRouteRoute
+  mainDashboardPromptVaultRouteRoute: typeof mainDashboardPromptVaultRouteRoute
   mainDashboardRolesRouteRoute: typeof mainDashboardRolesRouteRoute
+  mainDashboardSettingsRouteRoute: typeof mainDashboardSettingsRouteRoute
   mainDashboardSubscriptionsRouteRoute: typeof mainDashboardSubscriptionsRouteRoute
   mainDashboardTasksRouteRoute: typeof mainDashboardTasksRouteRoute
   mainDashboardUsersRouteRoute: typeof mainDashboardUsersRouteRoute
@@ -967,6 +1050,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardComingSoonRouteRoute: mainDashboardComingSoonRouteRoute,
   mainDashboardCrmRouteRoute: mainDashboardCrmRouteRoute,
   mainDashboardDefaultRouteRoute: mainDashboardDefaultRouteRoute,
+  mainDashboardDocumentsRouteRoute: mainDashboardDocumentsRouteRoute,
   mainDashboardEcommerceRouteRoute: mainDashboardEcommerceRouteRoute,
   mainDashboardEnglishRouteRoute: mainDashboardEnglishRouteRoute,
   mainDashboardFastingRouteRoute: mainDashboardFastingRouteRoute,
@@ -984,7 +1068,9 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
     mainDashboardPatientMonitoringRouteRoute,
   mainDashboardProductivityRouteRoute: mainDashboardProductivityRouteRoute,
   mainDashboardProfileRouteRoute: mainDashboardProfileRouteRoute,
+  mainDashboardPromptVaultRouteRoute: mainDashboardPromptVaultRouteRoute,
   mainDashboardRolesRouteRoute: mainDashboardRolesRouteRoute,
+  mainDashboardSettingsRouteRoute: mainDashboardSettingsRouteRoute,
   mainDashboardSubscriptionsRouteRoute: mainDashboardSubscriptionsRouteRoute,
   mainDashboardTasksRouteRoute: mainDashboardTasksRouteRoute,
   mainDashboardUsersRouteRoute: mainDashboardUsersRouteRoute,
@@ -1020,6 +1106,7 @@ const rootRouteChildren: RootRouteChildren = {
   mainChatRouteRoute: mainChatRouteRoute,
   mainDashboardRouteRoute: mainDashboardRouteRouteWithChildren,
   mainMailRouteRoute: mainMailRouteRoute,
+  mainOnboardingRouteRoute: mainOnboardingRouteRoute,
   mainLoginRoute: mainLoginRoute,
   mainRegisterRoute: mainRegisterRoute,
   mainUnauthorizedRoute: mainUnauthorizedRoute,

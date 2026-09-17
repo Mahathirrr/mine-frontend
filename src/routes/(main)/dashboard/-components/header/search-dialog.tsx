@@ -15,8 +15,10 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import type { AppPath, NavMainItem } from "@/navigation/sidebar/sidebar-items";
+import { getFilteredSidebarItems } from "@/lib/navigation/filter-sidebar";
+import type { AppPath, NavGroup, NavMainItem } from "@/navigation/sidebar/sidebar-items";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
+import { useAuthStore } from "@/stores/auth/auth-provider";
 
 type SearchItem = {
   id: string;
@@ -28,44 +30,55 @@ type SearchItem = {
   newTab?: boolean;
 };
 
-const sidebarGroupLabels = new Set(sidebarItems.flatMap((group) => (group.label ? [group.label] : [])));
+function buildSearchItems(groups: NavGroup[]): SearchItem[] {
+  const sidebarGroupLabels = new Set(groups.flatMap((group) => (group.label ? [group.label] : [])));
 
-function getSubItemGroup(groupLabel: string | undefined, itemTitle: string) {
-  return sidebarGroupLabels.has(itemTitle) ? (groupLabel ?? "Other") : itemTitle;
+  function getSubItemGroup(groupLabel: string | undefined, itemTitle: string) {
+    return sidebarGroupLabels.has(itemTitle) ? (groupLabel ?? "Other") : itemTitle;
+  }
+
+  const items = groups.flatMap((group) =>
+    group.items.flatMap((item) => {
+      if (item.subItems) {
+        return item.subItems.map((sub) => ({
+          id: sub.id,
+          group: getSubItemGroup(group.label, item.title),
+          label: sub.title,
+          url: sub.url,
+          icon: item.icon,
+          disabled: sub.disabled,
+          newTab: sub.newTab,
+        }));
+      }
+      if (!("url" in item) || !item.url) return [];
+      return [
+        {
+          id: item.id,
+          group: group.label ?? "Other",
+          label: item.title,
+          url: item.url,
+          icon: item.icon,
+          disabled: item.disabled,
+          newTab: item.newTab,
+        },
+      ];
+    }),
+  );
+
+  return [
+    ...items,
+    {
+      id: "settings",
+      group: "Account",
+      label: "Profile & Settings",
+      url: "/dashboard/settings" as AppPath,
+    },
+  ];
 }
-
-const searchItems: SearchItem[] = sidebarItems.flatMap((group) =>
-  group.items.flatMap((item) => {
-    if (item.subItems) {
-      return item.subItems.map((sub) => ({
-        id: sub.id,
-        group: getSubItemGroup(group.label, item.title),
-        label: sub.title,
-        url: sub.url,
-        icon: item.icon,
-        disabled: sub.disabled,
-        newTab: sub.newTab,
-      }));
-    }
-    return [
-      {
-        id: item.id,
-        group: group.label ?? "Other",
-        label: item.title,
-        url: item.url,
-        icon: item.icon,
-        disabled: item.disabled,
-        newTab: item.newTab,
-      },
-    ];
-  }),
-);
 
 function getAvailableItems(items: SearchItem[]) {
   return items.filter((item) => !item.disabled && !item.url.includes("coming-soon"));
 }
-
-const recommendations = getAvailableItems(searchItems);
 
 function groupBy(items: SearchItem[]) {
   const groups = [...new Set(items.map((item) => item.group))];
@@ -79,6 +92,16 @@ export function SearchDialog() {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const navigate = useNavigate();
+  const preferences = useAuthStore((s) => s.preferences);
+
+  const searchItems = React.useMemo(() => {
+    const groups = preferences
+      ? getFilteredSidebarItems(preferences.enabled_menu_items, preferences.show_template_pages)
+      : sidebarItems;
+    return buildSearchItems(groups);
+  }, [preferences]);
+
+  const recommendations = React.useMemo(() => getAvailableItems(searchItems), [searchItems]);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {

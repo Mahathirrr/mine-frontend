@@ -9,6 +9,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/api-error";
+import { postAuthPath } from "@/lib/auth/post-auth-redirect";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
 const formSchema = z
@@ -40,8 +41,8 @@ export function RegisterForm() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await register(data.name, data.email, data.password);
-      await navigate({ to: "/dashboard/leetcode", replace: true });
+      const prefs = await register(data.name, data.email, data.password);
+      await navigate({ to: postAuthPath(prefs), replace: true });
     } catch (e) {
       toast.add({
         title: "Registration failed",

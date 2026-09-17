@@ -5,6 +5,8 @@ import { useShallow } from "zustand/react/shallow";
 import { MineLogo } from "@/components/brand/mine-logo";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 import { APP_CONFIG } from "@/config/app-config";
+import { getFilteredSidebarItems } from "@/lib/navigation/filter-sidebar";
+import { resolveLandingPath } from "@/lib/navigation/mine-menu-catalog";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
@@ -25,6 +27,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const variant = isSynced ? sidebarVariant : props.variant;
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
   const authUser = useAuthStore((s) => s.user);
+  const preferences = useAuthStore((s) => s.preferences);
+
+  const visibleItems = preferences
+    ? getFilteredSidebarItems(preferences.enabled_menu_items, preferences.show_template_pages)
+    : sidebarItems;
+
+  const homePath = preferences ? resolveLandingPath(preferences) : "/dashboard/leetcode";
 
   const sidebarUser = authUser
     ? { name: authUser.name, email: authUser.email, avatar: "" }
@@ -34,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar {...props} variant={variant} collapsible={collapsible}>
       <SidebarHeader className="p-2">
         <Link
-          to="/dashboard/leetcode"
+          to={homePath}
           className="flex h-14 w-full items-center gap-3 rounded-lg px-3 transition-colors hover:bg-sidebar-accent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2"
         >
           <MineLogo size={44} variant="brand" className="size-11 shrink-0 group-data-[collapsible=icon]:size-9" />
@@ -44,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={sidebarItems} />
+        <NavMain items={visibleItems} />
       </SidebarContent>
       <SidebarFooter>
         <SupportCard />
