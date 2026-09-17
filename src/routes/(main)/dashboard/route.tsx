@@ -6,14 +6,11 @@ import { cn } from "cn";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { users } from "@/data/users";
 import { requireAuth } from "@/lib/auth/guard";
 import { privatePageHead } from "@/lib/seo/build-head";
 import { getDashboardLayout } from "@/server/server-actions";
 
 import { AccountSwitcher } from "./-components/header/account-switcher";
-import { GitHubRepositoriesMenu } from "./-components/header/github-repositories-menu";
-import { LayoutControls } from "./-components/header/layout-controls";
 import { SearchDialog } from "./-components/header/search-dialog";
 import { ThemeSwitcher } from "./-components/header/theme-switcher";
 import { OnboardingGate } from "./-components/onboarding-gate";
@@ -74,10 +71,8 @@ function DashboardLayout() {
               <SearchDialog />
             </div>
             <div className="flex items-center gap-2">
-              <LayoutControls />
               <ThemeSwitcher />
-              <GitHubRepositoriesMenu />
-              <AccountSwitcher users={users} />
+              <AccountSwitcher />
             </div>
           </div>
         </header>
