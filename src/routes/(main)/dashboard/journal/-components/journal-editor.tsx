@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import { cn } from "cn";
 import { ArrowLeft, Check, Loader2, Trash2 } from "lucide-react";
 
@@ -9,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { JournalEntry, JournalStatus, JournalTopic } from "@/lib/api/journal";
 
+import { JournalRichEditor } from "./journal-rich-editor";
 import { countWords } from "./journal-utils";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -38,22 +37,10 @@ export function JournalEditor({
   const content = entry?.content ?? "";
   const words = countWords(content);
   const showStatusControl = !isBlankEssay;
-  const bodyRef = React.useRef<HTMLTextAreaElement>(null);
-
-  const resizeBody = React.useCallback(() => {
-    const node = bodyRef.current;
-    if (!node) return;
-    node.style.height = "0px";
-    node.style.height = `${Math.max(node.scrollHeight, 520)}px`;
-  }, []);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: remeasure textarea when opening another entry
-  React.useLayoutEffect(() => {
-    resizeBody();
-  }, [entry?.id, resizeBody]);
+  const entryKey = entry?.id ?? "new";
 
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] flex-col overflow-hidden rounded-xl border bg-background/60">
+    <div className="flex min-h-[calc(100vh-10rem)] flex-col overflow-hidden rounded-xl border bg-background/60">
       <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b bg-background/90 px-4 py-2.5 backdrop-blur-sm sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           {onBack ? (
@@ -101,12 +88,12 @@ export function JournalEditor({
         </div>
       </header>
 
-      <div className="flex flex-1 justify-center overflow-y-auto bg-[#ececec] px-3 py-8 sm:px-6 sm:py-10 dark:bg-[#121212]">
+      <div className="flex flex-1 justify-center overflow-y-auto bg-[#ececec] px-2 py-6 sm:px-4 sm:py-8 dark:bg-[#121212]">
         <article
           className={cn(
-            "w-full max-w-[720px] shrink-0 rounded-sm bg-white shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_8px_rgba(60,64,67,0.08)]",
-            "min-h-[min(920px,calc(100vh-14rem))]",
-            "px-10 py-14 sm:px-[72px] sm:py-16",
+            "w-full max-w-[920px] shrink-0 rounded-sm bg-white shadow-[0_1px_3px_rgba(60,64,67,0.15),0_4px_8px_rgba(60,64,67,0.08)]",
+            "min-h-[min(1100px,calc(100vh-11rem))]",
+            "px-8 py-12 sm:px-16 sm:py-14",
             "dark:bg-[#1a1a1a] dark:shadow-[0_2px_12px_rgba(0,0,0,0.45)]",
           )}
         >
@@ -118,24 +105,13 @@ export function JournalEditor({
 
           <input
             aria-label="Judul essay"
-            className="mb-10 w-full border-0 bg-transparent font-normal text-[32px] text-foreground leading-[1.25] tracking-tight outline-none placeholder:text-muted-foreground/35 sm:text-[36px]"
+            className="mb-8 w-full border-0 bg-transparent font-normal text-[32px] text-foreground leading-[1.25] tracking-tight outline-none placeholder:text-muted-foreground/35 sm:mb-10 sm:text-[36px]"
             placeholder="Judul essay"
             value={title}
             onChange={(e) => onChange({ title: e.target.value })}
           />
 
-          <textarea
-            ref={bodyRef}
-            aria-label="Isi essay"
-            className="block w-full resize-none border-0 bg-transparent p-0 text-[15px] text-foreground/92 leading-[1.85] outline-none placeholder:text-muted-foreground/35 focus:outline-none focus:ring-0 sm:text-[16px] sm:leading-[1.9]"
-            placeholder="Mulai menulis di sini…"
-            value={content}
-            rows={1}
-            onChange={(e) => {
-              onChange({ content: e.target.value });
-              requestAnimationFrame(resizeBody);
-            }}
-          />
+          <JournalRichEditor key={entryKey} content={content} onChange={(html) => onChange({ content: html })} />
         </article>
       </div>
     </div>

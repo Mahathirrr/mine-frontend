@@ -182,3 +182,50 @@
 .disable-transitions * {
   transition: none !important;
 }
+
+.journal-prose {
+  font-size: 15px;
+  line-height: 1.85;
+  color: color-mix(in oklab, var(--foreground) 92%, transparent);
+}
+
+@media (min-width: 640px) {
+  .journal-prose {
+    font-size: 16px;
+    line-height: 1.9;
+  }
+}
+
+.journal-prose p {
+  margin: 0 0 1.05em;
+}
+
+.journal-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.journal-prose ul,
+.journal-prose ol {
+  margin: 0 0 1.05em;
+  padding-left: 1.5rem;
+}
+
+.journal-prose li {
+  margin: 0.25em 0;
+}
+
+.journal-prose blockquote {
+  margin: 0 0 1.05em;
+  padding-left: 1rem;
+  border-left: 3px solid color-mix(in oklab, var(--primary) 35%, transparent);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.journal-prose strong {
+  font-weight: 600;
+}
+
+.journal-prose em {
+  font-style: italic;
+}
