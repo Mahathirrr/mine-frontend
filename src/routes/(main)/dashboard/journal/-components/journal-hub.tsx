@@ -21,7 +21,7 @@ import { useAuthStore } from "@/stores/auth/auth-provider";
 
 import { PRESET_TOPIC_COLORS } from "./journal-constants";
 import { JournalEditor } from "./journal-editor";
-import { excerpt, formatJournalDate, topicColor } from "./journal-utils";
+import { countWords, excerpt, formatJournalDate, topicColor } from "./journal-utils";
 import { TopicWheel } from "./topic-wheel";
 
 export function JournalHub() {
@@ -84,7 +84,7 @@ export function JournalHub() {
         mood: draft.mood,
         status: draft.status,
         topic_id: draft.topic_id,
-        word_count: draft.content.trim().split(/\s+/).filter(Boolean).length,
+        word_count: countWords(draft.content),
       }
     : {
         id: 0,
@@ -92,7 +92,7 @@ export function JournalHub() {
         topic_id: draft.topic_id,
         title: draft.title,
         content: draft.content,
-        word_count: draft.content.trim().split(/\s+/).filter(Boolean).length,
+        word_count: countWords(draft.content),
         mood: draft.mood,
         status: draft.status,
         created_at: "",
