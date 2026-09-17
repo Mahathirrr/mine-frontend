@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,7 +41,7 @@ function sumMacros(items: FastingMealLog[]): Macros {
   );
 }
 
-function fmtMacro(n: number, decimals = 2) {
+function fmtMacro(n: number, decimals = 1) {
   if (Number.isInteger(n)) return String(n);
   return n.toFixed(decimals);
 }
@@ -71,7 +71,7 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
     type,
     label: mealLabels[type] ?? type,
     items: todayMeals.filter((m) => m.meal_type === type),
-  })).filter((g) => g.items.length > 0 || true);
+  }));
 
   function resetForm() {
     setForm({ title: "", description: "", calories: "", sodium_mg: "", protein_g: "", carbs_g: "", fat_g: "" });
@@ -141,24 +141,24 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="bg-emerald-600 px-4 py-3 text-white">
-          <p className="font-semibold">Hari ini</p>
+      <div className="overflow-hidden rounded-xl border bg-card">
+        <div className="border-b bg-muted/30 px-4 py-3">
+          <p className="font-semibold text-base">Hari ini</p>
         </div>
 
-        <MacroHeaderRow macros={daily} caloriesClassName="text-emerald-600 font-bold" />
+        <MacroHeaderRow macros={daily} />
 
-        <div className="divide-y">
+        <div className="divide-y divide-border/80">
           {byMeal.map(({ type, label, items }) => {
             const mealTotal = sumMacros(items);
             const isCollapsed = collapsed[type] ?? false;
 
             return (
               <section key={type}>
-                <div className="flex items-center gap-2 bg-emerald-600/8 px-3 py-2.5">
+                <div className="flex items-center gap-3 px-4 py-3">
                   <button
                     type="button"
-                    className="flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white hover:bg-emerald-700"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-background text-foreground"
                     onClick={() => {
                       setMealType(type);
                       setOpen(true);
@@ -172,9 +172,9 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
                     className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left"
                     onClick={() => setCollapsed((c) => ({ ...c, [type]: !isCollapsed }))}
                   >
-                    <span className="font-semibold text-emerald-700 dark:text-emerald-400">{label}</span>
+                    <span className="font-medium text-base">{label}</span>
                     <span className="flex items-center gap-2">
-                      <span className="font-semibold text-emerald-600 tabular-nums">{mealTotal.calories}</span>
+                      <span className="font-medium text-base tabular-nums">{mealTotal.calories}</span>
                       {isCollapsed ? (
                         <ChevronDown className="size-4 text-muted-foreground" />
                       ) : (
@@ -201,7 +201,7 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
                 )}
 
                 {!isCollapsed && items.length === 0 && (
-                  <p className="px-4 py-3 text-muted-foreground text-sm">Belum ada makanan — ketuk + untuk tambah.</p>
+                  <p className="px-4 pb-3 text-muted-foreground text-sm">Belum ada makanan — ketuk + untuk tambah.</p>
                 )}
               </section>
             );
@@ -228,7 +228,6 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
                 type="button"
                 size="sm"
                 variant={mealType === t ? "default" : "outline"}
-                className="rounded-full"
                 onClick={() => setMealType(t)}
               >
                 {mealLabels[t]}
@@ -245,12 +244,12 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
                     key={p.id}
                     type="button"
                     disabled={saving}
-                    className="rounded-xl border bg-muted/30 px-3 py-2.5 text-left transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/5"
+                    className="rounded-lg border border-border/80 bg-card px-3 py-2.5 text-left"
                     onClick={() => addFromPreset(p)}
                   >
-                    <p className="font-medium text-sm leading-tight">{p.name}</p>
-                    <p className="text-muted-foreground text-xs">{p.serving_label}</p>
-                    <p className="mt-1 text-emerald-600 text-xs tabular-nums">{p.calories} kcal</p>
+                    <p className="font-medium text-sm">{p.name}</p>
+                    <p className="mt-0.5 text-muted-foreground text-sm">{p.serving_label}</p>
+                    <p className="mt-1 text-muted-foreground text-sm tabular-nums">{p.calories} kcal</p>
                   </button>
                 ))}
               </div>
@@ -346,7 +345,10 @@ export function FastingMealsPanel({ data, token, onRefresh }: Props) {
   );
 }
 
-function MacroHeaderRow({ macros, caloriesClassName }: { macros: Macros; caloriesClassName?: string }) {
+const MACRO_GRID =
+  "grid grid-cols-[1fr_repeat(5,minmax(0,2.75rem))] gap-2 sm:grid-cols-[1fr_repeat(5,minmax(0,3.25rem))]";
+
+function MacroHeaderRow({ macros }: { macros: Macros }) {
   const cols = [
     { label: "Sod", value: fmtMacro(macros.sodium_mg, 0) },
     { label: "Fat", value: fmtMacro(macros.fat_g) },
@@ -355,12 +357,12 @@ function MacroHeaderRow({ macros, caloriesClassName }: { macros: Macros; calorie
     { label: "Cals", value: fmtMacro(macros.calories, 0), highlight: true },
   ];
   return (
-    <div className="grid grid-cols-[1fr_repeat(5,minmax(0,3rem))] gap-1 border-b px-3 py-2 text-[11px]">
+    <div className={`${MACRO_GRID} border-b px-4 py-3`}>
       <span />
       {cols.map((c) => (
         <div key={c.label} className="text-center">
-          <p className="font-medium text-muted-foreground uppercase tracking-wide">{c.label}</p>
-          <p className={`mt-0.5 tabular-nums ${c.highlight ? (caloriesClassName ?? "font-semibold") : "font-medium"}`}>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">{c.label}</p>
+          <p className={`mt-1 text-sm tabular-nums ${c.highlight ? "font-semibold text-foreground" : "font-medium"}`}>
             {c.value}
           </p>
         </div>
@@ -371,7 +373,7 @@ function MacroHeaderRow({ macros, caloriesClassName }: { macros: Macros; calorie
 
 function MacroSubRow({ macros }: { macros: Macros }) {
   return (
-    <div className="grid grid-cols-[1fr_repeat(5,minmax(0,3rem))] gap-1 border-b bg-muted/20 px-3 py-1.5 text-[11px] text-muted-foreground tabular-nums">
+    <div className={`${MACRO_GRID} border-b bg-muted/20 px-4 py-2 text-muted-foreground text-sm tabular-nums`}>
       <span />
       <span className="text-center">{fmtMacro(macros.sodium_mg, 0)}</span>
       <span className="text-center">{fmtMacro(macros.fat_g)}</span>
@@ -384,28 +386,28 @@ function MacroSubRow({ macros }: { macros: Macros }) {
 
 function FoodRow({ meal, onDelete }: { meal: FastingMealLog; onDelete: () => Promise<void> }) {
   return (
-    <div className="group border-b px-3 py-2.5 last:border-b-0">
-      <div className="grid grid-cols-[1fr_repeat(5,minmax(0,3rem))_auto] items-start gap-1">
-        <div className="min-w-0">
-          <p className="font-medium text-sm leading-tight">{meal.title}</p>
-          {meal.description && <p className="mt-0.5 text-muted-foreground text-xs">{meal.description}</p>}
+    <div className="border-b px-4 py-3 last:border-b-0">
+      <div className={`${MACRO_GRID} items-start`}>
+        <div className="min-w-0 pe-2">
+          <p className="font-medium text-base leading-snug">{meal.title}</p>
+          {meal.description && <p className="mt-0.5 text-muted-foreground text-sm">{meal.description}</p>}
+          <button
+            type="button"
+            className="mt-1.5 text-muted-foreground text-sm underline-offset-2 hover:text-foreground hover:underline"
+            onClick={() => void onDelete()}
+          >
+            Hapus
+          </button>
         </div>
-        <span className="text-center text-[11px] text-muted-foreground tabular-nums">
+        <span className="pt-0.5 text-center text-muted-foreground text-sm tabular-nums">
           {fmtMacro(meal.sodium_mg ?? 0, 0)}
         </span>
-        <span className="text-center text-[11px] text-muted-foreground tabular-nums">{fmtMacro(meal.fat_g)}</span>
-        <span className="text-center text-[11px] text-muted-foreground tabular-nums">{fmtMacro(meal.carbs_g)}</span>
-        <span className="text-center text-[11px] text-muted-foreground tabular-nums">{fmtMacro(meal.protein_g)}</span>
-        <span className="text-center font-medium text-sm tabular-nums">{meal.calories}</span>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="opacity-0 group-hover:opacity-100"
-          onClick={() => void onDelete()}
-          aria-label="Hapus"
-        >
-          <Trash2 className="size-3.5 text-destructive" />
-        </Button>
+        <span className="pt-0.5 text-center text-muted-foreground text-sm tabular-nums">{fmtMacro(meal.fat_g)}</span>
+        <span className="pt-0.5 text-center text-muted-foreground text-sm tabular-nums">{fmtMacro(meal.carbs_g)}</span>
+        <span className="pt-0.5 text-center text-muted-foreground text-sm tabular-nums">
+          {fmtMacro(meal.protein_g)}
+        </span>
+        <span className="pt-0.5 text-center font-medium text-base tabular-nums">{meal.calories}</span>
       </div>
     </div>
   );

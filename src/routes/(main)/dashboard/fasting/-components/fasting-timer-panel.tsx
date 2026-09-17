@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { format, isValid } from "date-fns";
-import { Flame, Pause, Pencil, Play } from "lucide-react";
+import { Flame, Pause, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,6 +138,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
               <EditableTile
                 label="Started"
                 value={active ? formatDateTime(active.started_at) : "Belum mulai"}
+                actionLabel="Edit"
                 canEdit={Boolean(active)}
                 onEdit={() => {
                   if (!active) return;
@@ -150,6 +151,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
                 value={
                   goalEnd && isValid(goalEnd) ? format(goalEnd, "EEE d, h:mm a") : `${Math.round(goalHours)}h target`
                 }
+                actionLabel="Change goal"
                 canEdit={Boolean(active)}
                 onEdit={() => setEditGoalOpen(true)}
               />
@@ -263,32 +265,31 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
 function EditableTile({
   label,
   value,
+  actionLabel,
   canEdit,
   onEdit,
 }: {
   label: string;
   value: string;
+  actionLabel: string;
   canEdit: boolean;
   onEdit: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-orange-500/10 bg-card/90 p-4 shadow-sm backdrop-blur-sm">
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.12em]">{label}</p>
+    <div className="rounded-xl border border-border/80 bg-card p-4">
+      <div className="flex items-start justify-between gap-3">
+        <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
         {canEdit && (
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="size-7 text-orange-600"
+            className="shrink-0 text-foreground text-sm underline-offset-2 hover:underline"
             onClick={onEdit}
-            aria-label={`Edit ${label}`}
           >
-            <Pencil className="size-3.5" />
-          </Button>
+            {actionLabel}
+          </button>
         )}
       </div>
-      <p className="mt-2 font-medium text-sm leading-snug">{value}</p>
+      <p className="mt-2 font-medium text-base leading-snug">{value}</p>
     </div>
   );
 }

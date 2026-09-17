@@ -67,21 +67,19 @@ export function FastingGoalPresets({ data, token, onRefresh, compact }: Props) {
   }
 
   return (
-    <div className={cn("space-y-5", compact && "space-y-4")}>
+    <div className={cn("space-y-6", compact && "space-y-5")}>
       {!compact && (
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <h3 className="font-semibold text-lg">Change fast goal</h3>
-            <p className="text-muted-foreground text-sm">
-              Goal aktif: {Math.round(active?.goal_hours ?? data.profile.goal_hours)} jam
-              {active ? " · bisa diubah saat timer jalan" : ""}
-            </p>
-          </div>
+        <div>
+          <h3 className="font-semibold text-base">Change fast goal</h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            Goal aktif: {Math.round(active?.goal_hours ?? data.profile.goal_hours)} jam
+            {active ? " · bisa diubah saat timer jalan" : ""}
+          </p>
         </div>
       )}
 
       <GoalSection title="Standard goals">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
           {standard.map((p) => (
             <GoalCard
               key={p.slug}
@@ -95,7 +93,7 @@ export function FastingGoalPresets({ data, token, onRefresh, compact }: Props) {
       </GoalSection>
 
       <GoalSection title="Custom goals">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <CustomTile
             title="Pick hours"
             subtitle="1–720 jam"
@@ -122,7 +120,7 @@ export function FastingGoalPresets({ data, token, onRefresh, compact }: Props) {
 
       {longer.length > 0 && (
         <GoalSection title="Longer fasts">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {longer.map((p) => (
               <GoalCard
                 key={p.slug}
@@ -197,7 +195,7 @@ export function FastingGoalPresets({ data, token, onRefresh, compact }: Props) {
 function GoalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wide">{title}</p>
+      <p className="mb-2.5 font-medium text-muted-foreground text-sm">{title}</p>
       {children}
     </div>
   );
@@ -220,14 +218,15 @@ function GoalCard({
       disabled={disabled}
       onClick={onSelect}
       className={cn(
-        "rounded-2xl p-3 text-left text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98]",
-        selected && "ring-2 ring-white/80 ring-offset-2 ring-offset-background",
+        "rounded-xl border bg-card px-3.5 py-3 text-left",
+        selected ? "border-orange-500/50 bg-orange-500/[0.04] ring-1 ring-orange-500/30" : "border-border/80",
       )}
-      style={{ backgroundColor: preset.color }}
     >
-      <p className="text-[11px] leading-tight opacity-90">{preset.label}</p>
-      <p className="mt-2 font-bold text-3xl tabular-nums leading-none">{Math.round(preset.goal_hours)}</p>
-      <p className="mt-1 text-[10px] opacity-80">hours</p>
+      <p className="text-muted-foreground text-sm leading-snug">{preset.label}</p>
+      <p className="mt-1.5 font-semibold text-2xl text-foreground tabular-nums leading-none">
+        {Math.round(preset.goal_hours)}
+        <span className="ms-1 font-normal text-muted-foreground text-sm">jam</span>
+      </p>
     </button>
   );
 }
@@ -248,10 +247,10 @@ function CustomTile({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="rounded-2xl bg-muted/80 p-3 text-left transition-colors hover:bg-muted"
+      className="rounded-xl border border-border/80 bg-card px-3.5 py-3 text-left"
     >
-      <p className="font-medium text-sm">{title}</p>
-      <p className="mt-1 text-muted-foreground text-xs">{subtitle}</p>
+      <p className="font-medium text-foreground text-sm">{title}</p>
+      <p className="mt-1 text-muted-foreground text-sm">{subtitle}</p>
     </button>
   );
 }
