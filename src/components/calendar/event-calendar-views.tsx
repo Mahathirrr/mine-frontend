@@ -121,8 +121,6 @@ export function EventCalendarViews({
         ----------------------------------------------------------------------------------------- */
 
         eventShortHeight={50}
-        eventColor='var(--primary)'
-        eventContrastColor='var(--primary-foreground)'
         eventClass={(info) => cn(
           info.isSelected
             ? ['outline-3', info.isDragging && 'shadow-lg']

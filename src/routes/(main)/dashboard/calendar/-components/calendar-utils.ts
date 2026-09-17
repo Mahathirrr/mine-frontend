@@ -2,7 +2,8 @@ import { endOfDay, format, parseISO, subMilliseconds } from "date-fns";
 
 import type { CalendarEventRecord, HolidayCalendarEvent, TaskCalendarEvent } from "@/lib/api/tasks";
 
-import { calendarColors } from "./calendar-config";
+import { colorForCalendarSlug } from "./calendar-config";
+import { eventTextColor, resolveKanbanEventColor, resolveStoredEventColor } from "./event-color-utils";
 
 export type CalendarEventSource = "event" | "kanban" | "holiday";
 
@@ -36,54 +37,64 @@ export function mapApiEvents(
   taskEvents: TaskCalendarEvent[],
   holidayEvents: HolidayCalendarEvent[] = [],
 ): CalendarUiEvent[] {
+  const withColors = (hex: string) => {
+    const text = eventTextColor(hex);
+    return {
+      color: hex,
+      backgroundColor: hex,
+      borderColor: hex,
+      textColor: text,
+    };
+  };
+
   return [
-    ...events.map((event) => ({
-      id: String(event.id),
-      title: event.title,
-      start: event.start_at,
-      end: event.end_at ?? undefined,
-      allDay: event.all_day,
-      backgroundColor: event.color,
-      borderColor: event.color,
-      textColor: "#ffffff",
-      editable: true,
-      durationEditable: !event.all_day,
-      extendedProps: {
-        source: "event" as const,
-        calendar_slug: event.calendar_slug,
-        description: event.description,
-        link: event.link ?? "",
-        eventId: event.id,
-      },
-    })),
-    ...taskEvents.map((event) => ({
-      id: event.id,
-      title: event.title,
-      start: event.start,
-      end: event.end,
-      allDay: event.allDay,
-      backgroundColor: calendarColors.kanban,
-      borderColor: calendarColors.kanban,
-      textColor: "#ffffff",
-      editable: true,
-      durationEditable: false,
-      extendedProps: {
-        source: "kanban" as const,
-        calendar_slug: "kanban",
-        description: "",
-        link: event.link ?? "",
-        taskId: event.task_id,
-        columnId: event.column_id,
-      },
-    })),
+    ...events.map((event) => {
+      const hex = resolveStoredEventColor(event.color, event.calendar_slug);
+      return {
+        id: String(event.id),
+        title: event.title,
+        start: event.start_at,
+        end: event.end_at ?? undefined,
+        allDay: event.all_day,
+        ...withColors(hex),
+        editable: true,
+        durationEditable: !event.all_day,
+        extendedProps: {
+          source: "event" as const,
+          calendar_slug: event.calendar_slug,
+          description: event.description,
+          link: event.link ?? "",
+          eventId: event.id,
+        },
+      };
+    }),
+    ...taskEvents.map((event) => {
+      const hex = resolveKanbanEventColor(event.color, event.column_id);
+      return {
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay,
+        ...withColors(hex),
+        editable: true,
+        durationEditable: false,
+        extendedProps: {
+          source: "kanban" as const,
+          calendar_slug: "kanban",
+          description: "",
+          link: event.link ?? "",
+          taskId: event.task_id,
+          columnId: event.column_id,
+        },
+      };
+    }),
     ...holidayEvents.map((event) => ({
       id: event.id,
       title: event.title,
       start: event.start,
       allDay: true,
-      backgroundColor: event.color,
-      borderColor: event.color,
-      textColor: "#ffffff",
+      ...withColors(event.color || colorForCalendarSlug("holidays")),
       editable: false,
       durationEditable: false,
       extendedProps: {
