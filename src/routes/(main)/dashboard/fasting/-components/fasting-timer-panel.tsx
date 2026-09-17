@@ -63,7 +63,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20">
+      <Card className="overflow-visible rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20">
         <CardHeader className="pb-0 text-center sm:text-left">
           <CardTitle className="flex items-center justify-center gap-2 sm:justify-start">
             <Flame className="size-5 text-orange-500" />
@@ -74,7 +74,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-8 pb-10 pt-4">
-          <div className="relative w-full max-w-[340px] rounded-[2rem] bg-gradient-to-b from-stone-100/90 via-background to-orange-500/[0.03] px-2 py-8 dark:from-stone-900/80 dark:via-background dark:to-orange-950/20">
+          <div className="relative w-full max-w-[340px] overflow-visible rounded-[2rem] bg-gradient-to-b from-stone-100/90 via-background to-orange-500/[0.03] px-4 py-10 dark:from-stone-900/80 dark:via-background dark:to-orange-950/20">
             <FastingTimerRing
               progress={progress}
               elapsedHours={elapsed}

@@ -4,16 +4,22 @@ import * as React from "react";
 
 import { format, parseISO } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+import { Link2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { FastingOverview } from "@/lib/api/fasting";
+import type { FastingDayChartPoint, FastingOverview } from "@/lib/api/fasting";
 
 import { FastingConsistencyCalendar } from "./fasting-consistency-calendar";
 import { formatDurationShort } from "./fasting-utils";
 
 type Props = { data: FastingOverview };
+
+const CHART_INNER_H = 140;
+const CHART_BOTTOM = 28;
+const CHART_TOP = 12;
 
 export function FastingStatsPanel({ data }: Props) {
   const [range, setRange] = React.useState<"week" | "month">("week");
@@ -76,7 +82,9 @@ export function FastingStatsPanel({ data }: Props) {
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 space-y-0">
           <div>
             <CardTitle>Fasting & eating charts</CardTitle>
-            <CardDescription>{dateRange}</CardDescription>
+            <CardDescription>
+              {dateRange} · ketuk/hover bar untuk detail · ↺ = lanjutan fast multi-hari (48–72 jam)
+            </CardDescription>
           </div>
           <Tabs value={range} onValueChange={(v) => v && setRange(v as "week" | "month")}>
             <TabsList className="rounded-full">
@@ -98,7 +106,7 @@ export function FastingStatsPanel({ data }: Props) {
       <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Fasting calendar</CardTitle>
-          <CardDescription>30 hari terakhir · kotak orange = goal tercapai</CardDescription>
+          <CardDescription>30 hari · orange = goal · ↺ = lanjutan fast multi-hari</CardDescription>
         </CardHeader>
         <CardContent>
           <FastingConsistencyCalendar days={data.calendar_heatmap} />
@@ -130,13 +138,13 @@ function SummaryItem({ label, value, highlight }: { label: string; value: string
   return (
     <div>
       <p className="text-muted-foreground text-sm">{label}</p>
-      <p className={cnValue(highlight, "mt-1 font-semibold text-2xl tabular-nums")}>{value}</p>
+      <p
+        className={`mt-1 font-semibold text-2xl tabular-nums ${highlight ? "text-orange-600 dark:text-orange-400" : ""}`}
+      >
+        {value}
+      </p>
     </div>
   );
-}
-
-function cnValue(highlight: boolean | undefined, base: string) {
-  return highlight ? `${base} text-orange-600 dark:text-orange-400` : base;
 }
 
 function ComparisonCard({
@@ -189,6 +197,20 @@ function PillCompareRow({ label, hours, accent }: { label: string; hours: number
   );
 }
 
+function dayDetailLines(row: FastingDayChartPoint, kind: "fasting" | "eating") {
+  const d = format(parseISO(row.date), "EEEE, d MMM yyyy", { locale: idLocale });
+  const lines = [
+    d,
+    `${kind === "fasting" ? "Puasa" : "Eating window"}: ${formatDurationShort(kind === "fasting" ? row.fasting_hours : row.eating_hours)}`,
+  ];
+  if (row.started_here) lines.push("Fast dimulai hari ini");
+  if (row.ended_here) lines.push("Fast berakhir hari ini");
+  if (row.continued) lines.push("Lanjutan fast multi-hari — bagian dari fast lebih panjang (mis. 48–72 jam)");
+  if (row.capped_full_day) lines.push("24 jam penuh di hari ini — fast masih lanjut ke hari berikutnya");
+  if (row.met_goal) lines.push("Goal harian tercapai");
+  return lines;
+}
+
 function PillChart({
   title,
   data,
@@ -197,44 +219,93 @@ function PillChart({
   accent,
 }: {
   title: string;
-  data: { date: string; fasting_hours: number; eating_hours: number }[];
+  data: FastingDayChartPoint[];
   dataKey: "fasting_hours" | "eating_hours";
   max: number;
   accent?: boolean;
 }) {
+  const gridLines = [max, max / 2, 0];
+  const chartHeight = CHART_INNER_H + CHART_BOTTOM + CHART_TOP;
+
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="font-medium">{title}</p>
-        <div className="flex gap-3 text-muted-foreground text-xs tabular-nums">
-          <span>0h</span>
-          <span>{max / 2}h</span>
-          <span>{max}h</span>
-        </div>
-      </div>
-      <div className="flex h-44 items-end justify-between gap-2 sm:gap-3">
-        {data.map((row) => {
-          const val = row[dataKey];
-          const pct = Math.min(100, (val / max) * 100);
-          const d = parseISO(row.date);
-          const dayLetter = format(d, "EEEEE", { locale: idLocale });
+      <p className="mb-3 font-medium">{title}</p>
+      <div className="relative rounded-2xl border border-border/60 bg-muted/15 px-3" style={{ height: chartHeight }}>
+        {gridLines.map((h) => {
+          const y = CHART_BOTTOM + (h / max) * CHART_INNER_H;
           return (
-            <div key={row.date} className="flex flex-1 flex-col items-center gap-2">
-              <div className="relative flex h-36 w-full max-w-[2.5rem] items-end justify-center">
-                <div
-                  title={`${row.date}: ${val.toFixed(1)}h`}
-                  className={`w-full min-h-[4px] rounded-full transition-all duration-500 ${
-                    accent
-                      ? "bg-gradient-to-t from-orange-600 to-orange-400 shadow-[0_2px_8px_rgba(249,115,22,0.25)]"
-                      : "bg-muted-foreground/30"
-                  }`}
-                  style={{ height: `${Math.max(pct, val > 0 ? 6 : 0)}%` }}
-                />
-              </div>
-              <span className="font-medium text-muted-foreground text-xs">{dayLetter}</span>
+            <div
+              key={h}
+              className="pointer-events-none absolute right-3 left-10 flex items-center"
+              style={{ bottom: y }}
+            >
+              <span className="w-7 shrink-0 text-right text-[10px] text-muted-foreground tabular-nums">{h}h</span>
+              <div className="ms-2 h-px flex-1 bg-border/60" />
             </div>
           );
         })}
+
+        <div
+          className="absolute right-3 left-3 flex items-end justify-between gap-1 pl-10"
+          style={{ bottom: CHART_BOTTOM, height: CHART_INNER_H }}
+        >
+          {data.map((row) => {
+            const val = row[dataKey];
+            const barPx = val > 0 ? Math.max(6, (val / max) * CHART_INNER_H) : 2;
+            const tooltipLines = dayDetailLines(row, dataKey === "fasting_hours" ? "fasting" : "eating");
+            const showContinued = (row.continued || row.capped_full_day) && dataKey === "fasting_hours";
+
+            return (
+              <Popover key={row.date}>
+                <PopoverTrigger
+                  className="group flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-end border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40"
+                  style={{ height: CHART_INNER_H }}
+                  render={
+                    <button
+                      type="button"
+                      aria-label={`${tooltipLines[0]} — ${tooltipLines[1]}`}
+                      className="flex h-full w-full flex-col items-center justify-end border-0 bg-transparent p-0"
+                    />
+                  }
+                >
+                  {showContinued && (
+                    <span className="mb-1 flex size-4 shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400">
+                      <Link2 className="size-2.5" />
+                    </span>
+                  )}
+                  <div
+                    className={`w-full max-w-[2.25rem] shrink-0 rounded-full transition-all duration-300 group-hover:brightness-110 group-active:scale-[0.98] ${
+                      accent
+                        ? "bg-gradient-to-t from-orange-600 to-orange-400 shadow-[0_2px_10px_rgba(249,115,22,0.3)]"
+                        : "bg-muted-foreground/35"
+                    }`}
+                    style={{ height: barPx }}
+                  />
+                </PopoverTrigger>
+                <PopoverContent side="top" className="w-64 rounded-xl px-3 py-2.5 text-xs">
+                  <div className="space-y-1">
+                    {tooltipLines.map((line) => (
+                      <p key={line} className={line === tooltipLines[0] ? "font-semibold" : "text-muted-foreground"}>
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            );
+          })}
+        </div>
+
+        <div className="absolute right-3 left-3 flex justify-between gap-1 pl-10" style={{ bottom: 6 }}>
+          {data.map((row) => (
+            <span
+              key={`lbl-${row.date}`}
+              className="min-w-0 flex-1 text-center font-medium text-[11px] text-muted-foreground"
+            >
+              {format(parseISO(row.date), "EEEEE", { locale: idLocale })}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

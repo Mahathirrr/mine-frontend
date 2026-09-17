@@ -75,6 +75,17 @@ export type FastingMealLog = {
   notes: string;
 };
 
+export type FastingDayChartPoint = {
+  date: string;
+  fasting_hours: number;
+  eating_hours: number;
+  met_goal: boolean;
+  continued?: boolean;
+  started_here?: boolean;
+  ended_here?: boolean;
+  capped_full_day?: boolean;
+};
+
 export type FastingProtocol = {
   slug: string;
   label: string;
@@ -120,8 +131,8 @@ export type FastingOverview = {
     zone_progress: number;
     all_zones: FastingZone[];
   } | null;
-  fasting_chart: { date: string; fasting_hours: number; eating_hours: number; met_goal: boolean }[];
-  calendar_heatmap: { date: string; fasting_hours: number; eating_hours: number; met_goal: boolean }[];
+  fasting_chart: FastingDayChartPoint[];
+  calendar_heatmap: FastingDayChartPoint[];
   weight_chart: { date: string; weight_kg: number }[];
   week_comparison: {
     this_week_fasting_hours: number;

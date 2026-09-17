@@ -2,9 +2,10 @@
 
 import { cn } from "cn";
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { FastingZone } from "@/lib/api/fasting";
 
-import { zoneIcons } from "./fasting-utils";
+import { formatDurationShort, zoneIcons } from "./fasting-utils";
 
 type Props = {
   progress: number;
@@ -48,11 +49,11 @@ export function FastingTimerRing({
   const head = markerPosition(size, stroke / 2 + 2, clamped);
 
   const milestones = allZones
-    .filter((z) => z.end_hour < 72 && z.start_hour > 0 && z.start_hour < goalHours)
-    .map((z) => ({ hour: z.start_hour, icon: zoneIcons[z.icon] ?? "•", label: z.label }));
+    .filter((z) => z.end_hour < 72 && z.start_hour >= 0 && z.start_hour < goalHours)
+    .map((z) => ({ zone: z, hour: z.start_hour, icon: zoneIcons[z.icon] ?? "•" }));
 
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+    <div className="relative inline-flex items-center justify-center py-4" style={{ width: size, height: size + 32 }}>
       <svg width={size} height={size} className="-rotate-90" aria-label="Fasting progress ring">
         <title>Fasting progress</title>
         <defs>
@@ -106,35 +107,62 @@ export function FastingTimerRing({
       </svg>
 
       {milestones.map((m) => {
-        const frac = m.hour / goalHours;
+        const frac = Math.min(1, m.hour / goalHours);
         const pos = markerPosition(size, stroke / 2 + 2, frac);
         const reached = elapsedHours >= m.hour;
-        const active = zoneLabel === m.label;
+        const active = zoneLabel === m.zone.label;
+        const endLabel = m.zone.end_hour >= 72 ? "72h+" : `${m.zone.end_hour}h`;
+
         return (
-          <div
-            key={m.hour}
-            title={m.label}
-            className={cn(
-              "absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-xs transition-all duration-500",
-              active && "size-9 bg-red-500 text-white shadow-[0_0_16px_rgba(239,68,68,0.55)]",
-              !active && reached && "bg-orange-500/20 text-base ring-1 ring-orange-500/40",
-              !active && !reached && "bg-muted/80 text-muted-foreground/60 ring-1 ring-border/50",
-            )}
-            style={{ left: pos.left, top: pos.top }}
-          >
-            {m.icon}
-          </div>
+          <Popover key={m.zone.slug}>
+            <PopoverTrigger
+              className={cn(
+                "absolute flex -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 transition-all duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50",
+                active ? "size-10 bg-red-500 text-lg text-white shadow-[0_0_18px_rgba(239,68,68,0.55)]" : "size-8",
+                !active && reached && "bg-orange-500/15 text-base ring-1 ring-orange-500/40",
+                !active && !reached && "bg-muted/90 text-muted-foreground/70 ring-1 ring-border/60",
+              )}
+              style={{ left: pos.left, top: pos.top }}
+            >
+              {m.icon}
+            </PopoverTrigger>
+            <PopoverContent side="top" className="w-64 rounded-2xl p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{m.icon}</span>
+                <div>
+                  <p className="font-semibold">{m.zone.label}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {m.zone.start_hour}h – {endLabel}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2 text-muted-foreground text-sm leading-relaxed">{m.zone.description}</p>
+              <p className="mt-2 text-xs">
+                {reached ? (
+                  active ? (
+                    <span className="text-orange-600 dark:text-orange-400">Zona aktif sekarang</span>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400">Sudah dilewati</span>
+                  )
+                ) : (
+                  <span className="text-muted-foreground">
+                    Tersisa ~{formatDurationShort(Math.max(0, m.hour - elapsedHours))} menuju zona ini
+                  </span>
+                )}
+              </p>
+            </PopoverContent>
+          </Popover>
         );
       })}
 
       {clamped > 0.01 && (
         <div
-          className="absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
+          className="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
           style={{ left: head.left, top: head.top }}
         />
       )}
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 pt-2 text-center">
         {zoneLabel && (
           <div className="mb-2 flex items-center gap-1.5 font-medium text-red-500 text-sm dark:text-red-400">
             {zoneIcon && <span className="text-base leading-none">{zoneIcon}</span>}
@@ -145,6 +173,7 @@ export function FastingTimerRing({
         <p className="font-extralight text-[2.75rem] tabular-nums leading-none tracking-tight sm:text-[3.25rem]">
           {label}
         </p>
+        <p className="mt-2 text-[11px] text-muted-foreground">Ketuk icon di ring untuk info zona</p>
       </div>
     </div>
   );

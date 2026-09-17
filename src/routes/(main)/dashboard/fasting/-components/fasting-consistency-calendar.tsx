@@ -5,23 +5,22 @@ import * as React from "react";
 import { cn } from "cn";
 import { addDays, format, parseISO, startOfWeek } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+import { Link2 } from "lucide-react";
 
-type DayData = {
-  date: string;
-  fasting_hours: number;
-  eating_hours: number;
-  met_goal: boolean;
-};
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { FastingDayChartPoint } from "@/lib/api/fasting";
+
+import { formatDurationShort } from "./fasting-utils";
 
 type Props = {
-  days: DayData[];
+  days: FastingDayChartPoint[];
 };
 
 const WEEKDAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-type CalendarCell = DayData | null;
+type CalendarCell = FastingDayChartPoint | null;
 
-function buildCalendarWeeks(days: DayData[]): { month?: string; week: CalendarCell[] }[] {
+function buildCalendarWeeks(days: FastingDayChartPoint[]): { month?: string; week: CalendarCell[] }[] {
   if (days.length === 0) return [];
 
   const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
@@ -95,6 +94,12 @@ export function FastingConsistencyCalendar({ days }: Props) {
         />
         <LegendDot className="bg-muted/80" label="Ada fast" />
         <LegendDot className="bg-muted/25" label="Kosong" />
+        <span className="flex items-center gap-1.5">
+          <span className="flex size-3 items-center justify-center rounded-md bg-orange-500/15 ring-1 ring-orange-500/30">
+            <Link2 className="size-2 text-orange-600" />
+          </span>
+          Multi-hari
+        </span>
       </div>
     </div>
   );
@@ -109,34 +114,67 @@ function LegendDot({ className, label }: { className: string; label: string }) {
   );
 }
 
-function DayCell({ cell }: { cell: DayData }) {
+function DayCell({ cell }: { cell: FastingDayChartPoint }) {
   const dayNum = Number(cell.date.slice(8));
   const isToday = cell.date === format(new Date(), "yyyy-MM-dd");
   const hasData = cell.fasting_hours > 0;
+  const dateLabel = format(parseISO(cell.date), "EEEE, d MMM yyyy", { locale: idLocale });
+
+  const detailLines = [
+    `${dateLabel}`,
+    `Puasa: ${formatDurationShort(cell.fasting_hours)}`,
+    `Eating: ${formatDurationShort(cell.eating_hours)}`,
+  ];
+  if (cell.started_here) detailLines.push("Fast dimulai hari ini");
+  if (cell.ended_here) detailLines.push("Fast berakhir hari ini");
+  if (cell.continued) detailLines.push("Lanjutan fast multi-hari");
+  if (cell.capped_full_day) detailLines.push("24 jam penuh — fast lanjut");
 
   return (
-    <div
-      title={`${cell.date}: ${cell.fasting_hours.toFixed(1)} jam puasa`}
-      className={cn(
-        "flex aspect-square flex-col items-center justify-center rounded-xl transition-colors",
-        cell.met_goal &&
-          "bg-gradient-to-br from-orange-500/25 to-orange-500/8 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.25)]",
-        !cell.met_goal && hasData && "bg-muted/60",
-        !hasData && "bg-muted/20",
-        isToday && "ring-2 ring-orange-500/45 ring-offset-1 ring-offset-background",
-      )}
-    >
-      <span className={cn("font-semibold text-sm tabular-nums", isToday && "text-orange-600 dark:text-orange-400")}>
-        {dayNum}
-      </span>
-      <span
+    <Popover>
+      <PopoverTrigger
         className={cn(
-          "mt-0.5 text-[10px] tabular-nums",
-          hasData ? "font-medium text-muted-foreground" : "text-muted-foreground/40",
+          "relative flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-0 p-0 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-orange-500/45",
+          cell.met_goal &&
+            "bg-gradient-to-br from-orange-500/25 to-orange-500/8 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.25)]",
+          !cell.met_goal && hasData && "bg-muted/60",
+          !hasData && "bg-muted/20",
+          isToday && "ring-2 ring-orange-500/45 ring-offset-1 ring-offset-background",
         )}
+        render={
+          <button
+            type="button"
+            aria-label={`${dateLabel}, ${cell.fasting_hours} jam puasa`}
+            className="h-full w-full"
+          />
+        }
       >
-        {hasData ? `${Math.round(cell.fasting_hours)}h` : "·"}
-      </span>
-    </div>
+        {(cell.continued || cell.capped_full_day) && (
+          <span className="absolute top-1 right-1 flex size-3.5 items-center justify-center rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400">
+            <Link2 className="size-2" />
+          </span>
+        )}
+        <span className={cn("font-semibold text-sm tabular-nums", isToday && "text-orange-600 dark:text-orange-400")}>
+          {dayNum}
+        </span>
+        <span
+          className={cn(
+            "mt-0.5 text-[10px] tabular-nums",
+            hasData ? "font-medium text-muted-foreground" : "text-muted-foreground/40",
+          )}
+        >
+          {hasData ? `${Math.round(cell.fasting_hours)}h` : "·"}
+        </span>
+      </PopoverTrigger>
+      <PopoverContent side="top" className="w-56 rounded-xl px-3 py-2 text-xs">
+        <div className="space-y-1">
+          {detailLines.map((line, i) => (
+            <p key={line} className={i === 0 ? "font-semibold" : "text-muted-foreground"}>
+              {line}
+            </p>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
