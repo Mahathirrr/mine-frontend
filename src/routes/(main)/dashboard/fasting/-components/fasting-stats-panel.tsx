@@ -110,10 +110,10 @@ export function FastingStatsPanel({ data, token, onRefresh }: Props) {
         <PillChart title="Eating window" data={chartData} dataKey="eating_hours" max={24} />
       </div>
 
-      <div className="max-w-sm space-y-2">
+      <div className="max-w-md space-y-2">
         <div>
           <h3 className="font-semibold text-base">Fasting calendar</h3>
-          <p className="text-muted-foreground text-xs">30 hari · orange = goal</p>
+          <p className="text-muted-foreground text-sm">30 hari · orange = goal · ketuk tanggal untuk detail</p>
         </div>
         <FastingConsistencyCalendar days={data.calendar_heatmap} />
       </div>

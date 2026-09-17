@@ -58,27 +58,30 @@ export function FastingConsistencyCalendar({ days }: Props) {
   const weeks = React.useMemo(() => buildCalendarWeeks(days), [days]);
 
   return (
-    <div className="space-y-2">
-      <div className="grid grid-cols-7 gap-0.5">
+    <div className="space-y-3">
+      <div className="grid grid-cols-7 gap-1.5">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="py-0.5 text-center font-medium text-[9px] text-muted-foreground uppercase">
+          <div
+            key={d}
+            className="py-1 text-center font-medium text-[11px] text-muted-foreground uppercase tracking-wide"
+          >
             {d}
           </div>
         ))}
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2.5">
         {weeks.map((row) => {
           const weekKey = row.week.map((c) => c?.date ?? "x").join("-");
           return (
             <React.Fragment key={weekKey}>
-              {row.month && <p className="font-medium text-[10px] text-muted-foreground">{row.month}</p>}
-              <div className="grid grid-cols-7 gap-0.5">
+              {row.month && <p className="font-medium text-muted-foreground text-xs">{row.month}</p>}
+              <div className="grid grid-cols-7 gap-1.5">
                 {row.week.map((cell, ci) =>
                   cell ? (
                     <DayCell key={cell.date} cell={cell} />
                   ) : (
-                    <div key={`e-${weekKey}-${WEEKDAYS[ci]}`} className="h-7 rounded-md" />
+                    <div key={`e-${weekKey}-${WEEKDAYS[ci]}`} className="aspect-square min-h-10 rounded-xl" />
                   ),
                 )}
               </div>
@@ -87,7 +90,7 @@ export function FastingConsistencyCalendar({ days }: Props) {
         })}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[10px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 pt-1 text-muted-foreground text-xs">
         <LegendDot
           className="bg-gradient-to-br from-orange-500/30 to-orange-500/10 ring-1 ring-orange-500/30"
           label="Goal tercapai"
@@ -95,8 +98,8 @@ export function FastingConsistencyCalendar({ days }: Props) {
         <LegendDot className="bg-muted/80" label="Ada fast" />
         <LegendDot className="bg-muted/25" label="Kosong" />
         <span className="flex items-center gap-1.5">
-          <span className="flex size-3 items-center justify-center rounded-md bg-orange-500/15 ring-1 ring-orange-500/30">
-            <Link2 className="size-2 text-orange-600" />
+          <span className="flex size-3.5 items-center justify-center rounded-md bg-orange-500/15 ring-1 ring-orange-500/30">
+            <Link2 className="size-2.5 text-orange-600" />
           </span>
           Multi-hari
         </span>
@@ -108,7 +111,7 @@ export function FastingConsistencyCalendar({ days }: Props) {
 function LegendDot({ className, label }: { className: string; label: string }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className={cn("size-3 rounded-md", className)} />
+      <span className={cn("size-3.5 rounded-md", className)} />
       {label}
     </span>
   );
@@ -134,12 +137,12 @@ function DayCell({ cell }: { cell: FastingDayChartPoint }) {
     <Popover>
       <PopoverTrigger
         className={cn(
-          "relative flex h-7 cursor-pointer flex-col items-center justify-center rounded-md border-0 p-0 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-orange-500/45",
+          "relative flex aspect-square min-h-10 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-0 p-0 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-orange-500/45",
           cell.met_goal &&
             "bg-gradient-to-br from-orange-500/25 to-orange-500/8 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.25)]",
           !cell.met_goal && hasData && "bg-muted/60",
           !hasData && "bg-muted/20",
-          isToday && "ring-1 ring-orange-500/50",
+          isToday && "ring-2 ring-orange-500/45 ring-offset-1 ring-offset-background",
         )}
         render={
           <button
@@ -150,17 +153,20 @@ function DayCell({ cell }: { cell: FastingDayChartPoint }) {
         }
       >
         {(Boolean(cell.continued) || Boolean(cell.capped_full_day)) && (
-          <span className="absolute top-0 right-0 flex size-2.5 items-center justify-center rounded-full bg-orange-500/25 text-orange-600">
-            <Link2 className="size-1.5" />
+          <span className="absolute top-1 right-1 flex size-3.5 items-center justify-center rounded-full bg-orange-500/20 text-orange-600 dark:text-orange-400">
+            <Link2 className="size-2" />
           </span>
         )}
+        <span className={cn("font-semibold text-sm tabular-nums", isToday && "text-orange-600 dark:text-orange-400")}>
+          {dayNum}
+        </span>
         <span
           className={cn(
-            "font-semibold text-[10px] tabular-nums leading-none",
-            isToday && "text-orange-600 dark:text-orange-400",
+            "mt-0.5 text-[10px] tabular-nums",
+            hasData ? "font-medium text-muted-foreground" : "text-muted-foreground/40",
           )}
         >
-          {dayNum}
+          {hasData ? `${Math.round(cell.fasting_hours)}h` : "·"}
         </span>
       </PopoverTrigger>
       <PopoverContent side="top" className="w-56 rounded-xl px-3 py-2 text-xs">

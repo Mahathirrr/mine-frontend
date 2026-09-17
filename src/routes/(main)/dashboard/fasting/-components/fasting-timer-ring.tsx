@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+
 import { cn } from "cn";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -18,6 +20,31 @@ type Props = {
   zoneIcon?: string;
   allZones?: FastingZone[];
 };
+
+/** Space for milestone buttons (max 40px) + glow outside the ring track */
+const MARKER_PAD = 52;
+
+function useRingSize(requested?: number) {
+  const [size, setSize] = React.useState(requested ?? 272);
+
+  React.useEffect(() => {
+    if (requested != null) {
+      setSize(requested);
+      return;
+    }
+    const update = () => {
+      const w = window.innerWidth;
+      if (w < 400) setSize(248);
+      else if (w < 640) setSize(264);
+      else setSize(272);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [requested]);
+
+  return size;
+}
 
 function ZoneStatus({
   reached,
@@ -56,13 +83,14 @@ export function FastingTimerRing({
   progress,
   elapsedHours,
   goalHours,
-  size = 300,
+  size: sizeProp,
   label,
   sublabel,
   zoneLabel,
   zoneIcon,
   allZones = [],
 }: Props) {
+  const size = useRingSize(sizeProp);
   const clamped = Math.min(1, Math.max(0, progress));
   const stroke = 14;
   const r = (size - stroke) / 2;
@@ -76,18 +104,18 @@ export function FastingTimerRing({
     .filter((z) => z.end_hour < 72 && z.start_hour >= 0 && z.start_hour < goalHours)
     .map((z) => ({ zone: z, hour: z.start_hour, icon: zoneIcons[z.icon] ?? "•" }));
 
-  const pad = 24;
+  const frame = size + MARKER_PAD * 2;
 
   return (
     <div
-      className="relative mx-auto inline-flex items-center justify-center overflow-visible"
-      style={{ width: size + pad * 2, height: size + pad * 2 + 20, padding: pad }}
+      className="relative mx-auto shrink-0 overflow-visible"
+      style={{ width: frame, height: frame, minWidth: frame, minHeight: frame }}
     >
       <svg
         width={size}
         height={size}
-        className="absolute -rotate-90"
-        style={{ left: pad, top: pad }}
+        className="absolute -rotate-90 overflow-visible"
+        style={{ left: MARKER_PAD, top: MARKER_PAD }}
         aria-label="Fasting progress ring"
       >
         <title>Fasting progress</title>
@@ -144,8 +172,8 @@ export function FastingTimerRing({
       {milestones.map((m) => {
         const frac = Math.min(1, m.hour / goalHours);
         const pos = markerPosition(size, stroke / 2 + 2, frac);
-        const left = pos.left + pad;
-        const top = pos.top + pad;
+        const left = pos.left + MARKER_PAD;
+        const top = pos.top + MARKER_PAD;
         const reached = elapsedHours >= m.hour;
         const active = zoneLabel === m.zone.label;
         const endLabel = m.zone.end_hour >= 72 ? "72h+" : `${m.zone.end_hour}h`;
@@ -154,7 +182,7 @@ export function FastingTimerRing({
           <Popover key={m.zone.slug}>
             <PopoverTrigger
               className={cn(
-                "absolute flex -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 transition-all duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50",
+                "absolute z-10 flex -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 transition-all duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50",
                 active ? "size-10 bg-red-500 text-lg text-white shadow-[0_0_18px_rgba(239,68,68,0.55)]" : "size-8",
                 !active && reached && "bg-orange-500/15 text-base ring-1 ring-orange-500/40",
                 !active && !reached && "bg-muted/90 text-muted-foreground/70 ring-1 ring-border/60",
@@ -184,26 +212,26 @@ export function FastingTimerRing({
 
       {clamped > 0.01 && (
         <div
-          className="pointer-events-none absolute size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
-          style={{ left: head.left + pad, top: head.top + pad }}
+          className="pointer-events-none absolute z-10 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
+          style={{ left: head.left + MARKER_PAD, top: head.top + MARKER_PAD }}
         />
       )}
 
       <div
-        className="pointer-events-none absolute flex flex-col items-center justify-center px-8 pt-2 text-center"
-        style={{ left: pad, top: pad, width: size, height: size }}
+        className="pointer-events-none absolute z-0 flex flex-col items-center justify-center px-6 text-center"
+        style={{ left: MARKER_PAD, top: MARKER_PAD, width: size, height: size }}
       >
         {zoneLabel && (
-          <div className="mb-2 flex items-center gap-1.5 font-medium text-red-500 text-sm dark:text-red-400">
+          <div className="mb-1.5 flex items-center gap-1.5 font-medium text-red-500 text-sm dark:text-red-400">
             {zoneIcon && <span className="text-base leading-none">{zoneIcon}</span>}
             <span>{zoneLabel}</span>
           </div>
         )}
-        {sublabel && <p className="mb-1 text-[11px] text-muted-foreground uppercase tracking-[0.14em]">{sublabel}</p>}
-        <p className="font-extralight text-[2.75rem] tabular-nums leading-none tracking-tight sm:text-[3.25rem]">
+        {sublabel && <p className="mb-1 text-[10px] text-muted-foreground uppercase tracking-[0.12em]">{sublabel}</p>}
+        <p className="font-extralight text-[2.35rem] tabular-nums leading-none tracking-tight sm:text-[2.75rem]">
           {label}
         </p>
-        <p className="mt-2 text-[11px] text-muted-foreground">Ketuk icon di ring untuk info zona</p>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">Ketuk icon di ring untuk info zona</p>
       </div>
     </div>
   );

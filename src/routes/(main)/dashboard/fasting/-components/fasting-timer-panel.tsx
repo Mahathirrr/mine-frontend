@@ -102,7 +102,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
   return (
     <>
       <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <Card className="overflow-visible rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20">
+        <Card className="overflow-visible rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20 [&_[data-slot=card-content]]:overflow-visible">
           <CardHeader className="pb-0 text-center sm:text-left">
             <CardTitle className="flex items-center justify-center gap-2 sm:justify-start">
               <Flame className="size-5 text-orange-500" />
@@ -112,17 +112,19 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
               {protocol?.label ?? data.profile.protocol_slug} · target {Math.round(goalHours)} jam puasa
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-8 overflow-visible pt-6 pb-12">
-            <FastingTimerRing
-              progress={progress}
-              elapsedHours={elapsed}
-              goalHours={goalHours}
-              label={formatDuration(elapsed)}
-              sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
-              zoneLabel={zone?.label}
-              zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
-              allZones={data.zone?.all_zones}
-            />
+          <CardContent className="flex w-full flex-col items-center gap-8 overflow-visible px-4 pt-4 pb-14 sm:px-8">
+            <div className="flex w-full justify-center overflow-visible py-2">
+              <FastingTimerRing
+                progress={progress}
+                elapsedHours={elapsed}
+                goalHours={goalHours}
+                label={formatDuration(elapsed)}
+                sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
+                zoneLabel={zone?.label}
+                zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
+                allZones={data.zone?.all_zones}
+              />
+            </div>
 
             <div className="grid w-full max-w-md grid-cols-2 gap-3">
               <EditableTile
