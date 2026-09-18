@@ -33,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ? getFilteredSidebarItems(preferences.enabled_menu_items, preferences.show_template_pages)
     : sidebarItems;
 
-  const homePath = preferences ? resolveLandingPath(preferences) : "/dashboard/leetcode";
+  const homePath = preferences ? resolveLandingPath(preferences) : "/dashboard";
 
   const sidebarUser = authUser
     ? { name: authUser.name, email: authUser.email, avatar: authUser.avatar?.thumb_url ?? "" }

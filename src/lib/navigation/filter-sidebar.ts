@@ -2,6 +2,9 @@ import type { NavGroup, NavMainItem } from "@/navigation/sidebar/sidebar-items";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 
 function filterItem(item: NavMainItem, enabled: Set<string>): NavMainItem | null {
+  if (item.id === "home") {
+    return item;
+  }
   if ("url" in item && item.url) {
     return enabled.has(item.id) ? item : null;
   }

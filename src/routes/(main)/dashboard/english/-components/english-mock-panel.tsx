@@ -101,7 +101,7 @@ export function EnglishMockPanel({ data, token, onRefresh }: Props) {
               <MockRow key={mock.id} mock={mock} onDelete={() => setDeleteId(mock.id)} />
             ))}
             {data.mock_tests.length === 0 && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Belum ada mock. Mulai dengan ETS/BC/IDP atau simulasi sendiri.
               </p>
             )}

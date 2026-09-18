@@ -26,6 +26,7 @@ import {
   ShoppingBag,
   Sparkles,
   SquareArrowUpRight,
+  Target,
   UserRound,
   Users,
 } from "lucide-react";
@@ -80,6 +81,12 @@ export const sidebarItems: NavGroup[] = [
     label: "Mine",
     items: [
       {
+        id: "home",
+        title: "Beranda",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+      },
+      {
         id: "leetcode",
         title: "LeetCode",
         url: "/dashboard/leetcode",
@@ -90,6 +97,13 @@ export const sidebarItems: NavGroup[] = [
         title: "Wawancara",
         url: "/dashboard/interviews",
         icon: BriefcaseBusiness,
+      },
+      {
+        id: "job-tracker",
+        title: "Job Tracker",
+        url: "/dashboard/job-tracker",
+        icon: Target,
+        badge: "new",
       },
       {
         id: "kanban",

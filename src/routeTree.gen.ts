@@ -36,6 +36,7 @@ import { Route as mainDashboardFinanceRouteRouteImport } from './routes/(main)/d
 import { Route as mainDashboardInfrastructureRouteRouteImport } from './routes/(main)/dashboard/infrastructure/route'
 import { Route as mainDashboardInterviewsRouteRouteImport } from './routes/(main)/dashboard/interviews/route'
 import { Route as mainDashboardInvoiceRouteRouteImport } from './routes/(main)/dashboard/invoice/route'
+import { Route as mainDashboardJobTrackerRouteRouteImport } from './routes/(main)/dashboard/job-tracker/route'
 import { Route as mainDashboardJournalRouteRouteImport } from './routes/(main)/dashboard/journal/route'
 import { Route as mainDashboardKanbanRouteRouteImport } from './routes/(main)/dashboard/kanban/route'
 import { Route as mainDashboardLeetcodeRouteRouteImport } from './routes/(main)/dashboard/leetcode/route'
@@ -47,6 +48,7 @@ import { Route as mainDashboardProfileRouteRouteImport } from './routes/(main)/d
 import { Route as mainDashboardPromptVaultRouteRouteImport } from './routes/(main)/dashboard/prompt-vault/route'
 import { Route as mainDashboardRolesRouteRouteImport } from './routes/(main)/dashboard/roles/route'
 import { Route as mainDashboardSettingsRouteRouteImport } from './routes/(main)/dashboard/settings/route'
+import { Route as mainDashboardSkillsRouteRouteImport } from './routes/(main)/dashboard/skills/route'
 import { Route as mainDashboardSubscriptionsRouteRouteImport } from './routes/(main)/dashboard/subscriptions/route'
 import { Route as mainDashboardTasksRouteRouteImport } from './routes/(main)/dashboard/tasks/route'
 import { Route as mainDashboardUsersRouteRouteImport } from './routes/(main)/dashboard/users/route'
@@ -208,6 +210,12 @@ const mainDashboardInvoiceRouteRoute =
     path: '/invoice',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
+const mainDashboardJobTrackerRouteRoute =
+  mainDashboardJobTrackerRouteRouteImport.update({
+    id: '/job-tracker',
+    path: '/job-tracker',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardJournalRouteRoute =
   mainDashboardJournalRouteRouteImport.update({
     id: '/journal',
@@ -270,6 +278,12 @@ const mainDashboardSettingsRouteRoute =
   mainDashboardSettingsRouteRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardSkillsRouteRoute =
+  mainDashboardSkillsRouteRouteImport.update({
+    id: '/skills',
+    path: '/skills',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardSubscriptionsRouteRoute =
@@ -359,6 +373,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -370,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -409,6 +425,7 @@ export interface FileRoutesByTo {
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -420,6 +437,7 @@ export interface FileRoutesByTo {
   '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -461,6 +479,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/(main)/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/(main)/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/(main)/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/(main)/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/(main)/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/(main)/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -472,6 +491,7 @@ export interface FileRoutesById {
   '/(main)/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/(main)/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/(main)/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/(main)/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/(main)/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/(main)/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/(main)/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -514,6 +534,7 @@ export interface FileRouteTypes {
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/job-tracker'
     | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
@@ -525,6 +546,7 @@ export interface FileRouteTypes {
     | '/dashboard/prompt-vault'
     | '/dashboard/roles'
     | '/dashboard/settings'
+    | '/dashboard/skills'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -564,6 +586,7 @@ export interface FileRouteTypes {
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/job-tracker'
     | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
@@ -575,6 +598,7 @@ export interface FileRouteTypes {
     | '/dashboard/prompt-vault'
     | '/dashboard/roles'
     | '/dashboard/settings'
+    | '/dashboard/skills'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -615,6 +639,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/infrastructure'
     | '/(main)/dashboard/interviews'
     | '/(main)/dashboard/invoice'
+    | '/(main)/dashboard/job-tracker'
     | '/(main)/dashboard/journal'
     | '/(main)/dashboard/kanban'
     | '/(main)/dashboard/leetcode'
@@ -626,6 +651,7 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/prompt-vault'
     | '/(main)/dashboard/roles'
     | '/(main)/dashboard/settings'
+    | '/(main)/dashboard/skills'
     | '/(main)/dashboard/subscriptions'
     | '/(main)/dashboard/tasks'
     | '/(main)/dashboard/users'
@@ -846,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardInvoiceRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/job-tracker': {
+      id: '/(main)/dashboard/job-tracker'
+      path: '/job-tracker'
+      fullPath: '/dashboard/job-tracker'
+      preLoaderRoute: typeof mainDashboardJobTrackerRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/journal': {
       id: '/(main)/dashboard/journal'
       path: '/journal'
@@ -921,6 +954,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof mainDashboardSettingsRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/skills': {
+      id: '/(main)/dashboard/skills'
+      path: '/skills'
+      fullPath: '/dashboard/skills'
+      preLoaderRoute: typeof mainDashboardSkillsRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/subscriptions': {
@@ -1020,6 +1060,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardInfrastructureRouteRoute: typeof mainDashboardInfrastructureRouteRoute
   mainDashboardInterviewsRouteRoute: typeof mainDashboardInterviewsRouteRoute
   mainDashboardInvoiceRouteRoute: typeof mainDashboardInvoiceRouteRoute
+  mainDashboardJobTrackerRouteRoute: typeof mainDashboardJobTrackerRouteRoute
   mainDashboardJournalRouteRoute: typeof mainDashboardJournalRouteRoute
   mainDashboardKanbanRouteRoute: typeof mainDashboardKanbanRouteRoute
   mainDashboardLeetcodeRouteRoute: typeof mainDashboardLeetcodeRouteRoute
@@ -1031,6 +1072,7 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardPromptVaultRouteRoute: typeof mainDashboardPromptVaultRouteRoute
   mainDashboardRolesRouteRoute: typeof mainDashboardRolesRouteRoute
   mainDashboardSettingsRouteRoute: typeof mainDashboardSettingsRouteRoute
+  mainDashboardSkillsRouteRoute: typeof mainDashboardSkillsRouteRoute
   mainDashboardSubscriptionsRouteRoute: typeof mainDashboardSubscriptionsRouteRoute
   mainDashboardTasksRouteRoute: typeof mainDashboardTasksRouteRoute
   mainDashboardUsersRouteRoute: typeof mainDashboardUsersRouteRoute
@@ -1059,6 +1101,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardInfrastructureRouteRoute: mainDashboardInfrastructureRouteRoute,
   mainDashboardInterviewsRouteRoute: mainDashboardInterviewsRouteRoute,
   mainDashboardInvoiceRouteRoute: mainDashboardInvoiceRouteRoute,
+  mainDashboardJobTrackerRouteRoute: mainDashboardJobTrackerRouteRoute,
   mainDashboardJournalRouteRoute: mainDashboardJournalRouteRoute,
   mainDashboardKanbanRouteRoute: mainDashboardKanbanRouteRoute,
   mainDashboardLeetcodeRouteRoute: mainDashboardLeetcodeRouteRoute,
@@ -1071,6 +1114,7 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardPromptVaultRouteRoute: mainDashboardPromptVaultRouteRoute,
   mainDashboardRolesRouteRoute: mainDashboardRolesRouteRoute,
   mainDashboardSettingsRouteRoute: mainDashboardSettingsRouteRoute,
+  mainDashboardSkillsRouteRoute: mainDashboardSkillsRouteRoute,
   mainDashboardSubscriptionsRouteRoute: mainDashboardSubscriptionsRouteRoute,
   mainDashboardTasksRouteRoute: mainDashboardTasksRouteRoute,
   mainDashboardUsersRouteRoute: mainDashboardUsersRouteRoute,

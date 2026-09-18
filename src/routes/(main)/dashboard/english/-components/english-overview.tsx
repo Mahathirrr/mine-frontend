@@ -48,7 +48,7 @@ export function EnglishOverviewPanel({ data }: Props) {
               <span>{profile.toefl_target_total}</span>
             </div>
             <Progress value={stats.readiness_toefl} />
-            <p className="text-xs text-muted-foreground">Kesiapan {stats.readiness_toefl}%</p>
+            <p className="text-muted-foreground text-xs">Kesiapan {stats.readiness_toefl}%</p>
           </CardContent>
         </Card>
         <Card>
@@ -62,7 +62,7 @@ export function EnglishOverviewPanel({ data }: Props) {
               <span>{profile.ielts_target_band.toFixed(1)}</span>
             </div>
             <Progress value={stats.readiness_ielts} />
-            <p className="text-xs text-muted-foreground">Kesiapan {stats.readiness_ielts}%</p>
+            <p className="text-muted-foreground text-xs">Kesiapan {stats.readiness_ielts}%</p>
           </CardContent>
         </Card>
         <Card>
@@ -70,7 +70,7 @@ export function EnglishOverviewPanel({ data }: Props) {
             <CardDescription>Belajar minggu ini</CardDescription>
             <CardTitle className="text-2xl tabular-nums">{stats.practice_hours_week.toFixed(1)} jam</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-muted-foreground text-sm">
             {stats.practice_sessions_week} sesi · target {profile.weekly_hours_goal} jam/minggu
           </CardContent>
         </Card>
@@ -79,7 +79,7 @@ export function EnglishOverviewPanel({ data }: Props) {
             <CardDescription>Streak & vocab</CardDescription>
             <CardTitle className="text-2xl tabular-nums">{profile.study_streak} hari</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
+          <CardContent className="text-muted-foreground text-sm">
             {stats.vocab_total} kata · {stats.mock_total} mock test tercatat
           </CardContent>
         </Card>
@@ -93,8 +93,8 @@ export function EnglishOverviewPanel({ data }: Props) {
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border p-4">
-              <p className="text-sm font-medium">TOEFL iBT</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums">
+              <p className="font-medium text-sm">TOEFL iBT</p>
+              <p className="mt-1 font-semibold text-2xl tabular-nums">
                 {toeflDays == null
                   ? "Belum di-set"
                   : toeflDays > 0
@@ -103,11 +103,11 @@ export function EnglishOverviewPanel({ data }: Props) {
                       ? "Hari ini"
                       : "Lewat"}
               </p>
-              <p className="text-xs text-muted-foreground">{profile.toefl_exam_date ?? "Tambah di tab Profil"}</p>
+              <p className="text-muted-foreground text-xs">{profile.toefl_exam_date ?? "Tambah di tab Profil"}</p>
             </div>
             <div className="rounded-lg border p-4">
-              <p className="text-sm font-medium">IELTS</p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums">
+              <p className="font-medium text-sm">IELTS</p>
+              <p className="mt-1 font-semibold text-2xl tabular-nums">
                 {ieltsDays == null
                   ? "Belum di-set"
                   : ieltsDays > 0
@@ -116,7 +116,7 @@ export function EnglishOverviewPanel({ data }: Props) {
                       ? "Hari ini"
                       : "Lewat"}
               </p>
-              <p className="text-xs text-muted-foreground">{profile.ielts_exam_date ?? "Tambah di tab Profil"}</p>
+              <p className="text-muted-foreground text-xs">{profile.ielts_exam_date ?? "Tambah di tab Profil"}</p>
             </div>
           </CardContent>
         </Card>
@@ -142,7 +142,7 @@ export function EnglishOverviewPanel({ data }: Props) {
           {insights.map((ins, i) => (
             <div key={i} className={`rounded-lg border p-4 ${insightClass(ins.tone)}`}>
               <p className="font-medium">{ins.title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{ins.detail}</p>
+              <p className="mt-1 text-muted-foreground text-sm">{ins.detail}</p>
             </div>
           ))}
         </div>
@@ -156,7 +156,7 @@ export function EnglishOverviewPanel({ data }: Props) {
           </CardHeader>
           <CardContent>
             {score_timeline.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Belum ada mock test. Catat di tab Mock Test.</p>
+              <p className="text-muted-foreground text-sm">Belum ada mock test. Catat di tab Mock Test.</p>
             ) : (
               <ChartContainer config={scoreConfig} className="h-56 w-full">
                 <LineChart data={score_timeline}>
@@ -218,7 +218,7 @@ function SectionAvgCard({
       </CardHeader>
       <CardContent>
         {bars.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Butuh minimal 1 mock full test.</p>
+          <p className="text-muted-foreground text-sm">Butuh minimal 1 mock full test.</p>
         ) : (
           <ChartContainer config={cfg} className="h-52 w-full">
             <BarChart data={bars} layout="vertical">

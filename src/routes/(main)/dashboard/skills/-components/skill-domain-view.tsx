@@ -4,9 +4,11 @@ import * as React from "react";
 
 import { Link } from "@tanstack/react-router";
 
+import { cn } from "cn";
 import {
   ArrowLeft,
   Check,
+  ChevronRight,
   Code2,
   Download,
   ExternalLink,
@@ -173,18 +175,7 @@ function RoadmapPanel({
       </div>
 
       {phases.map((phase) => (
-        <Collapsible key={phase.id} defaultOpen className="rounded-lg border">
-          <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-left font-medium">
-            {phase.name}
-            <span className="text-muted-foreground text-xs">{phase.topics?.length ?? 0} topik</span>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 border-t px-4 py-3">
-            {(phase.topics ?? []).map((topic) => (
-              <TopicCard key={topic.id} topic={topic} onRefresh={onRefresh} />
-            ))}
-            <AddTopicButton domainId={domainId} phaseId={phase.id} onRefresh={onRefresh} />
-          </CollapsibleContent>
-        </Collapsible>
+        <PhaseSection key={phase.id} phase={phase} domainId={domainId} onRefresh={onRefresh} />
       ))}
 
       <Dialog open={phaseDialog} onOpenChange={setPhaseDialog}>
@@ -199,6 +190,45 @@ function RoadmapPanel({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function PhaseSection({
+  phase,
+  domainId,
+  onRefresh,
+}: {
+  phase: SkillDomainDetail["phases"][number];
+  domainId: number;
+  onRefresh: () => Promise<void>;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const topicCount = phase.topics?.length ?? 0;
+  const checkedCount =
+    phase.topics?.reduce(
+      (sum, topic) => sum + (topic.checklist_items?.filter((item) => item.checked).length ?? 0),
+      0,
+    ) ?? 0;
+  const totalCount = phase.topics?.reduce((sum, topic) => sum + (topic.checklist_items?.length ?? 0), 0) ?? 0;
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen} className="rounded-lg border">
+      <CollapsibleTrigger className="flex w-full items-center gap-2 px-4 py-3 text-left font-medium transition-colors hover:bg-muted/50">
+        <ChevronRight
+          className={cn("size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
+        />
+        <span className="min-w-0 flex-1 truncate">{phase.name}</span>
+        <span className="shrink-0 text-muted-foreground text-xs">
+          {topicCount} topik · {checkedCount}/{totalCount}
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-3 border-t px-4 py-3">
+        {(phase.topics ?? []).map((topic) => (
+          <TopicCard key={topic.id} topic={topic} onRefresh={onRefresh} />
+        ))}
+        <AddTopicButton domainId={domainId} phaseId={phase.id} onRefresh={onRefresh} />
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -246,6 +276,7 @@ function AddTopicButton({
 
 function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => Promise<void> }) {
   const token = useAuthStore((s) => s.token);
+  const [open, setOpen] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [newTitle, setNewTitle] = React.useState("");
   const [newDescription, setNewDescription] = React.useState("");
@@ -267,17 +298,18 @@ function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => P
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base">{topic.name}</CardTitle>
-          <span className="text-muted-foreground text-xs">
-            {checkedCount}/{totalCount}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <ul className="space-y-3">
+    <Collapsible open={open} onOpenChange={setOpen} className="rounded-lg border bg-card">
+      <CollapsibleTrigger className="flex w-full items-center gap-2 px-4 py-3 text-left transition-colors hover:bg-muted/40">
+        <ChevronRight
+          className={cn("size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
+        />
+        <span className="min-w-0 flex-1 truncate font-medium text-sm">{topic.name}</span>
+        <span className="shrink-0 text-muted-foreground text-xs">
+          {checkedCount}/{totalCount}
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-3 border-t px-4 py-3">
+        <ul className="space-y-2">
           {(topic.checklist_items ?? []).map((item) => (
             <ChecklistItemRow key={item.id} item={item} onRefresh={onRefresh} />
           ))}
@@ -317,8 +349,8 @@ function TopicCard({ topic, onRefresh }: { topic: SkillTopic; onRefresh: () => P
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </CardContent>
-    </Card>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -357,9 +389,7 @@ function ChecklistItemRow({ item, onRefresh }: { item: SkillChecklistItem; onRef
         <p className={`font-medium text-sm ${item.checked ? "text-muted-foreground line-through" : ""}`}>
           {item.title}
         </p>
-        {item.description && (
-          <p className="mt-1 whitespace-pre-wrap text-muted-foreground text-xs leading-relaxed">{item.description}</p>
-        )}
+        {item.description && <ChecklistItemDescription description={item.description} />}
       </div>
       <Button size="icon" variant="ghost" className="size-7 shrink-0" onClick={() => setEditOpen(true)}>
         <Pencil className="size-3.5" />
@@ -391,6 +421,18 @@ function ChecklistItemRow({ item, onRefresh }: { item: SkillChecklistItem; onRef
         </DialogContent>
       </Dialog>
     </li>
+  );
+}
+
+function ChecklistItemDescription({ description }: { description: string }) {
+  return (
+    <details className="group mt-1">
+      <summary className="flex cursor-pointer list-none items-center gap-1 text-muted-foreground text-xs transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+        <ChevronRight className="size-3 shrink-0 transition-transform group-open:rotate-90" />
+        Lihat materi
+      </summary>
+      <p className="mt-1 whitespace-pre-wrap pl-4 text-muted-foreground text-xs leading-relaxed">{description}</p>
+    </details>
   );
 }
 
@@ -433,6 +475,14 @@ function MaterialsPanel({
     }
   }
 
+  const [listOpen, setListOpen] = React.useState(materials.length <= 5);
+  React.useEffect(() => {
+    setListOpen(materials.length <= 5);
+  }, [materials.length]);
+
+  const fileMaterials = materials.filter((m) => m.material_type === "file");
+  const linkMaterials = materials.filter((m) => m.material_type === "link" || m.material_type === "note");
+
   return (
     <div className="space-y-4">
       <Card>
@@ -447,11 +497,23 @@ function MaterialsPanel({
           {materials.length === 0 ? (
             <p className="text-muted-foreground text-sm">Belum ada materi. Upload PDF atau tambah link di bawah.</p>
           ) : (
-            <div className="space-y-2">
-              {materials.map((m) => (
-                <MaterialRow key={m.id} material={m} onRefresh={onRefresh} />
-              ))}
-            </div>
+            <Collapsible open={listOpen} onOpenChange={setListOpen} className="rounded-lg border">
+              <CollapsibleTrigger className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-muted/50">
+                <ChevronRight
+                  className={cn("size-4 shrink-0 text-muted-foreground transition-transform", listOpen && "rotate-90")}
+                />
+                <span className="font-medium">Daftar materi</span>
+                <span className="ml-auto text-muted-foreground text-xs">{materials.length} item</span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 border-t px-4 py-3">
+                {fileMaterials.length > 0 && (
+                  <MaterialGroup title="File" materials={fileMaterials} onRefresh={onRefresh} />
+                )}
+                {linkMaterials.length > 0 && (
+                  <MaterialGroup title="Link & catatan" materials={linkMaterials} onRefresh={onRefresh} />
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           )}
 
           <div className="flex flex-wrap gap-2 border-t pt-4">
@@ -492,51 +554,92 @@ function MaterialsPanel({
   );
 }
 
-function MaterialRow({ material, onRefresh }: { material: SkillMaterial; onRefresh: () => Promise<void> }) {
-  const token = useAuthStore((s) => s.token);
+function MaterialGroup({
+  title,
+  materials,
+  onRefresh,
+}: {
+  title: string;
+  materials: SkillMaterial[];
+  onRefresh: () => Promise<void>;
+}) {
+  const [open, setOpen] = React.useState(materials.length <= 3);
 
   return (
-    <div className="flex items-center justify-between gap-2 text-sm">
-      <div className="min-w-0 truncate">
-        <span className="font-medium">{material.title}</span>
-        {material.material_type === "file" && material.size_bytes != null && (
-          <span className="ml-2 text-muted-foreground text-xs">{formatBytes(material.size_bytes)}</span>
-        )}
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger className="flex w-full items-center gap-2 py-1 text-left text-sm">
+        <ChevronRight
+          className={cn("size-3.5 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
+        />
+        <span className="font-medium">{title}</span>
+        <span className="text-muted-foreground text-xs">({materials.length})</span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-1 space-y-1 pl-5">
+        {materials.map((material) => (
+          <MaterialRow key={material.id} material={material} onRefresh={onRefresh} />
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+function MaterialRow({ material, onRefresh }: { material: SkillMaterial; onRefresh: () => Promise<void> }) {
+  const token = useAuthStore((s) => s.token);
+  const note = material.note_content?.trim();
+
+  return (
+    <div className="rounded-md border px-3 py-2 text-sm">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 truncate">
+          <span className="font-medium">{material.title}</span>
+          {material.material_type === "file" && material.size_bytes != null && (
+            <span className="ml-2 text-muted-foreground text-xs">{formatBytes(material.size_bytes)}</span>
+          )}
+        </div>
+        <div className="flex shrink-0 gap-1">
+          {material.material_type === "file" && token && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-7"
+              onClick={() =>
+                void skillsApi.downloadMaterial(token, material.id, material.original_name ?? material.title)
+              }
+            >
+              <Download className="size-3.5" />
+            </Button>
+          )}
+          {material.material_type === "link" && material.url && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-7"
+              render={<a href={material.url} target="_blank" rel="noreferrer" />}
+            >
+              <ExternalLink className="size-3.5" />
+            </Button>
+          )}
+          {token && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-7 text-destructive"
+              onClick={() => void skillsApi.deleteMaterial(token, material.id).then(onRefresh)}
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          )}
+        </div>
       </div>
-      <div className="flex shrink-0 gap-1">
-        {material.material_type === "file" && token && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="size-7"
-            onClick={() =>
-              void skillsApi.downloadMaterial(token, material.id, material.original_name ?? material.title)
-            }
-          >
-            <Download className="size-3.5" />
-          </Button>
-        )}
-        {material.material_type === "link" && material.url && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="size-7"
-            render={<a href={material.url} target="_blank" rel="noreferrer" />}
-          >
-            <ExternalLink className="size-3.5" />
-          </Button>
-        )}
-        {token && (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="size-7 text-destructive"
-            onClick={() => void skillsApi.deleteMaterial(token, material.id).then(onRefresh)}
-          >
-            <Trash2 className="size-3.5" />
-          </Button>
-        )}
-      </div>
+      {note && (
+        <details className="group mt-2">
+          <summary className="flex cursor-pointer list-none items-center gap-1 text-muted-foreground text-xs hover:text-foreground [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="size-3 transition-transform group-open:rotate-90" />
+            Lihat catatan
+          </summary>
+          <p className="mt-1 whitespace-pre-wrap pl-4 text-muted-foreground text-xs leading-relaxed">{note}</p>
+        </details>
+      )}
     </div>
   );
 }

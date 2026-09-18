@@ -97,7 +97,7 @@ export function EnglishPracticePanel({ data, token, onRefresh }: Props) {
                     {log.practice_date.slice(0, 10)} · {log.duration_min} menit
                     {log.materials ? ` · ${log.materials}` : ""}
                   </ItemDescription>
-                  {log.notes && <p className="mt-1 text-xs text-muted-foreground">{log.notes}</p>}
+                  {log.notes && <p className="mt-1 text-muted-foreground text-xs">{log.notes}</p>}
                 </ItemContent>
                 <ItemActions>
                   <Button variant="ghost" size="icon-sm" onClick={() => setDeleteId(log.id)}>

@@ -115,9 +115,9 @@ export function EnglishVocabPanel({ data, token, onRefresh }: Props) {
                     </ItemTitle>
                     <ItemDescription>{v.meaning}</ItemDescription>
                     {v.example_sentence && (
-                      <p className="mt-1 text-xs italic text-muted-foreground">&ldquo;{v.example_sentence}&rdquo;</p>
+                      <p className="mt-1 text-muted-foreground text-xs italic">&ldquo;{v.example_sentence}&rdquo;</p>
                     )}
-                    {v.topic && <p className="mt-1 text-xs text-muted-foreground">Topik: {v.topic}</p>}
+                    {v.topic && <p className="mt-1 text-muted-foreground text-xs">Topik: {v.topic}</p>}
                   </ItemContent>
                   <ItemActions>
                     <Button
@@ -138,7 +138,7 @@ export function EnglishVocabPanel({ data, token, onRefresh }: Props) {
                 </Item>
               ))}
               {filtered.length === 0 && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Kosong. Tambah dari reading/listening atau import manual.
                 </p>
               )}

@@ -35,13 +35,18 @@ export function SettingsHub() {
     if (!preferences) return;
     setSelected(preferences.enabled_menu_items);
     setShowTemplates(preferences.show_template_pages);
-    const current = preferences.enabled_menu_items.find((id) => pathForMenuId(id) === preferences.landing_path);
-    setLandingId(current ?? preferences.enabled_menu_items[0] ?? "");
+    if (preferences.landing_path === "/dashboard" || preferences.landing_path === "/dashboard/") {
+      setLandingId("home");
+    } else {
+      const current = preferences.enabled_menu_items.find((id) => pathForMenuId(id) === preferences.landing_path);
+      setLandingId(current ?? "home");
+    }
   }, [preferences]);
 
   React.useEffect(() => {
+    if (landingId === "home") return;
     if (!selected.includes(landingId)) {
-      setLandingId(selected[0] ?? "");
+      setLandingId(selected[0] ?? "home");
     }
   }, [selected, landingId]);
 
@@ -54,7 +59,8 @@ export function SettingsHub() {
     setError(null);
     setSaved(false);
     try {
-      const landingPath = pathForMenuId(landingId) ?? pathForMenuId(selected[0]);
+      const landingPath =
+        landingId === "home" ? "/dashboard" : (pathForMenuId(landingId) ?? pathForMenuId(selected[0]) ?? "/dashboard");
       await updatePreferences({
         enabled_menu_items: selected,
         show_template_pages: showTemplates,
@@ -125,6 +131,7 @@ export function SettingsHub() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
+                  <SelectItem value="home">Beranda (Command Center)</SelectItem>
                   {selected.map((id) => {
                     const item = mineMenuCatalog.find((entry) => entry.id === id);
                     if (!item) return null;

@@ -16,9 +16,15 @@ export const mineMenuCatalog: MineMenuCatalogItem[] = [
   },
   {
     id: "interviews",
-    title: "Wawancara & Job Tracker",
-    description: "Lamaran kerja, tahap interview, pertanyaan, dan prep pack.",
+    title: "Wawancara",
+    description: "Prep pack, bank soal, dan persiapan interview per perusahaan.",
     url: "/dashboard/interviews",
+  },
+  {
+    id: "job-tracker",
+    title: "Job Tracker",
+    description: "Pipeline lamaran, CRM perusahaan/kontak, thread, dan auto-feed lowongan.",
+    url: "/dashboard/job-tracker",
   },
   {
     id: "kanban",
@@ -95,6 +101,5 @@ export function resolveLandingPath(preferences: {
   if (preferences.landing_path) {
     return preferences.landing_path as AppPath;
   }
-  const first = preferences.enabled_menu_items[0];
-  return (first ? pathForMenuId(first) : null) ?? "/dashboard/settings";
+  return "/dashboard";
 }
