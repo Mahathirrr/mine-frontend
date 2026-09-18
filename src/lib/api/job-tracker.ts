@@ -101,10 +101,30 @@ export type JobOffer = {
 };
 
 export type JobApplicationWithRounds = JobApplication & {
-  rounds: JobInterviewRound[];
-  events?: JobApplicationEvent[];
+  rounds: JobInterviewRound[] | null;
+  events?: JobApplicationEvent[] | null;
   offer?: JobOffer | null;
 };
+
+export function jobApplicationRounds(app: Pick<JobApplicationWithRounds, "rounds">): JobInterviewRound[] {
+  return app.rounds ?? [];
+}
+
+function normalizeApplication(app: JobApplicationWithRounds): JobApplicationWithRounds {
+  return {
+    ...app,
+    rounds: app.rounds ?? [],
+    events: app.events ?? [],
+    tags: app.tags ?? [],
+  };
+}
+
+function normalizeOverview(overview: JobTrackerOverview): JobTrackerOverview {
+  return {
+    ...overview,
+    applications: (overview.applications ?? []).map(normalizeApplication),
+  };
+}
 
 export type JobCompany = {
   id: number;
@@ -302,19 +322,19 @@ async function request<T>(path: string, token: string, options: { method?: strin
 
 export const jobTrackerApi = {
   overview(token: string) {
-    return request<JobTrackerOverview>("/job-tracker/overview", token);
+    return request<JobTrackerOverview>("/job-tracker/overview", token).then(normalizeOverview);
   },
   createApplication(token: string, body: Partial<JobApplication> & { company_name: string; role_title: string }) {
     return request<{ application: JobApplicationWithRounds }>("/job-tracker/applications", token, {
       method: "POST",
       body,
-    }).then((r) => r.application);
+    }).then((r) => normalizeApplication(r.application));
   },
   updateApplication(token: string, id: number, body: Partial<JobApplication>) {
     return request<{ application: JobApplicationWithRounds }>(`/job-tracker/applications/${id}`, token, {
       method: "PATCH",
       body,
-    }).then((r) => r.application);
+    }).then((r) => normalizeApplication(r.application));
   },
   deleteApplication(token: string, id: number) {
     return request<{ ok: boolean }>(`/job-tracker/applications/${id}`, token, { method: "DELETE" });

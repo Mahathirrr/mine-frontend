@@ -4,7 +4,7 @@ import { cn } from "cn";
 import { Calendar, MapPin, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import type { JobApplicationWithRounds, JobStatus } from "@/lib/api/job-tracker";
+import { type JobApplicationWithRounds, jobApplicationRounds } from "@/lib/api/job-tracker";
 
 function companyInitials(name: string) {
   return name
@@ -21,7 +21,7 @@ type Props = {
 };
 
 export function JobApplicationCard({ app, onClick, isOverlay }: Props) {
-  const nextRound = app.rounds.find((r) => r.status === "scheduled" && r.scheduled_at);
+  const nextRound = jobApplicationRounds(app).find((r) => r.status === "scheduled" && r.scheduled_at);
 
   return (
     <button

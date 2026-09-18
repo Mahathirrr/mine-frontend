@@ -13,7 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { type JobApplicationWithRounds, type JobStatus, jobTrackerApi } from "@/lib/api/job-tracker";
+import {
+  type JobApplicationWithRounds,
+  type JobStatus,
+  jobApplicationRounds,
+  jobTrackerApi,
+} from "@/lib/api/job-tracker";
 
 import { JOB_STATUS_LABEL, JOB_STATUS_ORDER, PLATFORM_LABEL } from "./job-tracker-constants";
 
@@ -182,7 +187,7 @@ export function JobApplicationDetail({ app, open, onOpenChange, token, onUpdated
           </TabsContent>
 
           <TabsContent value="rounds" className="space-y-4 pt-4">
-            {app.rounds.map((r) => (
+            {jobApplicationRounds(app).map((r) => (
               <div key={r.id} className="rounded-lg border p-3">
                 <p className="font-medium text-sm">{r.title}</p>
                 {r.scheduled_at ? (
