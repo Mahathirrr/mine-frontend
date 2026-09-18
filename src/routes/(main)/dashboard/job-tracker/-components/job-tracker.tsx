@@ -62,6 +62,7 @@ import {
   PLATFORM_DEFAULT_URL,
   PLATFORM_LABEL,
 } from "./job-tracker-constants";
+import { ThreadsImportDialog } from "./threads-import-dialog";
 
 function StatCard({
   label,
@@ -139,6 +140,7 @@ export function JobTracker() {
   const [runningAllFeeds, setRunningAllFeeds] = React.useState(false);
 
   const [threadOpen, setThreadOpen] = React.useState(false);
+  const [threadsImportOpen, setThreadsImportOpen] = React.useState(false);
   const [threadForm, setThreadForm] = React.useState({ subject: "", channel: "email", body: "" });
   const [activeThread, setActiveThread] = React.useState<number | null>(null);
   const [replyBody, setReplyBody] = React.useState("");
@@ -683,9 +685,12 @@ export function JobTracker() {
         </TabsContent>
 
         <TabsContent value="threads" className="mt-4">
-          <div className="mb-3 flex justify-end">
+          <div className="mb-3 flex flex-wrap justify-end gap-2">
+            <Button size="sm" variant="outline" onClick={() => setThreadsImportOpen(true)}>
+              <Sparkles className="mr-1 size-4" /> Import Threads
+            </Button>
             <Button size="sm" onClick={() => setThreadOpen(true)}>
-              <MessageSquare className="mr-1 size-4" /> Thread baru
+              <MessageSquare className="mr-1 size-4" /> Thread manual
             </Button>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
@@ -702,7 +707,7 @@ export function JobTracker() {
                 >
                   <p className="font-medium text-sm">{t.subject}</p>
                   <p className="text-muted-foreground text-xs">
-                    {t.channel} · {(t.messages ?? []).length} pesan
+                    {t.channel === "threads" ? "Meta Threads" : t.channel} · {(t.messages ?? []).length} pesan
                   </p>
                 </button>
               ))}
@@ -1128,6 +1133,15 @@ export function JobTracker() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {token ? (
+        <ThreadsImportDialog
+          open={threadsImportOpen}
+          onOpenChange={setThreadsImportOpen}
+          token={token}
+          onImported={() => void load()}
+        />
+      ) : null}
     </div>
   );
 }

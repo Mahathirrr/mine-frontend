@@ -61,6 +61,7 @@ export const PLATFORM_LABEL: Record<string, string> = {
   lever: "Lever",
   workable: "Workable",
   ashby: "Ashby",
+  threads: "Threads",
   other: "Other",
 };
 

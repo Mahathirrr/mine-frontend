@@ -180,6 +180,31 @@ export type JobThreadMessage = {
   created_at: string;
 };
 
+export type ThreadsKeywordHit = {
+  id: string;
+  label: string;
+  explanation: string;
+  signal: string;
+  snippet?: string;
+};
+
+export type ThreadsIntelParse = {
+  post_url: string;
+  post_id: string;
+  author_handle: string;
+  subject: string;
+  company_name: string;
+  role_title: string;
+  job_url: string;
+  plain_text: string;
+  hashtags: string[];
+  mentions: string[];
+  links: string[];
+  keywords: ThreadsKeywordHit[];
+  summary_note: string;
+  external_key: string;
+};
+
 export type JobThread = {
   id: number;
   user_id: number;
@@ -408,6 +433,30 @@ export const jobTrackerApi = {
     return request<{ thread: JobThread }>("/job-tracker/threads", token, { method: "POST", body }).then(
       (r) => r.thread,
     );
+  },
+  parseThreadsIntel(token: string, body: { raw_text: string; post_url?: string }) {
+    return request<{ parsed: ThreadsIntelParse }>("/job-tracker/threads/parse", token, {
+      method: "POST",
+      body,
+    }).then((r) => r.parsed);
+  },
+  importThreadsIntel(
+    token: string,
+    body: {
+      raw_text: string;
+      post_url?: string;
+      application_id?: number;
+      company_id?: number;
+      create_ingestion_item?: boolean;
+    },
+  ) {
+    return request<{
+      parsed: ThreadsIntelParse;
+      thread: JobThread;
+      duplicate: boolean;
+      ingestion_item?: JobIngestionItem;
+      matched_company_id?: number | null;
+    }>("/job-tracker/threads/import", token, { method: "POST", body });
   },
   createThreadMessage(
     token: string,
