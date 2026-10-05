@@ -87,7 +87,7 @@ export function formatLocalDatetimeDisplay(local: string) {
 }
 
 export const zoneIcons: Record<string, string> = {
-  tools: "🔧",
+  tools: "🛠️",
   zap: "⚡",
   flame: "🔥",
   avocado: "🥑",

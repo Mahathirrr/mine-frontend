@@ -21,11 +21,11 @@ type Props = {
   allZones?: FastingZone[];
 };
 
-/** Space for milestone buttons (max 40px) + glow outside the ring track */
-const MARKER_PAD = 52;
+/** Space for milestone badges + ambient aura outside the ring track */
+const MARKER_PAD = 46;
 
 function useRingSize(requested?: number) {
-  const [size, setSize] = React.useState(requested ?? 272);
+  const [size, setSize] = React.useState(requested ?? 276);
 
   React.useEffect(() => {
     if (requested != null) {
@@ -36,7 +36,7 @@ function useRingSize(requested?: number) {
       const w = window.innerWidth;
       if (w < 400) setSize(248);
       else if (w < 640) setSize(264);
-      else setSize(272);
+      else setSize(276);
     };
     update();
     window.addEventListener("resize", update);
@@ -57,6 +57,14 @@ function ZoneStatus({
   hour: number;
   elapsedHours: number;
 }) {
+  if (active) {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-medium text-rose-500 dark:text-rose-400">
+        <span className="size-1.5 animate-ping rounded-full bg-rose-500" />
+        Zona aktif sekarang
+      </span>
+    );
+  }
   if (!reached) {
     return (
       <span className="text-muted-foreground">
@@ -64,14 +72,16 @@ function ZoneStatus({
       </span>
     );
   }
-  if (active) {
-    return <span className="text-orange-600 dark:text-orange-400">Zona aktif sekarang</span>;
-  }
-  return <span className="text-emerald-600 dark:text-emerald-400">Sudah dilewati</span>;
+  return (
+    <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+      ✓ Sudah dilewati
+    </span>
+  );
 }
 
 function markerPosition(size: number, ringInset: number, fraction: number) {
   const r = size / 2 - ringInset;
+  // Angle starts at top (-PI/2) and proceeds clockwise
   const angle = fraction * 2 * Math.PI - Math.PI / 2;
   return {
     left: size / 2 + r * Math.cos(angle),
@@ -92,23 +102,45 @@ export function FastingTimerRing({
 }: Props) {
   const size = useRingSize(sizeProp);
   const clamped = Math.min(1, Math.max(0, progress));
-  const stroke = 14;
+  const stroke = 18;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - clamped);
   const cx = size / 2;
   const cy = size / 2;
-  const head = markerPosition(size, stroke / 2 + 2, clamped);
+  const head = markerPosition(size, stroke / 2, clamped);
 
-  const milestones = allZones
-    .filter((z) => z.end_hour < 72 && z.start_hour >= 0 && z.start_hour < goalHours)
-    .map((z) => ({ zone: z, hour: z.start_hour, icon: zoneIcons[z.icon] ?? "•" }));
+  // Collect unique milestone targets along the fast up to goalHours
+  const milestones = React.useMemo(() => {
+    if (!allZones || allZones.length === 0 || goalHours <= 0) return [];
+
+    const list: Array<{ zone: FastingZone; hour: number; icon: string; frac: number }> = [];
+    const seenAngles = new Set<string>();
+
+    for (const z of allZones) {
+      if (z.start_hour > 0 && z.start_hour <= goalHours && z.start_hour < 72) {
+        const frac = Math.min(1, z.start_hour / goalHours);
+        const angleKey = frac.toFixed(3);
+        if (!seenAngles.has(angleKey)) {
+          seenAngles.add(angleKey);
+          list.push({
+            zone: z,
+            hour: z.start_hour,
+            icon: zoneIcons[z.icon] ?? "⏱️",
+            frac,
+          });
+        }
+      }
+    }
+
+    return list.sort((a, b) => a.hour - b.hour);
+  }, [allZones, goalHours]);
 
   const frame = size + MARKER_PAD * 2;
 
   return (
     <div
-      className="relative mx-auto shrink-0 overflow-visible"
+      className="relative mx-auto shrink-0 select-none overflow-visible"
       style={{ width: frame, height: frame, minWidth: frame, minHeight: frame }}
     >
       <svg
@@ -120,28 +152,21 @@ export function FastingTimerRing({
       >
         <title>Fasting progress</title>
         <defs>
-          <linearGradient id="fast-ring-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ef4444" />
-            <stop offset="100%" stopColor="#fb923c" />
+          {/* Razor-sharp progress gradient */}
+          <linearGradient id="fast-ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fb923c" />
+            <stop offset="35%" stopColor="#f97316" />
+            <stop offset="75%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#f43f5e" />
           </linearGradient>
-          <filter id="fast-ring-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+
+          {/* Soft ambient aura filter (applied only to blurred underglow path) */}
+          <filter id="fast-ambient-blur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="5" result="blur" />
           </filter>
         </defs>
 
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r + 3}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={stroke + 8}
-          className="text-black/[0.05] dark:text-white/[0.06]"
-        />
+        {/* Base Track (Subtle dark matte ring) */}
         <circle
           cx={cx}
           cy={cy}
@@ -149,9 +174,28 @@ export function FastingTimerRing({
           fill="none"
           stroke="currentColor"
           strokeWidth={stroke}
-          className="text-black/[0.07] dark:text-white/[0.1]"
+          className="text-neutral-200/90 dark:text-[#2c272a]"
         />
 
+        {/* Ambient Underglow (Keeps main stroke razor-sharp while providing a warm aura) */}
+        {clamped > 0.01 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke="url(#fast-ring-grad)"
+            strokeWidth={stroke + 6}
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={offset}
+            filter="url(#fast-ambient-blur)"
+            opacity={0.35}
+            className="transition-[stroke-dashoffset] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          />
+        )}
+
+        {/* Main Razor-Sharp Progress Stroke */}
         {clamped > 0.005 && (
           <circle
             cx={cx}
@@ -163,15 +207,14 @@ export function FastingTimerRing({
             strokeLinecap="round"
             strokeDasharray={c}
             strokeDashoffset={offset}
-            filter="url(#fast-ring-glow)"
             className="transition-[stroke-dashoffset] duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)]"
           />
         )}
       </svg>
 
+      {/* Tactile Milestone Badges Along the Ring */}
       {milestones.map((m) => {
-        const frac = Math.min(1, m.hour / goalHours);
-        const pos = markerPosition(size, stroke / 2 + 2, frac);
+        const pos = markerPosition(size, stroke / 2, m.frac);
         const left = pos.left + MARKER_PAD;
         const top = pos.top + MARKER_PAD;
         const reached = elapsedHours >= m.hour;
@@ -182,56 +225,96 @@ export function FastingTimerRing({
           <Popover key={m.zone.slug}>
             <PopoverTrigger
               className={cn(
-                "absolute z-10 flex -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 transition-all duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50",
-                active ? "size-10 bg-red-500 text-lg text-white shadow-[0_0_18px_rgba(239,68,68,0.55)]" : "size-8",
-                !active && reached && "bg-orange-500/15 text-base ring-1 ring-orange-500/40",
-                !active && !reached && "bg-muted/90 text-muted-foreground/70 ring-1 ring-border/60",
+                "group absolute z-20 flex size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500",
+                active && "scale-105",
+                !active && "hover:scale-110",
               )}
               style={{ left, top }}
+              aria-label={`${m.zone.label} milestone`}
             >
-              {m.icon}
+              {/* Active Ambient Halo Glow (matching reference image) */}
+              {active && (
+                <span className="pointer-events-none absolute -inset-2.5 animate-pulse rounded-full bg-rose-500/35 blur-md" />
+              )}
+
+              {/* Milestone Disc / Puck */}
+              <span
+                className={cn(
+                  "relative flex size-full select-none items-center justify-center rounded-full text-lg transition-all duration-300 sm:text-xl",
+                  // 1. Active state (rich glowing crimson/red gradient)
+                  active &&
+                    "bg-gradient-to-b from-rose-500 to-red-600 text-white shadow-[0_4px_20px_rgba(244,63,94,0.65)] ring-4 ring-card dark:ring-[#161214]",
+                  // 2. Reached state (passed milestones)
+                  !active &&
+                    reached &&
+                    "bg-zinc-800 text-white shadow-md ring-2 ring-orange-500/70 dark:bg-[#2c272a] dark:shadow-[0_2px_12px_rgba(249,115,22,0.25)] dark:ring-orange-400/70",
+                  // 3. Upcoming state (matte disc with subtle ring border)
+                  !active &&
+                    !reached &&
+                    "bg-zinc-100 text-zinc-600 shadow-sm ring-2 ring-zinc-300 dark:bg-[#2c272a] dark:text-zinc-400 dark:shadow-md dark:ring-white/[0.08]",
+                )}
+              >
+                {m.icon}
+              </span>
             </PopoverTrigger>
-            <PopoverContent side="top" className="w-64 rounded-2xl p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{m.icon}</span>
+
+            <PopoverContent
+              side="top"
+              className="w-68 rounded-2xl border border-border/60 bg-popover/95 p-4 shadow-xl backdrop-blur-md"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted/80 text-xl">
+                  {m.icon}
+                </div>
                 <div>
-                  <p className="font-semibold">{m.zone.label}</p>
+                  <p className="font-semibold text-foreground text-sm">{m.zone.label}</p>
                   <p className="text-muted-foreground text-xs">
                     {m.zone.start_hour}h – {endLabel}
                   </p>
                 </div>
               </div>
-              <p className="mt-2 text-muted-foreground text-sm leading-relaxed">{m.zone.description}</p>
-              <p className="mt-2 text-xs">
+              <p className="mt-2.5 text-muted-foreground text-xs leading-relaxed">{m.zone.description}</p>
+              <div className="mt-3 flex items-center justify-between border-border/50 border-t pt-2.5 text-xs">
                 <ZoneStatus reached={reached} active={active} hour={m.hour} elapsedHours={elapsedHours} />
-              </p>
+              </div>
             </PopoverContent>
           </Popover>
         );
       })}
 
-      {clamped > 0.01 && (
+      {/* Leading Tip Indicator Bead */}
+      {clamped > 0.01 && clamped < 0.995 && (
         <div
-          className="pointer-events-none absolute z-10 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.7)] transition-all duration-1000"
+          className="pointer-events-none absolute z-20 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-gradient-to-br from-rose-500 to-red-600 shadow-[0_0_12px_rgba(244,63,94,0.9)] transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] dark:border-neutral-900"
           style={{ left: head.left + MARKER_PAD, top: head.top + MARKER_PAD }}
         />
       )}
 
+      {/* Center Dashboard Info (Zone, Elapsed %, Big Digital Timer) */}
       <div
-        className="pointer-events-none absolute z-0 flex flex-col items-center justify-center px-6 text-center"
+        className="pointer-events-none absolute z-10 flex select-none flex-col items-center justify-center px-4 text-center"
         style={{ left: MARKER_PAD, top: MARKER_PAD, width: size, height: size }}
       >
+        {/* Active Zone Label + Icon */}
         {zoneLabel && (
-          <div className="mb-1.5 flex items-center gap-1.5 font-medium text-red-500 text-sm dark:text-red-400">
-            {zoneIcon && <span className="text-base leading-none">{zoneIcon}</span>}
+          <div className="mb-2 flex items-center gap-1.5 font-bold text-orange-500 text-sm tracking-wide sm:text-base dark:text-orange-400">
+            {zoneIcon && <span className="text-base leading-none sm:text-lg">{zoneIcon}</span>}
             <span>{zoneLabel}</span>
           </div>
         )}
-        {sublabel && <p className="mb-1 text-[10px] text-muted-foreground uppercase tracking-[0.12em]">{sublabel}</p>}
-        <p className="font-extralight text-[2.35rem] tabular-nums leading-none tracking-tight sm:text-[2.75rem]">
-          {label}
-        </p>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">Ketuk icon di ring untuk info zona</p>
+
+        {/* Elapsed Time Subtitle */}
+        {sublabel && (
+          <p className="mb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.18em]">
+            {sublabel}
+          </p>
+        )}
+
+        {/* Main High-Contrast Digital Timer */}
+        <p className="font-extrabold text-4xl text-foreground tabular-nums tracking-tight sm:text-5xl">{label}</p>
+
+        {/* Micro-hint */}
+        <p className="mt-2 text-[10px] text-muted-foreground/70">Ketuk icon di ring untuk info zona</p>
       </div>
     </div>
   );

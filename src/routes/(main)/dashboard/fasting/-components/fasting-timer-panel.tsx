@@ -110,7 +110,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
   return (
     <>
       <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <Card className="overflow-visible rounded-3xl border-0 bg-gradient-to-br from-orange-50 via-background to-background shadow-none dark:from-orange-950/20 [&_[data-slot=card-content]]:overflow-visible">
+        <Card className="overflow-visible rounded-3xl border border-border/50 bg-card shadow-sm dark:border-white/[0.06] dark:bg-[#161214] [&_[data-slot=card-content]]:overflow-visible">
           <CardHeader className="pb-0 text-center sm:text-left">
             <CardTitle className="flex items-center justify-center gap-2 sm:justify-start">
               <Flame className="size-5 text-orange-500" />
@@ -120,25 +120,25 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
               {protocol?.label ?? data.profile.protocol_slug} · target {Math.round(goalHours)} jam puasa
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex w-full flex-col items-center gap-8 overflow-visible px-4 pt-4 pb-14 sm:px-8">
+          <CardContent className="flex w-full flex-col items-center gap-8 overflow-visible px-4 pt-4 pb-12 sm:px-8">
             <div className="flex w-full justify-center overflow-visible py-2">
               <FastingTimerRing
                 progress={progress}
                 elapsedHours={elapsed}
                 goalHours={goalHours}
                 label={formatDuration(elapsed)}
-                sublabel={`Elapsed time ${Math.round(progress * 100)}%`}
+                sublabel={`Elapsed Time ${Math.round(progress * 100)}%`}
                 zoneLabel={zone?.label}
-                zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱") : undefined}
+                zoneIcon={zone ? (zoneIcons[zone.icon] ?? "⏱️") : undefined}
                 allZones={data.zone?.all_zones}
               />
             </div>
 
-            <div className="grid w-full max-w-md grid-cols-2 gap-3">
+            <div className="grid w-full max-w-sm grid-cols-2 gap-4">
               <EditableTile
                 label="Started"
                 value={active ? formatDateTime(active.started_at) : "Belum mulai"}
-                actionLabel="Edit"
+                actionLabel="Edit start"
                 canEdit={Boolean(active)}
                 onEdit={() => {
                   if (!active) return;
@@ -149,7 +149,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
               <EditableTile
                 label="Goal"
                 value={
-                  goalEnd && isValid(goalEnd) ? format(goalEnd, "EEE d, h:mm a") : `${Math.round(goalHours)}h target`
+                  goalEnd && isValid(goalEnd) ? format(goalEnd, "EEE d, HH.mm") : `${Math.round(goalHours)}h target`
                 }
                 actionLabel="Change goal"
                 canEdit={Boolean(active)}
@@ -160,7 +160,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
             {data.timer.is_fasting ? (
               <Button
                 size="lg"
-                className="h-12 rounded-full bg-foreground px-10 text-background shadow-lg hover:bg-foreground/90"
+                className="h-12 cursor-pointer rounded-full bg-foreground px-10 font-semibold text-background shadow-lg transition-transform hover:scale-[1.02] hover:bg-foreground/90 active:scale-[0.98]"
                 onClick={() => setEndOpen(true)}
                 disabled={busy}
               >
@@ -170,7 +170,7 @@ export function FastingTimerPanel({ data, token, onRefresh }: Props) {
             ) : (
               <Button
                 size="lg"
-                className="h-12 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-10 shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-orange-700"
+                className="h-12 cursor-pointer rounded-full bg-gradient-to-r from-orange-500 to-rose-600 px-10 font-semibold text-white shadow-lg shadow-orange-500/25 transition-transform hover:scale-[1.02] hover:from-orange-600 hover:to-rose-700 active:scale-[0.98]"
                 onClick={startFast}
                 disabled={busy}
               >
@@ -276,20 +276,18 @@ function EditableTile({
   onEdit: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
-        {canEdit && (
-          <button
-            type="button"
-            className="shrink-0 text-foreground text-sm underline-offset-2 hover:underline"
-            onClick={onEdit}
-          >
-            {actionLabel}
-          </button>
-        )}
-      </div>
-      <p className="mt-2 font-medium text-base leading-snug">{value}</p>
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-border/40 bg-card/60 p-3.5 text-center backdrop-blur-xs transition-colors dark:border-white/[0.06] dark:bg-[#1f1b1d]/60">
+      <p className="font-semibold text-[11px] text-muted-foreground uppercase tracking-wider">{label}</p>
+      <p className="mt-1 font-bold text-base text-foreground sm:text-lg">{value}</p>
+      {canEdit && (
+        <button
+          type="button"
+          className="mt-1 cursor-pointer font-medium text-orange-500 text-xs transition-colors hover:text-orange-600 sm:text-sm dark:text-orange-400 dark:hover:text-orange-300"
+          onClick={onEdit}
+        >
+          {actionLabel}
+        </button>
+      )}
     </div>
   );
 }
