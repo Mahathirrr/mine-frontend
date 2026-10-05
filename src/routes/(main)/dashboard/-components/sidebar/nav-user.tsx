@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 
-import { CircleUser, CreditCard, EllipsisVertical, LogOut, MessageSquareDot } from "lucide-react";
+import { CircleUser, EllipsisVertical, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -45,7 +45,7 @@ export function NavUser({
               />
             }
           >
-            <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={user.avatar || undefined} alt={user.name} />
               <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
             </Avatar>
@@ -73,17 +73,9 @@ export function NavUser({
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => void navigate({ to: "/dashboard/settings" })}>
                 <CircleUser />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <MessageSquareDot />
-                Notifications
+                Profile & Settings
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
-import { calendarColors, calendarOptions } from "./calendar-config";
+import { calendarColors, calendarOptions, colorForCalendarSlug } from "./calendar-config";
 import type { CalendarEventSource } from "./calendar-utils";
 import {
   combineDatetimeLocal,
@@ -40,6 +40,7 @@ import {
   splitDatetimeLocal,
   toDatetimeLocalValue,
 } from "./calendar-utils";
+import { EventColorPicker } from "./event-color-picker";
 
 const linkSchema = z
   .string()
@@ -57,6 +58,7 @@ const formSchema = z
     end_at: z.string(),
     all_day: z.boolean(),
     calendar_slug: z.string(),
+    color: z.string().min(1),
   })
   .refine(
     (values) => {
@@ -76,6 +78,7 @@ export type EventFormValues = {
   end_at: string | null;
   all_day: boolean;
   calendar_slug: string;
+  color: string;
 };
 
 function normalizeHref(url: string): string {
@@ -109,6 +112,7 @@ type EventFormDialogProps = {
     end_at: string | null;
     all_day: boolean;
     calendar_slug: string;
+    color: string;
   } | null;
   onSubmit: (values: EventFormValues) => Promise<void>;
   onDelete?: () => Promise<void>;
@@ -141,6 +145,7 @@ export function EventFormDialog({
       end_at: "",
       all_day: false,
       calendar_slug: "work",
+      color: colorForCalendarSlug("work"),
     },
   });
 
@@ -149,6 +154,8 @@ export function EventFormDialog({
   const endAt = form.watch("end_at");
   const linkValue = form.watch("link");
   const calendarSlug = form.watch("calendar_slug");
+  const colorValue = form.watch("color");
+  const colorTouchedRef = React.useRef(false);
 
   React.useEffect(() => {
     if (allDay || isKanban) return;
@@ -164,7 +171,10 @@ export function EventFormDialog({
   }, [allDay, isKanban, form]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      colorTouchedRef.current = false;
+      return;
+    }
 
     if (mode === "edit" && initial) {
       const startAt = toDatetimeLocalValue(initial.start_at, initial.all_day);
@@ -181,7 +191,9 @@ export function EventFormDialog({
         end_at: endAt,
         all_day: initial.all_day,
         calendar_slug: initial.calendar_slug,
+        color: initial.color,
       });
+      colorTouchedRef.current = true;
       return;
     }
 
@@ -194,8 +206,15 @@ export function EventFormDialog({
       end_at: defaultEnd ?? defaultEndFromStart(start, defaultAllDay),
       all_day: defaultAllDay,
       calendar_slug: "work",
+      color: colorForCalendarSlug("work"),
     });
+    colorTouchedRef.current = false;
   }, [open, mode, initial, defaultStart, defaultEnd, defaultAllDay, form]);
+
+  React.useEffect(() => {
+    if (isKanban || colorTouchedRef.current) return;
+    form.setValue("color", colorForCalendarSlug(calendarSlug));
+  }, [calendarSlug, form, isKanban]);
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     const payload = isoFromFormValues(values.start_at, values.end_at, values.all_day);
@@ -207,6 +226,7 @@ export function EventFormDialog({
       end_at: payload.end_at,
       all_day: values.all_day,
       calendar_slug: values.calendar_slug,
+      color: values.color,
     });
     onOpenChange(false);
   }
@@ -458,13 +478,41 @@ export function EventFormDialog({
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-muted-foreground text-xs">
-                        Color: {calendarColors[calendarSlug] ?? calendarColors.work}
-                      </p>
                     </Field>
                   )}
                 />
               ) : null}
+
+              {!isKanban ? (
+                <Controller
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel>Event color</FieldLabel>
+                      <EventColorPicker
+                        value={field.value}
+                        onChange={(hex) => {
+                          colorTouchedRef.current = true;
+                          field.onChange(hex);
+                        }}
+                      />
+                      <p className="text-muted-foreground text-xs">
+                        Default follows calendar ({calendarColors[calendarSlug] ?? calendarColors.work}). Pick any color
+                        like Google Calendar.
+                      </p>
+                    </Field>
+                  )}
+                />
+              ) : (
+                <Field>
+                  <FieldLabel>Task color</FieldLabel>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="size-4 rounded-full" style={{ backgroundColor: colorValue }} />
+                    <span className="text-muted-foreground">Based on kanban column</span>
+                  </div>
+                </Field>
+              )}
             </FieldGroup>
 
             {isKanban && taskId ? (

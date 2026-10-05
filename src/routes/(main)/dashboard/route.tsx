@@ -6,18 +6,24 @@ import { cn } from "cn";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { users } from "@/data/users";
 import { requireAuth } from "@/lib/auth/guard";
+import { privatePageHead } from "@/lib/seo/build-head";
 import { getDashboardLayout } from "@/server/server-actions";
 
 import { AccountSwitcher } from "./-components/header/account-switcher";
-import { GitHubRepositoriesMenu } from "./-components/header/github-repositories-menu";
-import { LayoutControls } from "./-components/header/layout-controls";
 import { SearchDialog } from "./-components/header/search-dialog";
 import { ThemeSwitcher } from "./-components/header/theme-switcher";
+import { OnboardingGate } from "./-components/onboarding-gate";
 import { AppSidebar } from "./-components/sidebar/app-sidebar";
 
 export const Route = createFileRoute("/(main)/dashboard")({
+  ssr: false,
+  head: () =>
+    privatePageHead({
+      title: "Dashboard | Mine",
+      description: "Area pribadi Mine Personal Hub.",
+      path: "/dashboard",
+    }),
   beforeLoad: () => {
     requireAuth();
   },
@@ -65,16 +71,16 @@ function DashboardLayout() {
               <SearchDialog />
             </div>
             <div className="flex items-center gap-2">
-              <LayoutControls />
               <ThemeSwitcher />
-              <GitHubRepositoriesMenu />
-              <AccountSwitcher users={users} />
+              <AccountSwitcher />
             </div>
           </div>
         </header>
         {/* Pages can set data-content-padding="false" to render full-bleed app layouts. */}
         <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden p-4 has-data-[content-padding=false]:p-0 md:p-6 md:has-data-[content-padding=false]:p-0">
-          <Outlet />
+          <OnboardingGate>
+            <Outlet />
+          </OnboardingGate>
         </div>
       </SidebarInset>
     </SidebarProvider>

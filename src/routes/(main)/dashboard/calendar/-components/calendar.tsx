@@ -20,16 +20,12 @@ import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/api-error";
 import { tasksApi } from "@/lib/api/tasks";
 import { useAuthStore } from "@/stores/auth/auth-provider";
+import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { CalendarClearMenu } from "./calendar-clear-menu";
+import { calendarEventTimeFormat, calendarFilters, calendarViews, timeGridOptions } from "./calendar-config";
 import {
-  calendarColors,
-  calendarEventTimeFormat,
-  calendarFilters,
-  calendarViews,
-  timeGridOptions,
-} from "./calendar-config";
-import {
+  applyThemeToEvents,
   bulkDeleteRange,
   type CalendarUiEvent,
   countClearableEvents,
@@ -39,6 +35,7 @@ import {
   resolveClearScope,
   toDatetimeLocalValue,
 } from "./calendar-utils";
+import { resolveStoredEventColor } from "./event-color-utils";
 import { EventFormDialog, type EventFormValues } from "./event-form-dialog";
 import { type EventPreviewData, EventPreviewPopover } from "./event-preview-popover";
 
@@ -56,10 +53,13 @@ type EditingEventState = {
   end_at: string | null;
   all_day: boolean;
   calendar_slug: string;
+  color: string;
 };
 
 export function Calendar() {
   const token = useAuthStore((s) => s.token);
+  const resolvedThemeMode = usePreferencesStore((s) => s.resolvedThemeMode);
+  const isDark = resolvedThemeMode === "dark";
   const controller = useCalendarController();
   const [events, setEvents] = React.useState<CalendarUiEvent[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -93,7 +93,7 @@ export function Calendar() {
     setLoading(true);
     try {
       const res = await tasksApi.listCalendarEvents(token, range.start.toISOString(), range.end.toISOString());
-      setEvents(mapApiEvents(res.events, res.task_events, res.holiday_events));
+      setEvents(mapApiEvents(res.events, res.task_events, res.holiday_events, isDark));
     } catch (e) {
       toast.add({
         title: "Failed to load calendar",
@@ -103,11 +103,15 @@ export function Calendar() {
     } finally {
       setLoading(false);
     }
-  }, [token, range.end, range.start]);
+  }, [token, range.end, range.start, isDark]);
 
   React.useEffect(() => {
     void loadEvents();
   }, [loadEvents]);
+
+  React.useEffect(() => {
+    setEvents((prev) => (prev.length ? applyThemeToEvents(prev, isDark) : prev));
+  }, [isDark]);
 
   const filteredEvents = React.useMemo(() => {
     if (selectedCalendar === "all") return events;
@@ -146,7 +150,7 @@ export function Calendar() {
       end_at: info.event.end?.toISOString() ?? null,
       all_day: info.event.allDay ?? false,
       calendar_slug: props.calendar_slug ?? "work",
-      color: info.event.backgroundColor ?? calendarColors[props.calendar_slug ?? "work"] ?? "#3d8064",
+      color: props.accentColor ?? info.event.borderColor ?? resolveStoredEventColor("", props.calendar_slug ?? "work"),
       eventId: props.eventId,
       taskId: props.taskId,
       holidayType: props.holidayType,
@@ -172,6 +176,7 @@ export function Calendar() {
       end_at: previewEvent.end_at,
       all_day: previewEvent.all_day,
       calendar_slug: previewEvent.calendar_slug,
+      color: previewEvent.color,
     });
     setFormOpen(true);
   }
@@ -201,7 +206,7 @@ export function Calendar() {
     try {
       await tasksApi.createCalendarEvent(token, {
         ...values,
-        color: calendarColors[values.calendar_slug] ?? "#3d8064",
+        color: values.color,
       });
       await loadEvents();
       toast.add({ title: "Event created", type: "success" });
@@ -236,7 +241,7 @@ export function Calendar() {
           end_at: values.end_at,
           all_day: values.all_day,
           calendar_slug: values.calendar_slug,
-          color: calendarColors[values.calendar_slug] ?? "#3d8064",
+          color: values.color,
         });
       }
       await loadEvents();
@@ -529,6 +534,7 @@ export function Calendar() {
                 end_at: editingEvent.end_at,
                 all_day: editingEvent.all_day,
                 calendar_slug: editingEvent.calendar_slug,
+                color: editingEvent.color,
               }
             : null
         }

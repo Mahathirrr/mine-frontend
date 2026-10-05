@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
-    "build": "vite build && node scripts/generate-sw.mjs",
+    "build": "vite build && node scripts/generate-sw.mjs && node scripts/generate-seo.mjs",
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",

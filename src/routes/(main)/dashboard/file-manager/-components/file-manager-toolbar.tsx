@@ -16,11 +16,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
-export function FileManagerToolbar() {
+type Props = {
+  search?: string;
+  onSearchChange?: (value: string) => void;
+  filter?: "all" | "starred";
+  onFilterChange?: (value: "all" | "starred") => void;
+  sort?: "modified" | "name" | "size";
+  onSortChange?: (value: "modified" | "name" | "size") => void;
+};
+
+export function FileManagerToolbar({
+  search = "",
+  onSearchChange,
+  filter = "all",
+  onFilterChange,
+  sort = "modified",
+  onSortChange,
+}: Props) {
   return (
     <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       <InputGroup className="md:max-w-lg">
-        <InputGroupInput placeholder="Search files and folders..." aria-label="Search files and folders" />
+        <InputGroupInput
+          placeholder="Cari dokumen..."
+          aria-label="Cari dokumen"
+          value={search}
+          onChange={(e) => onSearchChange?.(e.target.value)}
+        />
         <InputGroupAddon>
           <Search />
         </InputGroupAddon>
@@ -33,44 +54,31 @@ export function FileManagerToolbar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Show</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value="all">
-                <DropdownMenuRadioItem value="all">All files</DropdownMenuRadioItem>
+              <DropdownMenuLabel>Tampilkan</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={filter}
+                onValueChange={(value) => onFilterChange?.(value as "all" | "starred")}
+              >
+                <DropdownMenuRadioItem value="all">Semua file</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="starred">Starred</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="shared">Shared</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <SlidersHorizontal />
-                  File type
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent sideOffset={8}>
-                  <DropdownMenuGroup>
-                    <DropdownMenuRadioGroup value="all">
-                      <DropdownMenuRadioItem value="all">All types</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="archive">Archive</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="design">Design</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="document">Document</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="pdf">PDF</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="spreadsheet">Spreadsheet</DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
                   <ArrowUpDown />
-                  Sort by
+                  Urutkan
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent sideOffset={8}>
                   <DropdownMenuGroup>
-                    <DropdownMenuRadioGroup value="modified">
-                      <DropdownMenuRadioItem value="modified">Last modified</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="name">Name</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="size">File size</DropdownMenuRadioItem>
+                    <DropdownMenuRadioGroup
+                      value={sort}
+                      onValueChange={(value) => onSortChange?.(value as "modified" | "name" | "size")}
+                    >
+                      <DropdownMenuRadioItem value="modified">Terakhir diubah</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="name">Nama</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="size">Ukuran file</DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuGroup>
                 </DropdownMenuSubContent>

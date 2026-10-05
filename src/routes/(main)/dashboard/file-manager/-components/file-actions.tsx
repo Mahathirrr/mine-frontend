@@ -12,7 +12,17 @@ import {
 
 import type { FileManagerFile } from "./data";
 
-export function FileActions({ file, onToggleStar }: { file: FileManagerFile; onToggleStar: () => void }) {
+export function FileActions({
+  file,
+  onToggleStar,
+  onDownload,
+  onDelete,
+}: {
+  file: FileManagerFile;
+  onToggleStar: () => void;
+  onDownload?: () => void;
+  onDelete?: () => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label={`Actions for ${file.name}`} />}>
@@ -24,22 +34,28 @@ export function FileActions({ file, onToggleStar }: { file: FileManagerFile; onT
             <Star />
             {file.starred ? "Remove from starred" : "Add to starred"}
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={onDownload}>
             <Download />
             Download
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Share2 />
-            Copy share link
-          </DropdownMenuItem>
+          {!onDelete && (
+            <DropdownMenuItem>
+              <Share2 />
+              Copy share link
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem variant="destructive">
-            <Trash2 />
-            Move to trash
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        {onDelete && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem variant="destructive" onSelect={onDelete}>
+                <Trash2 />
+                Hapus
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

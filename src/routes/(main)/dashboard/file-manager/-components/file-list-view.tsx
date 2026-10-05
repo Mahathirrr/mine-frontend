@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState } from "react";
 
 import { cn } from "cn";
@@ -11,10 +12,27 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { type FileManagerFile, fileIcons } from "./data";
 import { FileActions } from "./file-actions";
 
-export function FileListView({ files }: { files: FileManagerFile[] }) {
+type Props = {
+  files: FileManagerFile[];
+  onToggleStar?: (fileId: string) => void;
+  onDownload?: (fileId: string) => void;
+  onDelete?: (fileId: string) => void;
+};
+
+export function FileListView({ files, onToggleStar, onDownload, onDelete }: Props) {
   const [listFiles, setListFiles] = useState(files);
-  const toggleStar = (fileId: string) =>
+
+  React.useEffect(() => {
+    setListFiles(files);
+  }, [files]);
+
+  const toggleStar = (fileId: string) => {
+    if (onToggleStar) {
+      onToggleStar(fileId);
+      return;
+    }
     setListFiles((current) => current.map((file) => (file.id === fileId ? { ...file, starred: !file.starred } : file)));
+  };
 
   return (
     <Table>
@@ -67,7 +85,12 @@ export function FileListView({ files }: { files: FileManagerFile[] }) {
                   >
                     <Star className={cn(file.starred && "fill-current")} />
                   </Button>
-                  <FileActions file={file} onToggleStar={() => toggleStar(file.id)} />
+                  <FileActions
+                    file={file}
+                    onToggleStar={() => toggleStar(file.id)}
+                    onDownload={onDownload ? () => onDownload(file.id) : undefined}
+                    onDelete={onDelete ? () => onDelete(file.id) : undefined}
+                  />
                 </div>
               </TableCell>
             </TableRow>

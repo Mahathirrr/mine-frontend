@@ -14,6 +14,7 @@ import { Route as mainChatRouteRouteImport } from './routes/(main)/chat/route'
 import { Route as mainDashboardRouteRouteImport } from './routes/(main)/dashboard/route'
 import { Route as mainLoginRouteImport } from './routes/(main)/login'
 import { Route as mainMailRouteRouteImport } from './routes/(main)/mail/route'
+import { Route as mainOnboardingRouteRouteImport } from './routes/(main)/onboarding/route'
 import { Route as mainRegisterRouteImport } from './routes/(main)/register'
 import { Route as mainUnauthorizedRouteImport } from './routes/(main)/unauthorized'
 import { Route as mainAuthV2RouteRouteImport } from './routes/(main)/auth/v2/route'
@@ -26,12 +27,16 @@ import { Route as mainDashboardChatRouteRouteImport } from './routes/(main)/dash
 import { Route as mainDashboardComingSoonRouteRouteImport } from './routes/(main)/dashboard/coming-soon/route'
 import { Route as mainDashboardCrmRouteRouteImport } from './routes/(main)/dashboard/crm/route'
 import { Route as mainDashboardDefaultRouteRouteImport } from './routes/(main)/dashboard/default/route'
+import { Route as mainDashboardDocumentsRouteRouteImport } from './routes/(main)/dashboard/documents/route'
 import { Route as mainDashboardEcommerceRouteRouteImport } from './routes/(main)/dashboard/ecommerce/route'
+import { Route as mainDashboardEnglishRouteRouteImport } from './routes/(main)/dashboard/english/route'
+import { Route as mainDashboardFastingRouteRouteImport } from './routes/(main)/dashboard/fasting/route'
 import { Route as mainDashboardFileManagerRouteRouteImport } from './routes/(main)/dashboard/file-manager/route'
 import { Route as mainDashboardFinanceRouteRouteImport } from './routes/(main)/dashboard/finance/route'
 import { Route as mainDashboardInfrastructureRouteRouteImport } from './routes/(main)/dashboard/infrastructure/route'
 import { Route as mainDashboardInterviewsRouteRouteImport } from './routes/(main)/dashboard/interviews/route'
 import { Route as mainDashboardInvoiceRouteRouteImport } from './routes/(main)/dashboard/invoice/route'
+import { Route as mainDashboardJobTrackerRouteRouteImport } from './routes/(main)/dashboard/job-tracker/route'
 import { Route as mainDashboardJournalRouteRouteImport } from './routes/(main)/dashboard/journal/route'
 import { Route as mainDashboardKanbanRouteRouteImport } from './routes/(main)/dashboard/kanban/route'
 import { Route as mainDashboardLeetcodeRouteRouteImport } from './routes/(main)/dashboard/leetcode/route'
@@ -40,7 +45,10 @@ import { Route as mainDashboardMailRouteRouteImport } from './routes/(main)/dash
 import { Route as mainDashboardPatientMonitoringRouteRouteImport } from './routes/(main)/dashboard/patient-monitoring/route'
 import { Route as mainDashboardProductivityRouteRouteImport } from './routes/(main)/dashboard/productivity/route'
 import { Route as mainDashboardProfileRouteRouteImport } from './routes/(main)/dashboard/profile/route'
+import { Route as mainDashboardPromptVaultRouteRouteImport } from './routes/(main)/dashboard/prompt-vault/route'
 import { Route as mainDashboardRolesRouteRouteImport } from './routes/(main)/dashboard/roles/route'
+import { Route as mainDashboardSettingsRouteRouteImport } from './routes/(main)/dashboard/settings/route'
+import { Route as mainDashboardSkillsRouteRouteImport } from './routes/(main)/dashboard/skills/route'
 import { Route as mainDashboardSubscriptionsRouteRouteImport } from './routes/(main)/dashboard/subscriptions/route'
 import { Route as mainDashboardTasksRouteRouteImport } from './routes/(main)/dashboard/tasks/route'
 import { Route as mainDashboardUsersRouteRouteImport } from './routes/(main)/dashboard/users/route'
@@ -76,6 +84,11 @@ const mainLoginRoute = mainLoginRouteImport.update({
 const mainMailRouteRoute = mainMailRouteRouteImport.update({
   id: '/(main)/mail',
   path: '/mail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const mainOnboardingRouteRoute = mainOnboardingRouteRouteImport.update({
+  id: '/(main)/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const mainRegisterRoute = mainRegisterRouteImport.update({
@@ -143,10 +156,28 @@ const mainDashboardDefaultRouteRoute =
     path: '/default',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
+const mainDashboardDocumentsRouteRoute =
+  mainDashboardDocumentsRouteRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardEcommerceRouteRoute =
   mainDashboardEcommerceRouteRouteImport.update({
     id: '/ecommerce',
     path: '/ecommerce',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardEnglishRouteRoute =
+  mainDashboardEnglishRouteRouteImport.update({
+    id: '/english',
+    path: '/english',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardFastingRouteRoute =
+  mainDashboardFastingRouteRouteImport.update({
+    id: '/fasting',
+    path: '/fasting',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardFileManagerRouteRoute =
@@ -177,6 +208,12 @@ const mainDashboardInvoiceRouteRoute =
   mainDashboardInvoiceRouteRouteImport.update({
     id: '/invoice',
     path: '/invoice',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardJobTrackerRouteRoute =
+  mainDashboardJobTrackerRouteRouteImport.update({
+    id: '/job-tracker',
+    path: '/job-tracker',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
 const mainDashboardJournalRouteRoute =
@@ -226,11 +263,29 @@ const mainDashboardProfileRouteRoute =
     path: '/profile',
     getParentRoute: () => mainDashboardRouteRoute,
   } as any)
+const mainDashboardPromptVaultRouteRoute =
+  mainDashboardPromptVaultRouteRouteImport.update({
+    id: '/prompt-vault',
+    path: '/prompt-vault',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardRolesRouteRoute = mainDashboardRolesRouteRouteImport.update({
   id: '/roles',
   path: '/roles',
   getParentRoute: () => mainDashboardRouteRoute,
 } as any)
+const mainDashboardSettingsRouteRoute =
+  mainDashboardSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
+const mainDashboardSkillsRouteRoute =
+  mainDashboardSkillsRouteRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => mainDashboardRouteRoute,
+  } as any)
 const mainDashboardSubscriptionsRouteRoute =
   mainDashboardSubscriptionsRouteRouteImport.update({
     id: '/subscriptions',
@@ -296,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof mainChatRouteRoute
   '/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/mail': typeof mainMailRouteRoute
+  '/onboarding': typeof mainOnboardingRouteRoute
   '/login': typeof mainLoginRoute
   '/register': typeof mainRegisterRoute
   '/unauthorized': typeof mainUnauthorizedRoute
@@ -308,12 +364,16 @@ export interface FileRoutesByFullPath {
   '/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -322,7 +382,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -340,6 +403,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/chat': typeof mainChatRouteRoute
   '/mail': typeof mainMailRouteRoute
+  '/onboarding': typeof mainOnboardingRouteRoute
   '/login': typeof mainLoginRoute
   '/register': typeof mainRegisterRoute
   '/unauthorized': typeof mainUnauthorizedRoute
@@ -352,12 +416,16 @@ export interface FileRoutesByTo {
   '/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -366,7 +434,10 @@ export interface FileRoutesByTo {
   '/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -386,6 +457,7 @@ export interface FileRoutesById {
   '/(main)/chat': typeof mainChatRouteRoute
   '/(main)/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/(main)/mail': typeof mainMailRouteRoute
+  '/(main)/onboarding': typeof mainOnboardingRouteRoute
   '/(main)/login': typeof mainLoginRoute
   '/(main)/register': typeof mainRegisterRoute
   '/(main)/unauthorized': typeof mainUnauthorizedRoute
@@ -398,12 +470,16 @@ export interface FileRoutesById {
   '/(main)/dashboard/coming-soon': typeof mainDashboardComingSoonRouteRoute
   '/(main)/dashboard/crm': typeof mainDashboardCrmRouteRoute
   '/(main)/dashboard/default': typeof mainDashboardDefaultRouteRoute
+  '/(main)/dashboard/documents': typeof mainDashboardDocumentsRouteRoute
   '/(main)/dashboard/ecommerce': typeof mainDashboardEcommerceRouteRoute
+  '/(main)/dashboard/english': typeof mainDashboardEnglishRouteRoute
+  '/(main)/dashboard/fasting': typeof mainDashboardFastingRouteRoute
   '/(main)/dashboard/file-manager': typeof mainDashboardFileManagerRouteRoute
   '/(main)/dashboard/finance': typeof mainDashboardFinanceRouteRoute
   '/(main)/dashboard/infrastructure': typeof mainDashboardInfrastructureRouteRoute
   '/(main)/dashboard/interviews': typeof mainDashboardInterviewsRouteRoute
   '/(main)/dashboard/invoice': typeof mainDashboardInvoiceRouteRoute
+  '/(main)/dashboard/job-tracker': typeof mainDashboardJobTrackerRouteRoute
   '/(main)/dashboard/journal': typeof mainDashboardJournalRouteRoute
   '/(main)/dashboard/kanban': typeof mainDashboardKanbanRouteRoute
   '/(main)/dashboard/leetcode': typeof mainDashboardLeetcodeRouteRoute
@@ -412,7 +488,10 @@ export interface FileRoutesById {
   '/(main)/dashboard/patient-monitoring': typeof mainDashboardPatientMonitoringRouteRoute
   '/(main)/dashboard/productivity': typeof mainDashboardProductivityRouteRoute
   '/(main)/dashboard/profile': typeof mainDashboardProfileRouteRoute
+  '/(main)/dashboard/prompt-vault': typeof mainDashboardPromptVaultRouteRoute
   '/(main)/dashboard/roles': typeof mainDashboardRolesRouteRoute
+  '/(main)/dashboard/settings': typeof mainDashboardSettingsRouteRoute
+  '/(main)/dashboard/skills': typeof mainDashboardSkillsRouteRoute
   '/(main)/dashboard/subscriptions': typeof mainDashboardSubscriptionsRouteRoute
   '/(main)/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/(main)/dashboard/users': typeof mainDashboardUsersRouteRoute
@@ -433,6 +512,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/dashboard'
     | '/mail'
+    | '/onboarding'
     | '/login'
     | '/register'
     | '/unauthorized'
@@ -445,12 +525,16 @@ export interface FileRouteTypes {
     | '/dashboard/coming-soon'
     | '/dashboard/crm'
     | '/dashboard/default'
+    | '/dashboard/documents'
     | '/dashboard/ecommerce'
+    | '/dashboard/english'
+    | '/dashboard/fasting'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/job-tracker'
     | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
@@ -459,7 +543,10 @@ export interface FileRouteTypes {
     | '/dashboard/patient-monitoring'
     | '/dashboard/productivity'
     | '/dashboard/profile'
+    | '/dashboard/prompt-vault'
     | '/dashboard/roles'
+    | '/dashboard/settings'
+    | '/dashboard/skills'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -477,6 +564,7 @@ export interface FileRouteTypes {
   to:
     | '/chat'
     | '/mail'
+    | '/onboarding'
     | '/login'
     | '/register'
     | '/unauthorized'
@@ -489,12 +577,16 @@ export interface FileRouteTypes {
     | '/dashboard/coming-soon'
     | '/dashboard/crm'
     | '/dashboard/default'
+    | '/dashboard/documents'
     | '/dashboard/ecommerce'
+    | '/dashboard/english'
+    | '/dashboard/fasting'
     | '/dashboard/file-manager'
     | '/dashboard/finance'
     | '/dashboard/infrastructure'
     | '/dashboard/interviews'
     | '/dashboard/invoice'
+    | '/dashboard/job-tracker'
     | '/dashboard/journal'
     | '/dashboard/kanban'
     | '/dashboard/leetcode'
@@ -503,7 +595,10 @@ export interface FileRouteTypes {
     | '/dashboard/patient-monitoring'
     | '/dashboard/productivity'
     | '/dashboard/profile'
+    | '/dashboard/prompt-vault'
     | '/dashboard/roles'
+    | '/dashboard/settings'
+    | '/dashboard/skills'
     | '/dashboard/subscriptions'
     | '/dashboard/tasks'
     | '/dashboard/users'
@@ -522,6 +617,7 @@ export interface FileRouteTypes {
     | '/(main)/chat'
     | '/(main)/dashboard'
     | '/(main)/mail'
+    | '/(main)/onboarding'
     | '/(main)/login'
     | '/(main)/register'
     | '/(main)/unauthorized'
@@ -534,12 +630,16 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/coming-soon'
     | '/(main)/dashboard/crm'
     | '/(main)/dashboard/default'
+    | '/(main)/dashboard/documents'
     | '/(main)/dashboard/ecommerce'
+    | '/(main)/dashboard/english'
+    | '/(main)/dashboard/fasting'
     | '/(main)/dashboard/file-manager'
     | '/(main)/dashboard/finance'
     | '/(main)/dashboard/infrastructure'
     | '/(main)/dashboard/interviews'
     | '/(main)/dashboard/invoice'
+    | '/(main)/dashboard/job-tracker'
     | '/(main)/dashboard/journal'
     | '/(main)/dashboard/kanban'
     | '/(main)/dashboard/leetcode'
@@ -548,7 +648,10 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/patient-monitoring'
     | '/(main)/dashboard/productivity'
     | '/(main)/dashboard/profile'
+    | '/(main)/dashboard/prompt-vault'
     | '/(main)/dashboard/roles'
+    | '/(main)/dashboard/settings'
+    | '/(main)/dashboard/skills'
     | '/(main)/dashboard/subscriptions'
     | '/(main)/dashboard/tasks'
     | '/(main)/dashboard/users'
@@ -568,6 +671,7 @@ export interface RootRouteChildren {
   mainChatRouteRoute: typeof mainChatRouteRoute
   mainDashboardRouteRoute: typeof mainDashboardRouteRouteWithChildren
   mainMailRouteRoute: typeof mainMailRouteRoute
+  mainOnboardingRouteRoute: typeof mainOnboardingRouteRoute
   mainLoginRoute: typeof mainLoginRoute
   mainRegisterRoute: typeof mainRegisterRoute
   mainUnauthorizedRoute: typeof mainUnauthorizedRoute
@@ -612,6 +716,13 @@ declare module '@tanstack/react-router' {
       path: '/mail'
       fullPath: '/mail'
       preLoaderRoute: typeof mainMailRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(main)/onboarding': {
+      id: '/(main)/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof mainOnboardingRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(main)/register': {
@@ -698,11 +809,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardDefaultRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/documents': {
+      id: '/(main)/dashboard/documents'
+      path: '/documents'
+      fullPath: '/dashboard/documents'
+      preLoaderRoute: typeof mainDashboardDocumentsRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/ecommerce': {
       id: '/(main)/dashboard/ecommerce'
       path: '/ecommerce'
       fullPath: '/dashboard/ecommerce'
       preLoaderRoute: typeof mainDashboardEcommerceRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/english': {
+      id: '/(main)/dashboard/english'
+      path: '/english'
+      fullPath: '/dashboard/english'
+      preLoaderRoute: typeof mainDashboardEnglishRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/fasting': {
+      id: '/(main)/dashboard/fasting'
+      path: '/fasting'
+      fullPath: '/dashboard/fasting'
+      preLoaderRoute: typeof mainDashboardFastingRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/file-manager': {
@@ -738,6 +870,13 @@ declare module '@tanstack/react-router' {
       path: '/invoice'
       fullPath: '/dashboard/invoice'
       preLoaderRoute: typeof mainDashboardInvoiceRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/job-tracker': {
+      id: '/(main)/dashboard/job-tracker'
+      path: '/job-tracker'
+      fullPath: '/dashboard/job-tracker'
+      preLoaderRoute: typeof mainDashboardJobTrackerRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/journal': {
@@ -796,11 +935,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDashboardProfileRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
+    '/(main)/dashboard/prompt-vault': {
+      id: '/(main)/dashboard/prompt-vault'
+      path: '/prompt-vault'
+      fullPath: '/dashboard/prompt-vault'
+      preLoaderRoute: typeof mainDashboardPromptVaultRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
     '/(main)/dashboard/roles': {
       id: '/(main)/dashboard/roles'
       path: '/roles'
       fullPath: '/dashboard/roles'
       preLoaderRoute: typeof mainDashboardRolesRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/settings': {
+      id: '/(main)/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof mainDashboardSettingsRouteRouteImport
+      parentRoute: typeof mainDashboardRouteRoute
+    }
+    '/(main)/dashboard/skills': {
+      id: '/(main)/dashboard/skills'
+      path: '/skills'
+      fullPath: '/dashboard/skills'
+      preLoaderRoute: typeof mainDashboardSkillsRouteRouteImport
       parentRoute: typeof mainDashboardRouteRoute
     }
     '/(main)/dashboard/subscriptions': {
@@ -891,12 +1051,16 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardComingSoonRouteRoute: typeof mainDashboardComingSoonRouteRoute
   mainDashboardCrmRouteRoute: typeof mainDashboardCrmRouteRoute
   mainDashboardDefaultRouteRoute: typeof mainDashboardDefaultRouteRoute
+  mainDashboardDocumentsRouteRoute: typeof mainDashboardDocumentsRouteRoute
   mainDashboardEcommerceRouteRoute: typeof mainDashboardEcommerceRouteRoute
+  mainDashboardEnglishRouteRoute: typeof mainDashboardEnglishRouteRoute
+  mainDashboardFastingRouteRoute: typeof mainDashboardFastingRouteRoute
   mainDashboardFileManagerRouteRoute: typeof mainDashboardFileManagerRouteRoute
   mainDashboardFinanceRouteRoute: typeof mainDashboardFinanceRouteRoute
   mainDashboardInfrastructureRouteRoute: typeof mainDashboardInfrastructureRouteRoute
   mainDashboardInterviewsRouteRoute: typeof mainDashboardInterviewsRouteRoute
   mainDashboardInvoiceRouteRoute: typeof mainDashboardInvoiceRouteRoute
+  mainDashboardJobTrackerRouteRoute: typeof mainDashboardJobTrackerRouteRoute
   mainDashboardJournalRouteRoute: typeof mainDashboardJournalRouteRoute
   mainDashboardKanbanRouteRoute: typeof mainDashboardKanbanRouteRoute
   mainDashboardLeetcodeRouteRoute: typeof mainDashboardLeetcodeRouteRoute
@@ -905,7 +1069,10 @@ interface mainDashboardRouteRouteChildren {
   mainDashboardPatientMonitoringRouteRoute: typeof mainDashboardPatientMonitoringRouteRoute
   mainDashboardProductivityRouteRoute: typeof mainDashboardProductivityRouteRoute
   mainDashboardProfileRouteRoute: typeof mainDashboardProfileRouteRoute
+  mainDashboardPromptVaultRouteRoute: typeof mainDashboardPromptVaultRouteRoute
   mainDashboardRolesRouteRoute: typeof mainDashboardRolesRouteRoute
+  mainDashboardSettingsRouteRoute: typeof mainDashboardSettingsRouteRoute
+  mainDashboardSkillsRouteRoute: typeof mainDashboardSkillsRouteRoute
   mainDashboardSubscriptionsRouteRoute: typeof mainDashboardSubscriptionsRouteRoute
   mainDashboardTasksRouteRoute: typeof mainDashboardTasksRouteRoute
   mainDashboardUsersRouteRoute: typeof mainDashboardUsersRouteRoute
@@ -925,12 +1092,16 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
   mainDashboardComingSoonRouteRoute: mainDashboardComingSoonRouteRoute,
   mainDashboardCrmRouteRoute: mainDashboardCrmRouteRoute,
   mainDashboardDefaultRouteRoute: mainDashboardDefaultRouteRoute,
+  mainDashboardDocumentsRouteRoute: mainDashboardDocumentsRouteRoute,
   mainDashboardEcommerceRouteRoute: mainDashboardEcommerceRouteRoute,
+  mainDashboardEnglishRouteRoute: mainDashboardEnglishRouteRoute,
+  mainDashboardFastingRouteRoute: mainDashboardFastingRouteRoute,
   mainDashboardFileManagerRouteRoute: mainDashboardFileManagerRouteRoute,
   mainDashboardFinanceRouteRoute: mainDashboardFinanceRouteRoute,
   mainDashboardInfrastructureRouteRoute: mainDashboardInfrastructureRouteRoute,
   mainDashboardInterviewsRouteRoute: mainDashboardInterviewsRouteRoute,
   mainDashboardInvoiceRouteRoute: mainDashboardInvoiceRouteRoute,
+  mainDashboardJobTrackerRouteRoute: mainDashboardJobTrackerRouteRoute,
   mainDashboardJournalRouteRoute: mainDashboardJournalRouteRoute,
   mainDashboardKanbanRouteRoute: mainDashboardKanbanRouteRoute,
   mainDashboardLeetcodeRouteRoute: mainDashboardLeetcodeRouteRoute,
@@ -940,7 +1111,10 @@ const mainDashboardRouteRouteChildren: mainDashboardRouteRouteChildren = {
     mainDashboardPatientMonitoringRouteRoute,
   mainDashboardProductivityRouteRoute: mainDashboardProductivityRouteRoute,
   mainDashboardProfileRouteRoute: mainDashboardProfileRouteRoute,
+  mainDashboardPromptVaultRouteRoute: mainDashboardPromptVaultRouteRoute,
   mainDashboardRolesRouteRoute: mainDashboardRolesRouteRoute,
+  mainDashboardSettingsRouteRoute: mainDashboardSettingsRouteRoute,
+  mainDashboardSkillsRouteRoute: mainDashboardSkillsRouteRoute,
   mainDashboardSubscriptionsRouteRoute: mainDashboardSubscriptionsRouteRoute,
   mainDashboardTasksRouteRoute: mainDashboardTasksRouteRoute,
   mainDashboardUsersRouteRoute: mainDashboardUsersRouteRoute,
@@ -976,6 +1150,7 @@ const rootRouteChildren: RootRouteChildren = {
   mainChatRouteRoute: mainChatRouteRoute,
   mainDashboardRouteRoute: mainDashboardRouteRouteWithChildren,
   mainMailRouteRoute: mainMailRouteRoute,
+  mainOnboardingRouteRoute: mainOnboardingRouteRoute,
   mainLoginRoute: mainLoginRoute,
   mainRegisterRoute: mainRegisterRoute,
   mainUnauthorizedRoute: mainUnauthorizedRoute,

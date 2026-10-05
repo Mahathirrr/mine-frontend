@@ -41,21 +41,62 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data as T;
 }
 
+export type UserAvatar = {
+  thumb_url: string;
+  full_url: string;
+};
+
 export type User = {
   id: number;
   name: string;
   email: string;
   created_at?: string;
+  has_avatar?: boolean;
+  avatar?: UserAvatar;
+};
+
+export type UserPreferences = {
+  onboarding_completed: boolean;
+  enabled_menu_items: string[];
+  show_template_pages: boolean;
+  landing_path: string | null;
 };
 
 export type AuthResponse = {
   token: string;
   user: User;
+  preferences?: UserPreferences;
 };
 
 export type MeResponse = {
   user: User;
+  preferences: UserPreferences;
 };
+
+export type PreferencesResponse = {
+  preferences: UserPreferences;
+};
+
+export type AvatarResponse = {
+  user: User;
+};
+
+async function uploadMultipart<T>(path: string, token: string, file: File): Promise<T> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  const data = await res.json().catch(() => ({}) as Record<string, unknown>);
+  if (!res.ok) {
+    throw new ApiError(friendlyApiMessage(res.status, extractErrorMessage(data)), res.status);
+  }
+  return data as T;
+}
 
 export const api = {
   register(name: string, email: string, password: string) {
@@ -72,5 +113,29 @@ export const api = {
   },
   me(token: string) {
     return request<MeResponse>("/auth/me", { token });
+  },
+
+  updatePreferences(
+    token: string,
+    body: Partial<{
+      enabled_menu_items: string[];
+      show_template_pages: boolean;
+      landing_path: string | null;
+      onboarding_completed: boolean;
+    }>,
+  ) {
+    return request<PreferencesResponse>("/auth/preferences", {
+      method: "PATCH",
+      body,
+      token,
+    });
+  },
+
+  uploadAvatar(token: string, file: File) {
+    return uploadMultipart<AvatarResponse>("/auth/avatar", token, file);
+  },
+
+  deleteAvatar(token: string) {
+    return request<AvatarResponse>("/auth/avatar", { method: "DELETE", token });
   },
 };

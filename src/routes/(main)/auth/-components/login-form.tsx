@@ -10,6 +10,7 @@ import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/compo
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/api-error";
+import { postAuthPath } from "@/lib/auth/post-auth-redirect";
 import { useAuthStore } from "@/stores/auth/auth-provider";
 
 const formSchema = z.object({
@@ -34,8 +35,8 @@ export function LoginForm() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await login(data.email, data.password);
-      await navigate({ to: "/dashboard/leetcode", replace: true });
+      const prefs = await login(data.email, data.password);
+      await navigate({ to: postAuthPath(prefs), replace: true });
     } catch (e) {
       const description =
         e instanceof ApiError && e.status === 401

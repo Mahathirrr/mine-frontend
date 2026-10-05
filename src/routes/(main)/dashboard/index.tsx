@@ -1,7 +1,11 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+
+import { MineCommandCenter } from "./-components/home/mine-command-center";
 
 export const Route = createFileRoute("/(main)/dashboard/")({
-  beforeLoad: () => {
-    throw redirect({ to: "/dashboard/leetcode", replace: true });
-  },
+  component: Page,
 });
+
+function Page() {
+  return <MineCommandCenter />;
+}
